@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>867375742683-b4d61dhjiasecq3ntk59ik86cr4fur3k.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.867375742683-b4d61dhjiasecq3ntk59ik86cr4fur3k</string>
+	<key>API_KEY</key>
+	<string>AIzaSyD6HxhngDEREBVsZUOL10rzXoUmEa_Wl-8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>867375742683</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.thoughts</string>
+	<key>PROJECT_ID</key>
+	<string>thoughts-fe76a</string>
+	<key>STORAGE_BUCKET</key>
+	<string>thoughts-fe76a.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:867375742683:ios:2ca62ae36a752ed86a96fe</string>
+	<key>DATABASE_URL</key>
+	<string>https://thoughts-fe76a.firebaseio.com</string>
+</dict>
+</plist>
