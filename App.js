@@ -12,7 +12,7 @@
 import { View, Text } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import auth from '@react-native-firebase/auth';
-import GetIn from  "./app/scenes/GetIn";
+import GetStarted from  "./app/scenes/GetStarted";
 import AppNavigator from  "./app/routes/AppNavigator";
 
  
@@ -36,11 +36,11 @@ export default function App() {
  
   if (!user) {
     return (
-       <GetIn/>
+       <GetStarted/>
     );
   }
  
   return (
-   <AppNavigator /> 
+  <GetStarted/>
   );
 };
