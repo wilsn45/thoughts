@@ -2,39 +2,40 @@ import React, { useState } from 'react';
 import {View,
     StyleSheet,
     Text,
-    TouchableOpacity,
     TextInput,
-	FlatList } from 'react-native';
+    TouchableOpacity} from 'react-native';
 
 import * as api from ".././services/auth";
 import { useAuth } from ".././provider";
 
-import {KeyboardAvoidingView} from 'react-native'
 import Icon from 'react-native-vector-icons/Feather';
-import {MessageList} from '../storage/data/MessageList';
-import MessageView from '../components/MessageView';
-
+//import {Header, ErrorText} from "../../components/Shared";
 
 export default function GetStarted() {
-
-
     
     //1 - DECLARE VARIABLES
-    const [buttonEnabled, setButtonEnabled] = useState(false);
+    const [phoneShow, setPhoneShow] = useState(true);
+    const [otcShow, setOtcShow] = useState(false);
+   
+
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState("A 4 digit OTP will be sent via SMS to verify your number");
+    const [buttonText, setButtonText] = useState("Get Started");
+    const [buttonEnabled, setButtonEnabled] = useState(true);
+    
 
 
     const [phoneNumber, setPhoneNumber] = useState("");
-    const [otc, setOtc] = useState("");
+    const [countryCode, setCountryCode] = useState("+1");
+   
 
 
-    const [otcShow, setOtcShow] = useState(false);
+   
 
     phoneNumberCallback = (value) => {
         setPhoneNumber(value)
         console.log(phoneNumber)
-        if (phoneNumber.length == 9) {
+        if (phoneNumber.length >7) {
             setButtonEnabled (true)
 
         }
@@ -52,14 +53,13 @@ export default function GetStarted() {
         else {
             setButtonEnabled (false)
         }
-    };
+    }
 
    
 
-   
-
-    async function  onGetStartedClicked() {
-        setOtcShow(true)
+    async function  onClick() {
+        //setOtcShow(true)
+        //setPhoneShow(false)
         setButtonEnabled (false)
         console.log(phoneNumber)
 
@@ -79,82 +79,192 @@ export default function GetStarted() {
 
     return (
 
-        <View style={styles.main}>
-            <View style = {styles.headerView}>
-            </View>
-            <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
+        <View style = {styles.main} >
 
-              <View style = {styles.chatView}>
-              
-                <FlatList  style = {styles.chatFlatList}
-         		 data={MessageList}
-          		  renderItem={({ item }) => <MessageView msg={item.msg} isSend = {item.isSend} />}
-      				  keyExtractor={item => item.msg}
-     			 />
+        	<View style = {styles.center}>
 
-              </View>
+        	<View style = {styles.textView}>
+        		<Text style={styles.welcomeText}>Welcome to </Text>
+        		<Text style={styles.thoughtsText}>thoughts</Text>
+			</View>
+			{ phoneShow && 
+				 <View style = {styles.phone}>
+				  <View style = {styles.phoneCodeView}>
+			 		<TextInput style={styles.phoneCodeTextView}
+			 	 	 keyboardType =  "phone-pad"
+                 	 maxLength={4}
+                 	 onChangeText={(txt) => setCountryCode(txt)}
+     			 	 value={countryCode}
+			 	 	 />
+			   	</View>
+			 		 <TextInput style={styles.phoneNumberTextView}
+			 	 	 keyboardType = "phone-pad"
+                 	 maxLength={10}
+			 	 	 />
+				</View>
+			}
+			{ otcShow && 
+				<View style = {styles.otc}> 
+					<View style = {styles.otcIconView}>
+					 <Icon name={'lock'}  size={25} />
+			 		</View>
+			 			<TextInput style={styles.phoneNumberTextView}
+			 	  		keyboardType = "phone-pad"
+                 		 maxLength={4}
+			 	  		/>
+					</View>
+			}
 
-              <View style = {styles.sendView}>
-                 <TextInput style={styles.textViewNumber} />
-                <Icon name= "send" size={30} color= "black" style = {{marginTop: 5, marginLeft : 5}} />
-              </View>
-  
-            </KeyboardAvoidingView>
+			<Text style= { error ? styles.errorText : styles.messageText}> 
+				{message}
+        	</Text>
+
+
+        	<TouchableOpacity
+                 style={ 
+                         buttonEnabled ? styles.buttonEnabledView : styles.buttonDisabledView 
+                        }
+                 onPress={() => onClick()}
+                 underlayColor='#fff'
+                 disabled={!buttonEnabled}>
+                <Text style={styles.buttonText}>{buttonText}</Text>
+               </TouchableOpacity>
+
+
+        	</View>
+            
         </View>
     );
 };
 
 const styles = StyleSheet.create({ 
+	main : {
+        flex : 1,
+        alignItems : "center",
+        justifyContent : "center",
+        flexDirection: 'row'
+    },
+	center : {
+		flex : 0.9,
+		height : '30%',
+		alignSelf: 'center',
+        flexDirection: 'column'
+    },
+    
+    textView : {
+    	flexDirection: 'row',
+    	alignItems : "flex-end",
+    },
+    welcomeText : {
+        fontSize: 32,
+        fontFamily: "Thonburi",
+        color : "#5a5e5e",
+    },
+	thoughtsText : {
+		fontSize: 32,
+        fontFamily: "Thonburi",
+        color : "#024a57",
+    },
+    phone : {
+    	marginTop : 40,
+    	height : 50,
+    	width : '90%',
+    	flexDirection: 'row',
+		borderColor: '#F0F0F0',
+		borderWidth : 2,
+		borderRadius: 5,
 
-    main : {
-        flex : 1,
-        flexDirection : "column",
-        alignItems : "flex-start",
-        justifyContent : "flex-start",
-        width: '100%',
     },
-    
-    headerView : {
-        height : 40,
-        width: '90%', 
-        marginTop : 40,
-        borderRadius : 10,
-        borderColor : "black",
-        borderWidth : 1,
-        alignSelf : "center"
+    phoneCodeView : {
+    	backgroundColor : "#F0F0F0",
+    	flex: 0.2,
+    	height : '100%',
+    	borderColor : '#F0F0F0',
+    	borderRightWidth : 1,
+    	
+    	justifyContent : "center",
+
     },
-    container : {
-        flex : 0.97,
-        width: '100%', 
+    phoneCodeTextView : {
+    	color : 'black',
+    	fontSize: 19,   
+    	marginLeft: 10,
+    	marginRight: 10,
     },
-    sendView : {
-        height : 45,
-        width: '95%', 
-        borderColor : "grey",
-        borderWidth : 1,
-        borderRadius : 20,
-        margin : 10,
-        alignSelf : "center",
-        flexDirection : "row",
+    phoneNumberTextView : {
+    	flex: 0.8,
+    	height : '100%',
+    	color : 'black',
+    	fontSize: 25,   
+    	marginLeft: 10
     },
-    
-    textViewNumber: {
-       width: '85%',
-       height : 45,
-       fontSize : 20,
-       paddingLeft : 10
+
+    otc : {
+    	height : 50,
+    	marginTop : 90,
+    	width : '90%',
+    	flexDirection: 'row',
+		borderColor: '#F0F0F0',
+		borderWidth : 2,
+		borderRadius: 5,
+		position:'absolute',
     },
-    chatView : {
-        flex : 1,
-        margin : 10
+    otcIconView : {
+    	marginLeft: 20,
+    	marginRight: 10,
+    	flex: 0.15,
+    	borderColor : 'grey',
+    	borderRightWidth : 1,
+    	justifyContent : "center"
+    },
+    otcTextInputView : {
+    	flex: 0.8,
+    	height : '100%',
+    	marginLeft: 10
+    },
+    messageText : {
+    	margin: 10,
+    	marginRight : 25,
+    	fontSize: 13,
+        fontFamily: "Thonburi",
+        color : "#5a5e5e",
+    },
+     errorText : {
+     	margin: 10,
+    	marginRight : 25,
+    	fontSize: 13,
+        fontFamily: "Thonburi",
+        color : "red",
+    },
+
+    buttonEnabledView: {
+    	marginTop : 30,
+        width : '60%',
+        height : 50,
+        backgroundColor:'#024a57',
+        borderRadius:5,
+        justifyContent:  "center",
+        alignSelf: "center"
+    },
+	buttonDisabledView: {
+		marginTop : 30,
+        width : '60%',
+        height : 50,
+        backgroundColor:'#63b1bf',
+        borderRadius:5,
+        borderWidth: 0,
+        justifyContent:  "center",
+        alignSelf: "center"
      },
-    chatFlatList: {
-    	width : '100%',
-    	flexDirection : "column-reverse",
 
+     buttonText: {
+      color:'#fff',
+      textAlign:'center',
+      fontSize: 25,
+      fontFamily: "Thonburi",
     }
+	
     
-
 });
 
 GetStarted.navigationOptions = ({}) => {
