@@ -3,9 +3,7 @@ import {View,
     StyleSheet,
     Text,
     TextInput,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    Keyboard} from 'react-native';
+    TouchableOpacity} from 'react-native';
 
 import * as api from ".././services/auth";
 import { useAuth } from ".././provider";
@@ -60,8 +58,9 @@ export default function GetStarted() {
    
 
     async function  onClick() {
+        //setOtcShow(true)
+        //setPhoneShow(false)
         setButtonEnabled (false)
-        setButtonText("Loading...")
         console.log(phoneNumber)
 
         // try {
@@ -80,14 +79,14 @@ export default function GetStarted() {
 
     return (
 
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-
         <View style = {styles.main} >
 
         	<View style = {styles.center}>
 
-        	<Text style={styles.thoughtsText}>thoughts</Text>
-			
+        	<View style = {styles.textView}>
+        		<Text style={styles.welcomeText}>Welcome to </Text>
+        		<Text style={styles.thoughtsText}>thoughts</Text>
+			</View>
 			{ phoneShow && 
 				 <View style = {styles.phone}>
 				  <View style = {styles.phoneCodeView}>
@@ -135,8 +134,6 @@ export default function GetStarted() {
         	</View>
             
         </View>
-
-        </TouchableWithoutFeedback>
     );
 };
 
@@ -145,45 +142,54 @@ const styles = StyleSheet.create({
         flex : 1,
         alignItems : "center",
         justifyContent : "center",
-        flexDirection: 'row',
-        backgroundColor : "#fff",
-
+        flexDirection: 'row'
     },
 	center : {
 		flex : 0.9,
-		height : '50%',
+		height : '30%',
 		alignSelf: 'center',
-        flexDirection: 'column',
-        alignItems : "center",
+        flexDirection: 'column'
     },
-    thoughtsText : {
-        fontSize: 38,
+    
+    textView : {
+    	flexDirection: 'row',
+    	alignItems : "flex-end",
+    },
+    welcomeText : {
+        fontSize: 32,
+        fontFamily: "Thonburi",
+        color : "#5a5e5e",
+    },
+	thoughtsText : {
+		fontSize: 32,
         fontFamily: "Thonburi",
         color : "#024a57",
-        fontWeight : "bold"
     },
     phone : {
-    	marginTop : 70,
-    	height : 60,
-    	width : '80%',
+    	marginTop : 40,
+    	height : 50,
+    	width : '90%',
     	flexDirection: 'row',
 		borderColor: '#F0F0F0',
 		borderWidth : 2,
-		borderRadius: 15,
+		borderRadius: 5,
+
     },
     phoneCodeView : {
+    	backgroundColor : "#F0F0F0",
     	flex: 0.2,
     	height : '100%',
     	borderColor : '#F0F0F0',
     	borderRightWidth : 1,
+    	
     	justifyContent : "center",
 
     },
     phoneCodeTextView : {
     	color : 'black',
-    	fontSize: 20,   
+    	fontSize: 19,   
     	marginLeft: 10,
-    	marginRight: 5,
+    	marginRight: 10,
     },
     phoneNumberTextView : {
     	flex: 0.8,
@@ -194,13 +200,13 @@ const styles = StyleSheet.create({
     },
 
     otc : {
-    	height : 60,
-    	marginTop : 105,
-    	width : '80%',
+    	height : 50,
+    	marginTop : 90,
+    	width : '90%',
     	flexDirection: 'row',
 		borderColor: '#F0F0F0',
 		borderWidth : 2,
-		borderRadius: 15,
+		borderRadius: 5,
 		position:'absolute',
     },
     otcIconView : {
@@ -217,36 +223,36 @@ const styles = StyleSheet.create({
     	marginLeft: 10
     },
     messageText : {
-        marginTop : 30,
-    	width : 250,
+    	margin: 10,
+    	marginRight : 25,
     	fontSize: 13,
         fontFamily: "Thonburi",
         color : "#5a5e5e",
     },
      errorText : {
-        marginTop : 30,
-        width : 250,
-        fontSize: 13,
+     	margin: 10,
+    	marginRight : 25,
+    	fontSize: 13,
         fontFamily: "Thonburi",
         color : "red",
     },
 
     buttonEnabledView: {
-    	marginTop : 40,
+    	marginTop : 30,
         width : '60%',
-        height : 60,
-        backgroundColor:'#63b1bf',
-        borderRadius:25,
+        height : 50,
+        backgroundColor:'#024a57',
+        borderRadius:5,
         justifyContent:  "center",
         alignSelf: "center"
     },
 	buttonDisabledView: {
-		marginTop : 40,
+		marginTop : 30,
         width : '60%',
-        height : 60,
+        height : 50,
         backgroundColor:'#63b1bf',
-        opacity : 0.5,
-        borderRadius:25,
+        borderRadius:5,
+        borderWidth: 0,
         justifyContent:  "center",
         alignSelf: "center"
      },
@@ -254,9 +260,8 @@ const styles = StyleSheet.create({
      buttonText: {
       color:'#fff',
       textAlign:'center',
-      fontSize: 23,
+      fontSize: 25,
       fontFamily: "Thonburi",
-      fontWeight : "bold"
     }
 	
     
