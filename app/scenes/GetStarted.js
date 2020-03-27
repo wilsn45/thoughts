@@ -9,28 +9,29 @@ import {View,
 
 import * as api from ".././services/auth";
 import { useAuth } from ".././provider";
-
 import Icon from 'react-native-vector-icons/Feather';
-//import {Header, ErrorText} from "../../components/Shared";
+
 
 export default function GetStarted() {
     
     //1 - DECLARE VARIABLES
-    const [phoneShow, setPhoneShow] = useState(true);
-    const [otcShow, setOtcShow] = useState(false);
+    const [isFirstStep, setFirstStep] = useState(true)
    
 
     const [error, setError] = useState(null);
-    const [message, setMessage] = useState("A 4 digit OTP will be sent via SMS to verify your number");
+    const [message, setMessage] = useState("A 6 digit OTP will be sent via SMS to verify your number");
+
     const [buttonText, setButtonText] = useState("Get Started");
     const [buttonEnabled, setButtonEnabled] = useState(true);
     
-
-
     const [phoneNumber, setPhoneNumber] = useState("");
     const [countryCode, setCountryCode] = useState("+1");
+    const [otc, setOtc] = useState("");
    
 
+    function validE164(num) {
+     return /^\+?[1-9]\d{1,14}$/.test(num)
+    }
 
    
 
@@ -57,24 +58,66 @@ export default function GetStarted() {
         }
     }
 
+    function showError(message) {
+        setError(true);
+        setMessage(message)
+    }
+
+    function clearError() {
+        setError(false);
+        if (isFirstStep) {
+            setMessage("A 6 digit OTP will be sent via SMS to verify your number")
+        }
+    }
+
+    function showLoading() {
+        setButtonEnabled(false)
+        setButtonText("Loading...")
+    }
+
+    function hideLoading() {
+        setButtonEnabled(true)
+        if (isFirstStep) {
+             setButtonText("Get Started")
+        }
+        else {
+            setButtonText("Get In")
+        }
+       
+    }
+
+    function onValueChanged(value) {
+        if (isFirstStep) {
+            clearError()
+            setPhoneNumber(value)
+        }
+        else {
+            clearError()
+            setOtc(value)
+        }
+    }
    
 
-    async function  onClick() {
-        setButtonEnabled (false)
-        setButtonText("Loading...")
-        console.log(phoneNumber)
+    async function onClick() {
+        try {
+           showLoading()
+           if (isFirstStep) {
+               hideLoading()
+                const number = countryCode+phoneNumber;
+                if (!validE164(number)) {
+                  showError("Please enter valid phone number")
+                  return;
+                }
+                const res =  api.phoneNumberSignin(number);
+               console.log("is view class "+JSON.stringify(res))
+          }
+        else {
 
-        // try {
-        //     const confirmation = await api.passPhoneNumber(phoneNumber);
-        //      console.log(confirmation)
-        //     setOtcShow(true)
-        //     setButtonEnabled (false)
-
-        // } catch (error) {
-        //      console.log('error is' + error.message )
-        //     setError(error.message);
-        //     setLoading(false)
-        // }
+        }
+        } catch (error) {
+            console.log('error is' + error.message )
+            showError("Oops! something went wrong")
+        }
     }
 
 
@@ -88,7 +131,7 @@ export default function GetStarted() {
 
         	<Text style={styles.thoughtsText}>thoughts</Text>
 			
-			{ phoneShow && 
+			{ isFirstStep && 
 				 <View style = {styles.phone}>
 				  <View style = {styles.phoneCodeView}>
 			 		<TextInput style={styles.phoneCodeTextView}
@@ -100,28 +143,31 @@ export default function GetStarted() {
 			   	</View>
 			 		 <TextInput style={styles.phoneNumberTextView}
 			 	 	 keyboardType = "phone-pad"
+                     onChangeText={(value) => onValueChanged(value)}
                  	 maxLength={10}
 			 	 	 />
 				</View>
 			}
-			{ otcShow && 
+			{ !isFirstStep && 
 				<View style = {styles.otc}> 
 					<View style = {styles.otcIconView}>
 					 <Icon name={'lock'}  size={25} />
 			 		</View>
 			 			<TextInput style={styles.phoneNumberTextView}
 			 	  		keyboardType = "phone-pad"
-                 		 maxLength={4}
+                        onChangeText={(value) => onValueChanged(value)}
+                 		 maxLength={6}
 			 	  		/>
 					</View>
 			}
-
-			<Text style= { error ? styles.errorText : styles.messageText}> 
-				{message}
-        	</Text>
-
-
-        	<TouchableOpacity
+            
+            <View style={styles.messageView}>
+              <Text style= { error ? styles.errorText : styles.messageText}> 
+                {message}
+              </Text>
+            </View>
+			
+            <TouchableOpacity
                  style={ 
                          buttonEnabled ? styles.buttonEnabledView : styles.buttonDisabledView 
                         }
@@ -216,20 +262,24 @@ const styles = StyleSheet.create({
     	height : '100%',
     	marginLeft: 10
     },
+    messageView : {
+        marginTop : 20,
+        width : 250,
+        height : 50,
+    },
     messageText : {
-        marginTop : 30,
-    	width : 250,
-    	fontSize: 13,
+        width : 250,
+    	fontSize: 14,
         fontFamily: "Thonburi",
         color : "#5a5e5e",
     },
      errorText : {
-        marginTop : 30,
         width : 250,
-        fontSize: 13,
+        fontSize: 14,
         fontFamily: "Thonburi",
         color : "red",
     },
+
 
     buttonEnabledView: {
     	marginTop : 40,

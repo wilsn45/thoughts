@@ -4,15 +4,13 @@ import auth from '@react-native-firebase/auth';
 import * as c from '../constants';
 //Google Map API Key : AIzaSyCr65NbaaL4JvLuuvr5-n9QYH_1YxCRT1Q
 
-export async function passPhoneNumber(number) {
-    try  {
-         let phoneNumber = "+91" + number
-         console.log('Number to pass is' + phoneNumber )
-         const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-     }catch (e) {
-        throw handler(e)
-    }
-} 
+export async function phoneNumberSignin(number) {
+    
+    let res = await auth().signInWithPhoneNumber("+919958565727")
+    console.log("is api class "+JSON.stringify(res))
+   // return(res)
+}
+
 
 export async function register(data){
     try{
