@@ -38,12 +38,12 @@ export default function Home(props) {
                </TouchableOpacity>
 
             <TouchableOpacity
-                onPress={() => onClickPreference()}>
+                onPress={() => onClickChatList()}>
                 <Text>Preference</Text>
                </TouchableOpacity>
 
             <TouchableOpacity
-                onPress={() => onClickNewThought()}>
+                onPress={() => onClickChatList()}>
                 <Text>New Thought</Text>
                </TouchableOpacity>
         </View>
