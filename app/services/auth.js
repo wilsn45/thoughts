@@ -4,11 +4,20 @@ import auth from '@react-native-firebase/auth';
 import * as c from '../constants';
 //Google Map API Key : AIzaSyCr65NbaaL4JvLuuvr5-n9QYH_1YxCRT1Q
 
+
+function getErrorMessage(error) {
+
+}
+
 export async function phoneNumberSignin(number) {
     
-    let res = await auth().signInWithPhoneNumber("+919958565727")
-    console.log("is api class "+JSON.stringify(res))
-   // return(res)
+  let res = await auth().signInWithPhoneNumber(number).then((res) => {
+        console.log("res is "+JSON.stringify(res))
+        return
+      }).catch(() => {
+        console.log("error ="+error)
+        throw handler("Something went wrong")
+      })
 }
 
 

@@ -12,7 +12,9 @@ import { useAuth } from ".././provider";
 import Icon from 'react-native-vector-icons/Feather';
 
 
-export default function GetStarted() {
+export default function GetStarted(props) {
+     const {navigation} = props;
+     const {navigate} = navigation;
     
     //1 - DECLARE VARIABLES
     const [isFirstStep, setFirstStep] = useState(true)
@@ -96,28 +98,35 @@ export default function GetStarted() {
             setOtc(value)
         }
     }
+
+    function showOtCView() {
+        setFirstStep(false)
+        setMessage("Please enter the one time password")
+    }
    
 
-    async function onClick() {
-        try {
-           showLoading()
-           if (isFirstStep) {
-               hideLoading()
-                const number = countryCode+phoneNumber;
+   async function onClick() {
+     showLoading()
+     try {
+         if (isFirstStep) {
+               const number = countryCode+phoneNumber;
                 if (!validE164(number)) {
                   showError("Please enter valid phone number")
                   return;
                 }
-                const res =  api.phoneNumberSignin(number);
-               console.log("is view class "+JSON.stringify(res))
+               await api.phoneNumberSignin(number);
+               showOtCView()
+               hideLoading()
           }
         else {
-
+            await api.phoneNumberSignin(otc);
+             navigate('App');
         }
-        } catch (error) {
-            console.log('error is' + error.message )
-            showError("Oops! something went wrong")
-        }
+     }
+     catch (error){
+        showError("Something went wrong")
+     }
+          
     }
 
 
@@ -144,6 +153,7 @@ export default function GetStarted() {
 			 		 <TextInput style={styles.phoneNumberTextView}
 			 	 	 keyboardType = "phone-pad"
                      onChangeText={(value) => onValueChanged(value)}
+                     placeholder = "Phone Number"
                  	 maxLength={10}
 			 	 	 />
 				</View>
@@ -220,8 +230,8 @@ const styles = StyleSheet.create({
     phoneCodeView : {
     	flex: 0.2,
     	height : '100%',
-    	borderColor : '#F0F0F0',
-    	borderRightWidth : 1,
+    	borderColor : 'grey',
+        borderRightWidth : 1,
     	justifyContent : "center",
 
     },
@@ -241,14 +251,13 @@ const styles = StyleSheet.create({
 
     otc : {
     	height : 60,
-    	marginTop : 105,
+    	marginTop : 70,
     	width : '80%',
     	flexDirection: 'row',
 		borderColor: '#F0F0F0',
 		borderWidth : 2,
 		borderRadius: 15,
-		position:'absolute',
-    },
+	},
     otcIconView : {
     	marginLeft: 20,
     	marginRight: 10,
