@@ -20,7 +20,7 @@ function AuthProvider(props) {
     const getAuthState = async () => {
         try {
             //GET DATA
-            let data = await getStorageData();
+            let data = false;
 
             if (data) await handleGetIn(data);
             else await handleLogout(data);
@@ -87,27 +87,27 @@ export const setAuthorization = (token) => {
 };
 
 export const getStorageData = async () => {
-    try {
-        let token = await AsyncStorage.getItem(TOKEN_KEY);
-        let user = await AsyncStorage.getItem(USER_KEY);
+    // try {
+    //     let token = await AsyncStorage.getItem(TOKEN_KEY);
+    //     let user = await AsyncStorage.getItem(USER_KEY);
 
-        if (token !== null && user!== null) return {token, user:JSON.parse(user)};
-        else return null;
+    //     if (token !== null && user!== null) return {token, user:JSON.parse(user)};
+    //     else return null;
 
-    } catch (error) {
-        throw new Error(error)
-    }
+    // } catch (error) {
+    //     throw new Error(error)
+   // }
 };
 
 export const setStorageData = async (data) => {
-    try {
-        if (!data) await AsyncStorage.multiRemove(keys);
-        else {
-            let {token, user} = data;
-            let data_ = [[USER_KEY, JSON.stringify(user)], [TOKEN_KEY, token]];
-            await AsyncStorage.multiSet(data_);
-        }
-    } catch (error) {
-        throw new Error(error)
-    }
+    // try {
+    //     if (!data) await AsyncStorage.multiRemove(keys);
+    //     else {
+    //         let {token, user} = data;
+    //         let data_ = [[USER_KEY, JSON.stringify(user)], [TOKEN_KEY, token]];
+    //         await AsyncStorage.multiSet(data_);
+    //     }
+    // } catch (error) {
+    //     throw new Error(error)
+   // }
 };

@@ -18,10 +18,10 @@ export default function AuthLoading(props) {
 
             if (user) {
                 //check if username exist
-                let username = !!(user.username);
+                // let username = !!(user.username);
 
-                if (username) navigate('App');
-                else navigate('Auth', {}, StackActions.replace({ routeName: "Username" }))
+                // if (username) navigate('App');
+                // else navigate('Auth', {}, StackActions.replace({ routeName: "Username" }))
 
             } else navigate('Auth');
         } catch (e) {
@@ -32,7 +32,7 @@ export default function AuthLoading(props) {
     return (
         <View style={{backgroundColor: "#fff", alignItems: 'center', justifyContent: 'center', flex: 1}}>
             <ActivityIndicator/>
-            <Text>{"Loading User Data"}</Text>
+            <Text>"Loading "</Text>
         </View>
     );
 };
