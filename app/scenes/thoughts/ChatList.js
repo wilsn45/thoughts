@@ -4,7 +4,7 @@ import {View,
     Text,
     TouchableOpacity} from 'react-native';
 
-import * as api from "../../services/auth";
+import * as api from "../../services/user";
 import { useAuth } from "../../provider";
 
 

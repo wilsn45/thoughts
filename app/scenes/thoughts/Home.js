@@ -1,62 +1,112 @@
 import React, { useState } from 'react';
-import {View,
-    StyleSheet,
-    Text,
-    TouchableOpacity} from 'react-native';
+import { View, 
+        StyleSheet,
+        Text,
+        Image,
+        TextInput,
+        TouchableHighlight,
+        FlatList } from 'react-native';
 
-import * as api from "../../services/auth";
-import { useAuth } from "../../provider";
-
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/Feather';
+import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 
 
 
 export default function Home(props) {
-      const {navigation} = props;
-     const {navigate} = navigation;
 
+  const [locationViewWidth, setLocationViewWidth] = useState(100);
+  const { navigate } = useNavigation();
 
-    async function onClickChatList() {
-      navigate('ChatList');
+    toggleDrawer = () => {
+        navigation.toggleDrawer()
     }
 
-    async function onClickPreference() {
-      navigate('ChatList');
-    }
-
-    async function onClickNewThought() {
-      navigate('ChatList');
-    }
     
-    return (
+    
+  return (
+      
+    <View style = {styles.main}>
+     <View style = {styles.headerView}>
+       <Text style = {styles.userNameText}> Hola! Dani</Text>
+        <Icon name= "globe" size={30} color= "grey" style = {{marginRight : 10}} />
+      
+     </View>
 
-        <View style={{flex: 1, paddingHorizontal: 16, backgroundColor:"#fff"}}>
-           <Text> Home </Text>
 
-           <TouchableOpacity
-                onPress={() => onClickChatList()}>
-                <Text>Chat List</Text>
-               </TouchableOpacity>
+      <View style = {styles.thoughtsView}>
 
-            <TouchableOpacity
-                onPress={() => onClickChatList()}>
-                <Text>Preference</Text>
-               </TouchableOpacity>
-
-            <TouchableOpacity
-                onPress={() => onClickChatList()}>
-                <Text>New Thought</Text>
-               </TouchableOpacity>
+       <View style = {styles.thoughtsListView}>
+        
         </View>
+
+        <View style = {styles.newThoughtView}>
+
+          <View style = {styles.featherView}>
+            <Icon name= "feather" size={50} color= "black" />
+         </View>
+        
+        </View>
+      
+      </View>
+
+      
+
+    </View>
     );
-};
+}
 
-const styles = StyleSheet.create({ 
+const styles = StyleSheet.create({
 
-    
-});
+  main : {
+        flex : 1,
+  },
+  headerView : {
+    marginTop : 50,
+    flex : 0.05,
+    flexDirection : "row",
+    justifyContent: 'space-between',
+    marginLeft : 20,
+    marginRight : 20,
+  },
+  userNameText : {
+    fontSize : 25,
+    fontWeight: 'bold'
+  },
+  thoughtsView : {
+    marginTop : 10,
+    flex : 0.95,
+    marginBottom : 5,
+    width : '90%',
+    borderColor : "purple",
+    borderWidth : 0,
+    alignSelf: "center",
+    flexDirection : "column-reverse",
+  },
+  thoughtsListView : {
+    width : '100%',
+    height : '100%',
+  },
 
-Home.navigationOptions = ({}) => {
-    return {
-        title: ``
-    }
-};
+  newThoughtView : {
+    height : 90,
+    width : 90,
+    position : 'absolute',
+    alignSelf: "flex-end",
+  },
+
+  featherView : {
+    width : 80,
+    height : 80,
+    backgroundColor : "#fff",
+    borderRadius : 40,
+    borderColor : "grey",
+    borderWidth : 1.5,
+    alignItems : "center",
+    justifyContent : "center"
+  }
+  
+
+  
+
+  });

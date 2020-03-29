@@ -16,10 +16,10 @@ const TabNavigator = createBottomTabNavigator({
         screen: Thoughts,
         path: '/',
         navigationOptions: {
-            tabBarIcon: ({ focused, tintColor }) => {
-               return <Text style = {{fontSize : 45, marginTop: -15, alignSelf: "center", color : tintColor}} >r</Text>;
+           tabBarIcon: ({ focused, tintColor }) => {
+                return <Icon name={"cloud"} size={35} color={tintColor} />;
             },
-            tabBarOptions: {showLabel: false, activeTintColor:'#e50032'}
+            tabBarOptions: { showLabel: false,activeTintColor:'#63b1bf'}
         },
     },
     Eat: {
@@ -27,9 +27,9 @@ const TabNavigator = createBottomTabNavigator({
         path: '/',
         navigationOptions: {
             tabBarIcon: ({ focused, tintColor }) => {
-                return <Icon name={"maximize"} size={35} color={tintColor} />;
+                return <Icon name={"message-square"} size={35} color={tintColor} />;
             },
-            tabBarOptions: { showLabel: false,activeTintColor:'black'},
+            tabBarOptions: { showLabel: false,activeTintColor:'#63b1bf'},
         },
     },
     Order: {
@@ -37,9 +37,9 @@ const TabNavigator = createBottomTabNavigator({
         path: '/',
         navigationOptions: {
             tabBarIcon: ({ focused, tintColor }) => {
-                return <Icon name={"book"} size={35} color={tintColor} />;
+                return <Icon name={"smile"} size={35} color={tintColor} />;
             },
-            tabBarOptions: { showLabel: false,activeTintColor:'black'}
+            tabBarOptions: { showLabel: false,activeTintColor:'#63b1bf'}
         },
     }
 

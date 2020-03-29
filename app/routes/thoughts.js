@@ -14,6 +14,7 @@ const ThoughtsStack = createStackNavigator(
         ChatList: ChatListScreen,
         Talk: TalkScreen
     },
+    { headerMode: 'none' },
     {
         initialRouteName: 'Home',
     }

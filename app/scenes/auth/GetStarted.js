@@ -7,7 +7,7 @@ import {View,
     TouchableWithoutFeedback,
     Keyboard} from 'react-native';
 
-import * as api from "../../services/auth";
+import * as api from "../../services/user";
 import { useAuth } from "../../provider";
 import Icon from 'react-native-vector-icons/Feather';
 
