@@ -4,24 +4,30 @@ import { View,
         Text,
         Image,
         TextInput,
-        TouchableHighlight,
+        TouchableOpacity,
         FlatList } from 'react-native';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 
+import NewThought from "../../components/NewThoughtModal";
+import Modal from 'react-native-modal';
 
 
 export default function Home(props) {
 
   const [locationViewWidth, setLocationViewWidth] = useState(100);
+  const [newThought, showNewThought] = useState(false);
   const { navigate } = useNavigation();
 
     toggleDrawer = () => {
         navigation.toggleDrawer()
     }
 
+    closeNewThoughtModal = () => {
+        showNewThought(false)
+    }
     
     
   return (
@@ -42,14 +48,17 @@ export default function Home(props) {
 
         <View style = {styles.newThoughtView}>
 
-          <View style = {styles.featherView}>
-            <Icon name= "feather" size={50} color= "black" />
-         </View>
-        
+          <TouchableOpacity
+                 style={ styles.featherView }
+                 onPress={() => showNewThought(true)}>
+                 <Icon name= "feather" size={50} color= "black" />
+               </TouchableOpacity>
         </View>
       
       </View>
-
+        <Modal isVisible={newThought}>
+          <NewThought  closeCallBack = {closeNewThoughtModal}/>
+        </Modal>
       
 
     </View>
