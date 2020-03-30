@@ -10,7 +10,7 @@ import {View,
         KeyboardAvoidingView} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import ImagePicker from 'react-native-image-picker';
-
+import ImageView from "../../components/ImageView";
 
 const options = {
   title: 'Select Image',
@@ -55,8 +55,8 @@ export default function NewThought ({closeCallBack}) {
             // this.setState({
             //      avatarSource: source,
             // });
-        }
-});
+            }
+         });
 
      }
     return (
@@ -93,13 +93,15 @@ export default function NewThought ({closeCallBack}) {
             <View style = {styles.imageAndOptionVIew}>
 
               { imageFlag && 
-                <View style = {styles.imageView}>
-
+                <View style = {styles.selectedImageView}>
+                  <ImageView/>
                 </View>
               }
 
               
             </View>
+
+
             <View style = {styles.toolView}>
 
                 <TouchableOpacity style = {styles.toolOption} 
@@ -158,9 +160,12 @@ const styles = StyleSheet.create({
         borderColor: "orange",
        // borderWidth : 1
     },
-    imageView : {
-        flex : 0.5,
+    selectedImageView : {
+       flex : 0.5,
+      width : '100%',
          borderColor: "orange",
+       borderWidth : 1,
+      borderColor: "black",
        borderWidth : 1
 
     },
