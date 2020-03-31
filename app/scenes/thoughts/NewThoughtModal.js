@@ -7,7 +7,8 @@ import {View,
         TouchableOpacity,
         TouchableWithoutFeedback,
          Keyboard,
-        KeyboardAvoidingView} from 'react-native';
+        KeyboardAvoidingView,
+        ScrollView} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import ImagePicker from 'react-native-image-picker';
 import ImageView from "../../components/ImageView";
@@ -25,17 +26,29 @@ export default function NewThought ({closeCallBack}) {
     const [desc, setDesc] = useState("")
 
     const [locationFlag, setLocationFlag] = useState(false)
-    const [imageFlag, setImageFlag] = useState(true)
+    
     const [optionFlag, setOptionFlag] = useState(false)
 
 
+     const [imageOne, setImageOne] = useState()
+     const [imageTwo, setImageTwo] = useState()
+     const [imageThree, setImageThree] = useState()
+     const [imageFour, setImageFour] = useState()
+     const [imageFive, setImageFive] = useState()
+
+
+     const [imageCounter, setImageCounter] = useState(1)
 
      async function onLocationClick() {
         setLocationFlag(!locationFlag)
       }
 
+      async function cancelImage(number) {
 
-     async function onImageClick () {
+      }
+
+      function onImageClick () {
+      
 
         ImagePicker.showImagePicker(options, (response) => {
                  console.log('Response = ', response);
@@ -49,12 +62,17 @@ export default function NewThought ({closeCallBack}) {
         } else {
              const source = { uri: response.uri };
 
-             // You can also display the image using data:
-             // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+                switch(imageCounter) {
+                    case 1 : setImageOne(source);break;
+                    case 2 : setImageTwo(source);break;
+                    case 3 : setImageThree(source);break;
+                    case 4 : setImageFour(source);break;
+                    case 5 : setImageFive(source);break;
+                }
+                setImageCounter(imageCounter+1)
+                console.log("photo")
+                console.log(imageOne)
 
-            // this.setState({
-            //      avatarSource: source,
-            // });
             }
          });
 
@@ -92,9 +110,29 @@ export default function NewThought ({closeCallBack}) {
 
             <View style = {styles.imageAndOptionVIew}>
 
-              { imageFlag && 
+              { imageOne && 
+
                 <View style = {styles.selectedImageView}>
-                  <ImageView/>
+
+                <ScrollView horizontal style={{flex:1, backgroundColor:'white'}}>
+                {
+                    imageOne  &&  <ImageView source = {imageOne}/>
+                }
+                {
+                    imageTwo  &&  <ImageView source = {imageTwo}/>
+                }
+                {
+                    imageThree  &&  <ImageView source = {imageThree}/>
+                }
+                {
+                    imageFour &&  <ImageView source = {imageFour} />
+                }
+                {
+                    imageFive  &&  <ImageView source = {imageFive}/>
+                }
+                  
+                </ScrollView>
+                  
                 </View>
               }
 
@@ -166,8 +204,7 @@ const styles = StyleSheet.create({
          borderColor: "orange",
        borderWidth : 1,
       borderColor: "black",
-       borderWidth : 1
-
+       borderWidth : 1,
     },
     toolView : {
         flex : 0.1,

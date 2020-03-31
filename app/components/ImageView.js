@@ -31,8 +31,11 @@ export default function ImageView ({source, cancelCallback}) {
     
     return (
             <View  style={styles.fieldView}>
-              <Image source = {placeHolderImage} style = {styles.imageView}/>
-              <Icon name={"x"}  size={32}  style = {styles.cancelView} />
+              <Image source = {source} style = {styles.imageView}/>
+              <View  style = {styles.cancelView}>
+                <Icon name={"x"}  size={26} />
+              </View>
+              
             </View>
 
         );
@@ -41,6 +44,7 @@ export default function ImageView ({source, cancelCallback}) {
 
 const styles = StyleSheet.create({
     mainView : {
+        marginTop : 20,
         height : 50,
         width: 100,
         borderBottomWidth : 1,
@@ -50,10 +54,12 @@ const styles = StyleSheet.create({
         height : 30,
         width: 30,
         backgroundColor : "#fff",
-        borderRadius : 15,
+        borderRadius : 12,
         position : 'absolute',
        borderWidth : 1,
-        borderColor : "#fff"
+        borderColor : "#fff",
+        justifyContent : "center",
+        alignItems : "center"
     },
     imageView : {
         height : 140,
