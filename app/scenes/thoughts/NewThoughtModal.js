@@ -156,7 +156,7 @@ export default function NewThought ({closeCallBack}) {
 
            { imageOne &&
 
-                  <View style= {{flexDirection : "row", height : 125}}>
+                  <View style= {{flexDirection : "row", height : 125, paddingLeft : 10}}>
                      {
                         imageOne && <ImageView source = {imageOne} cancelCallback = {cancelCallback} number = {1}/>
                      }
@@ -172,7 +172,7 @@ export default function NewThought ({closeCallBack}) {
 
                   { imageFour &&
 
-                  <View style= {{flexDirection : "row", height : 125}}>
+                  <View style= {{flexDirection : "row", height : 125, paddingLeft : 10}}>
 
                     {
                       imageFour && <ImageView source = {imageFour} cancelCallback = {cancelCallback} number = {4}/>
