@@ -25,7 +25,7 @@ export default function NewThought ({closeCallBack}) {
 
     const [desc, setDesc] = useState("")
 
-    const [locationFlag, setLocationFlag] = useState(false)
+    const [locationFlag, setLocationFlag] = useState(true)
     
     const [optionFlag, setOptionFlag] = useState(false)
 
@@ -40,8 +40,17 @@ export default function NewThought ({closeCallBack}) {
 
      const [imageCounter, setImageCounter] = useState(1)
 
+
+
+     const [optionThreeVisisble, setOptionThreeVisible] = useState(false)
+     const [optionFourVisisble, setOptionFourVisible] = useState(false)
+
      async function onLocationClick() {
         setLocationFlag(!locationFlag)
+      }
+
+       async function onOptionClick() {
+        setOptionFlag(!optionFlag)
       }
 
       
@@ -133,7 +142,7 @@ export default function NewThought ({closeCallBack}) {
                 </View>
                 
             }
-
+            <ScrollView style = {styles.ScrollView}>
             <View style = {styles.descView}>
 
                 <TextInput style = {styles.descTextView}
@@ -145,13 +154,9 @@ export default function NewThought ({closeCallBack}) {
                      />
             </View>
 
-            <View style = {styles.imageAndOptionVIew}>
+           { imageOne &&
 
-              {   imageOne &&
-
-                <View style = {styles.selectedImageView}>
-
-                  <View style= {{flexDirection : "row"}}>
+                  <View style= {{flexDirection : "row", height : 125}}>
                      {
                         imageOne && <ImageView source = {imageOne} cancelCallback = {cancelCallback} number = {1}/>
                      }
@@ -163,8 +168,11 @@ export default function NewThought ({closeCallBack}) {
                      }
 
                   </View>
+                 }
 
-                  <View style= {{flexDirection : "row"}}>
+                  { imageFour &&
+
+                  <View style= {{flexDirection : "row", height : 125}}>
 
                     {
                       imageFour && <ImageView source = {imageFour} cancelCallback = {cancelCallback} number = {4}/>
@@ -177,12 +185,65 @@ export default function NewThought ({closeCallBack}) {
                     }
 
                   </View>
+                }
+              
+              {
+                 optionFlag && 
+
+                 <View style = {styles.optionView}>
+
+                <TextInput style = {styles.optionInput}
+                    placeholder = "Choice 1"> 
+                </TextInput>
+
+                <View style = {{flexDirection : "row"}}>
+
+                  <TextInput style = {styles.optionInput}s
+                    placeholder = "Choice 2"> 
+                  </TextInput>
+
+                  {
+                     !optionThreeVisisble && 
+
+                      <TouchableOpacity style = {{marginLeft : 5, alignSelf : "center"}} 
+                      onPress={() => setOptionThreeVisible(true)}>
+                     <Icon name={"plus-circle"}  size={28}  />
+                     </TouchableOpacity>
+                  }
+              </View>
+
+              {
+                 optionThreeVisisble && 
+
+                 <View style = {{flexDirection : "row"}}>
+                
+                  <TextInput style = {styles.optionInput}s
+                    placeholder = "Choice 3 (optional)"> 
+                  </TextInput>
+
+                   {
+                     !optionFourVisisble &&  
+                     <TouchableOpacity style = {{marginLeft : 5, alignSelf : "center"}} 
+                       onPress={() => setOptionFourVisible(true)}>
+                      <Icon name={"plus-circle"}  size={28}  />
+                     </TouchableOpacity>
+                   }
                </View>
               }
 
-              
-            </View>
+              {
+                optionFourVisisble && 
 
+                <TextInput style = {styles.optionInput}
+                    placeholder = "Choice 4 (optional)"> 
+                </TextInput>
+              }
+
+               </View>
+             
+              }
+
+            </ScrollView>
 
             <View style = {styles.toolView}>
 
@@ -217,16 +278,23 @@ const styles = StyleSheet.create({
         backgroundColor : "#fff"
     },
     locationView : {
+        flex : 0.05,
         marginTop : 10,
         marginLeft : 10,
         flexDirection : "row"
     },
-    descView : {
-        flex : 0.3,
+    ScrollView : {
+       flex : 0.85,
         marginTop : 10,
         width : '100%',
+        borderColor: "pink",
+       //borderWidth : 1
+    },
+    descView : {
+        width : '100%',
         borderColor: "green",
-      //  borderWidth : 1
+        marginBottom : 30
+       // borderWidth : 1
     },
     descTextView : {
       marginLeft : 10,
@@ -234,30 +302,27 @@ const styles = StyleSheet.create({
       fontSize: 20,
       fontFamily: "Thonburi",
     },
-   
-    imageAndOptionVIew : {
-        flex : 0.6,
-        marginTop : 10,
-        width : '100%',
-        borderColor: "orange",
-       // borderWidth : 1
+   optionView : {
+       width : '100%',
+       borderColor: "blue",
+       // borderWidth : 1,
+       paddingLeft : 10
     },
-    selectedImageView : {
-       flex : 0.65,
-      width : '100%',
-         borderColor: "orange",
-       borderWidth : 1,
-      borderColor: "black",
-       borderWidth : 1,
-       alignItems : "flex-start",
-       padding : 10
+    optionInput : {
+      height : 50,
+      width : 270,
+      borderColor : "grey",
+      borderRadius : 10,
+      borderWidth : 1,
+      margin : 10,
+      paddingLeft : 10
     },
     toolView : {
         flex : 0.1,
         marginTop : 10,
         width : '100%',
         borderColor: "blue",
-       // borderWidth : 1,
+      // borderWidth : 1,
         flexDirection : "row"
     },
     toolOption : {
