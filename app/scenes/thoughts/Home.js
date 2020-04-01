@@ -56,7 +56,8 @@ export default function Home(props) {
         </View>
       
       </View>
-        <Modal isVisible={newThought}>
+
+        <Modal isVisible={newThought} swipeArea={50}  >
           <NewThought  closeCallBack = {closeNewThoughtModal}/>
         </Modal>
       

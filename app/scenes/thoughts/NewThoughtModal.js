@@ -35,6 +35,7 @@ export default function NewThought ({closeCallBack}) {
      const [imageThree, setImageThree] = useState()
      const [imageFour, setImageFour] = useState()
      const [imageFive, setImageFive] = useState()
+     const [imageSix, setImageSix] = useState()
 
 
      const [imageCounter, setImageCounter] = useState(1)
@@ -43,40 +44,76 @@ export default function NewThought ({closeCallBack}) {
         setLocationFlag(!locationFlag)
       }
 
-      async function cancelImage(number) {
-
-      }
-
+      
       function onImageClick () {
       
 
         ImagePicker.showImagePicker(options, (response) => {
                  console.log('Response = ', response);
-
-         if (response.didCancel) {
-                console.log('User cancelled image picker');
+            if (response.didCancel) {
+               
         } else if (response.error) {
-                 console.log('ImagePicker Error: ', response.error);
+               
         } else if (response.customButton) {
-             console.log('User tapped custom button: ', response.customButton);
+            
         } else {
              const source = { uri: response.uri };
-
+             console.log("counter adding +" + imageCounter)
+              console.log("source url +" + response.uri)
                 switch(imageCounter) {
                     case 1 : setImageOne(source);break;
                     case 2 : setImageTwo(source);break;
                     case 3 : setImageThree(source);break;
                     case 4 : setImageFour(source);break;
                     case 5 : setImageFive(source);break;
+                    case 6 : setImageSix(source);break;
                 }
                 setImageCounter(imageCounter+1)
-                console.log("photo")
-                console.log(imageOne)
-
             }
          });
 
      }
+
+     function cancelCallback(number) {
+
+       console.log("counter deleting +" + imageCounter)
+
+         switch(number) {
+                    case 1 : {
+                      setImageOne(imageTwo)
+                      setImageTwo(imageThree)
+                      setImageThree(imageFour)
+                      setImageFour(imageFive)
+                      setImageFive(imageSix)
+                      setImageSix(null)
+                    };break;
+                    case 2 : {
+                      setImageTwo(imageThree)
+                      setImageThree(imageFour)
+                      setImageFour(imageFive)
+                      setImageFive(imageSix)
+                      setImageSix(null)
+                    };break;
+                    case 3 : {
+                      setImageThree(imageFour)
+                      setImageFour(imageFive)
+                      setImageFive(imageSix)
+                      setImageSix(null)
+                    };break;
+                    case 4 : {
+                      setImageFour(imageFive)
+                      setImageFive(imageSix)
+                      setImageSix(null)
+                    };break;
+                    case 5 : {
+                      setImageFive(imageSix)
+                      setImageSix(null)
+                    };break;
+                    case 6 : setImageSix(null);break;
+                }
+                setImageCounter(imageCounter-1)
+     }
+
     return (
 
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -110,30 +147,37 @@ export default function NewThought ({closeCallBack}) {
 
             <View style = {styles.imageAndOptionVIew}>
 
-              { imageOne && 
+              {   imageOne &&
 
                 <View style = {styles.selectedImageView}>
 
-                <ScrollView horizontal style={{flex:1, backgroundColor:'white'}}>
-                {
-                    imageOne  &&  <ImageView source = {imageOne}/>
-                }
-                {
-                    imageTwo  &&  <ImageView source = {imageTwo}/>
-                }
-                {
-                    imageThree  &&  <ImageView source = {imageThree}/>
-                }
-                {
-                    imageFour &&  <ImageView source = {imageFour} />
-                }
-                {
-                    imageFive  &&  <ImageView source = {imageFive}/>
-                }
-                  
-                </ScrollView>
-                  
-                </View>
+                  <View style= {{flexDirection : "row"}}>
+                     {
+                        imageOne && <ImageView source = {imageOne} cancelCallback = {cancelCallback} number = {1}/>
+                     }
+                     {
+                        imageTwo && <ImageView source = {imageTwo} cancelCallback = {cancelCallback} number = {2}/>
+                     }
+                     {
+                        imageThree && <ImageView source = {imageThree} cancelCallback = {cancelCallback} number = {3}/>
+                     }
+
+                  </View>
+
+                  <View style= {{flexDirection : "row"}}>
+
+                    {
+                      imageFour && <ImageView source = {imageFour} cancelCallback = {cancelCallback} number = {4}/>
+                    }
+                    {
+                       imageFive && <ImageView source = {imageFive} cancelCallback = {cancelCallback} number = {5}/>
+                    }
+                    {
+                      imageSix && <ImageView source = {imageSix} cancelCallback = {cancelCallback} number = {6}/>
+                    }
+
+                  </View>
+               </View>
               }
 
               
@@ -199,12 +243,14 @@ const styles = StyleSheet.create({
        // borderWidth : 1
     },
     selectedImageView : {
-       flex : 0.5,
+       flex : 0.65,
       width : '100%',
          borderColor: "orange",
        borderWidth : 1,
       borderColor: "black",
        borderWidth : 1,
+       alignItems : "flex-start",
+       padding : 10
     },
     toolView : {
         flex : 0.1,

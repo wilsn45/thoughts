@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {View, Image,TextInput, StyleSheet} from 'react-native';
+import {View, Image,TextInput, StyleSheet,TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 
 const icons={
@@ -27,16 +27,18 @@ const maxLength={
 
 const placeHolderImage = require('../assets/placeholder/profilePicPlaceholder.png')
 
-export default function ImageView ({source, cancelCallback}) {
+export default function ImageView ({source, cancelCallback,number}) {
     
     return (
             <View  style={styles.fieldView}>
               <Image source = {source} style = {styles.imageView}/>
-              <View  style = {styles.cancelView}>
-                <Icon name={"x"}  size={26} />
+
+               <TouchableOpacity
+                 style = {styles.cancelView}
+                 onPress={() => cancelCallback(number)}>
+                 <Icon name={"x"}  size={26} />
+               </TouchableOpacity>
               </View>
-              
-            </View>
 
         );
 };
@@ -62,8 +64,9 @@ const styles = StyleSheet.create({
         alignItems : "center"
     },
     imageView : {
-        height : 140,
-        width: 100,
+        height : 100,
+        width: 90,
+        borderRadius : 20,
         margin : 10
     }
     
