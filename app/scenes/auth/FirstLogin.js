@@ -1,48 +1,80 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {View,
     StyleSheet,
     Text,
+    Platform,
+    TouchableOpacity
     } from 'react-native';
 import * as api from "../../services/user";
 import { useAuth } from "../../provider";
+import Contacts from 'react-native-contacts';
+import { PermissionsAndroid } from 'react-native';
 var Spinner = require('react-native-spinkit');
 
 
 
 export default function FirstLogin(props) {
      
-   
-
-   async function onClick() {
-     //showLoading()
+   useEffect(() => {
      try {
-         if (isFirstStep) {
-               const number = countryCode+phoneNumber;
-                if (!validE164(number)) {
-                  showError("Please enter valid phone number")
-                  return;
-                }
-               await api.phoneNumberSignin(number);
-               showOtCView()
-               hideLoading()
-          }
-        else {
-           // await api.phoneNumberSignin(otc);
-             navigate('App');
-        }
+        if (Platform.OS == 'ios') {
+         console.log('ios Platform')
+         getContactListiOS()
+      }else {
+         console.log('android Platform')
+         getContactListAndroid()
+      }
      }
-     catch (error){
-        // showError("res is "+JSON.stringify(error))
-         console.log("res is "+JSON.stringify(error))
-     }
-          
+      catch (error) {
+        console.log(error)
+      }
+
+   });
+
+    function getContactListiOS() {
+      try {
+         Contacts.getAll((err, contacts) => {
+       if (err) {
+         throw err;
+       }
+         for ()
+         console.log(contacts)
+      })
+      }catch (error) {
+        console.log(error)
+      }
     }
 
+    function getContactListAndroid() {
 
-    return (
+      PermissionsAndroid.request(
+       PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+      {
+         'title': 'Contacts',
+          'message': 'This app would like to view your contacts.',
+          'buttonPositive': 'Please accept bare mortal'
+      }
+    ).then(() => {
+         Contacts.getAll((err, contacts) => {
+           if (err === 'denied'){
+             // error
+          } else {
+          console.log(contacts)
+      }
+  })
+})
+ 
+    }
+    
+
+
+   return (
 
       <View style={styles.container}>
-         <Spinner style={styles.spinner}  isVisible={true} size={60} type={"FadingCircleAlt"} color={"#63b1bf"}/>
+         
+           <TouchableOpacity onPress={() => getContactListiOS()}>
+              <Text> Get contact </Text>
+             </TouchableOpacity>
        </View>
     );
 };
@@ -74,3 +106,6 @@ FirstLogin.navigationOptions = ({}) => {
         title: ``
     }
 };
+
+
+ ///<Spinner style={styles.spinner}  isVisible={true} size={60} type={"FadingCircleAlt"} color={"#63b1bf"}/>

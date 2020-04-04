@@ -119,13 +119,13 @@ export default function GetStarted(props) {
                hideLoading()
           }
         else {
-           // await api.phoneNumberSignin(otc);
-             navigate('FirstLogin');
+           // await api.phoneNumberVerify(otc);
+           navigate('FirstLogin');
         }
      }
      catch (error){
         // showError("res is "+JSON.stringify(error))
-         console.log("res is "+JSON.stringify(error))
+         console.log("error is "+error)
      }
           
     }
