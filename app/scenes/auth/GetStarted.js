@@ -120,7 +120,7 @@ export default function GetStarted(props) {
           }
         else {
            // await api.phoneNumberSignin(otc);
-             navigate('App');
+             navigate('FirstLogin');
         }
      }
      catch (error){

@@ -21,14 +21,20 @@ export async function phoneNumberSignin(number) {
 }
 
 
-export async function register(data){
-    try{
-        let res = await axios.post(c.REGISTER, data);
+export async function phoneNumberVerify(otc) {
+    
+  let res = await auth().signInWithPhoneNumber(otc).then((res) => {
+        console.log("res is "+JSON.stringify(res))
+        return
+      }).catch(() => {
+        console.log("error ="+error)
+        throw handler("Something went wrong")
+      })
+}
 
-        return res.data;
-    }catch (e) {
-        throw handler(e)
-    }
+
+export async function ifUserExists(data){
+    
 }
 
 export async function GetIn(data){

@@ -24,6 +24,10 @@ const options = {
 export default function NewThought ({closeCallBack}) {
 
     const [desc, setDesc] = useState("")
+    const [optionOne, setOptionOne] = useState("")
+    const [optionTwo, setOptionTwo] = useState("")
+    const [optionThree, setOptionThree] = useState("")
+    const [optionFour, setOptionFour] = useState("")
 
     const [locationFlag, setLocationFlag] = useState(true)
     
@@ -123,6 +127,14 @@ export default function NewThought ({closeCallBack}) {
                 setImageCounter(imageCounter-1)
      }
 
+
+
+     function onPostClick () {
+
+     }
+
+
+
     return (
 
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -193,13 +205,15 @@ export default function NewThought ({closeCallBack}) {
                  <View style = {styles.optionView}>
 
                 <TextInput style = {styles.optionInput}
-                    placeholder = "Choice 1"> 
+                    placeholder = "Choice 1"
+                    onChangeText={(txt) => setOptionOne(txt)}> 
                 </TextInput>
 
                 <View style = {{flexDirection : "row"}}>
 
                   <TextInput style = {styles.optionInput}s
-                    placeholder = "Choice 2"> 
+                    placeholder = "Choice 2"
+                    onChangeText={(txt) => optionTwo(txt)}> 
                   </TextInput>
 
                   {
@@ -218,7 +232,8 @@ export default function NewThought ({closeCallBack}) {
                  <View style = {{flexDirection : "row"}}>
                 
                   <TextInput style = {styles.optionInput}s
-                    placeholder = "Choice 3 (optional)"> 
+                    placeholder = "Choice 3 (optional)"
+                    onChangeText={(txt) => setOptionThree(txt)}> 
                   </TextInput>
 
                    {
@@ -235,7 +250,8 @@ export default function NewThought ({closeCallBack}) {
                 optionFourVisisble && 
 
                 <TextInput style = {styles.optionInput}
-                    placeholder = "Choice 4 (optional)"> 
+                    placeholder = "Choice 4 (optional)"
+                    onChangeText={(txt) => setOptionFour(txt)}> 
                 </TextInput>
               }
 
@@ -260,6 +276,11 @@ export default function NewThought ({closeCallBack}) {
                 <TouchableOpacity style = {styles.toolOption} 
                  onPress={() => onLocationClick()}>
                  <Icon name={"map-pin"}  size={32}  />
+               </TouchableOpacity>
+
+               <TouchableOpacity style = {styles.postBottomView} 
+                 onPress={() => onPostClick()}>
+                <Text style = {styles.postText}> post </Text>
                </TouchableOpacity>
                
             </View>
@@ -329,6 +350,16 @@ const styles = StyleSheet.create({
         marginTop : 10,
         marginLeft : 30,
         marginRight : 10,
+    },
+
+     postBottomView : {
+        marginLeft : 50,
+    },
+    postText : {
+        fontSize: 26,
+        fontFamily: "Thonburi",
+        color : "#63b1bf",
+        alignSelf : "center"
     }
 
 
