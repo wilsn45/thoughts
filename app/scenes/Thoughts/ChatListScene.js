@@ -4,13 +4,13 @@ import {View,
     Text,
     TouchableOpacity} from 'react-native';
 
-import * as api from "../../services/user";
+import * as api from "../../services/UserGetInServices";
 import { useAuth } from "../../provider";
 
 
 
 
-export default function Me(props) {
+export default function ChatList(props) {
       const {navigation} = props;
      const {navigate} = navigation;
 
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     
 });
 
-Me.navigationOptions = ({}) => {
+ChatList.navigationOptions = ({}) => {
     return {
         title: ``
     }

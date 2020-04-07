@@ -7,7 +7,7 @@ import {View,
     TouchableWithoutFeedback,
     Keyboard} from 'react-native';
 
-import * as api from "../../services/user";
+import * as api from "../../services/UserGetInServices";
 import { useAuth } from "../../provider";
 import Icon from 'react-native-vector-icons/Feather';
 
@@ -17,8 +17,8 @@ export default function GetStarted(props) {
      const {navigate} = navigation;
     
     //1 - DECLARE VARIABLES
-    const [isFirstStep, setFirstStep] = useState(false)
-   
+    const [confirmation, setConfirmation] = useState(4577);
+
 
     const [error, setError] = useState(null);
     const [message, setMessage] = useState("A 6 digit OTP will be sent via SMS to verify your number");
@@ -36,30 +36,6 @@ export default function GetStarted(props) {
     }
 
    
-
-    phoneNumberCallback = (value) => {
-        setPhoneNumber(value)
-        console.log(phoneNumber)
-        if (phoneNumber.length >7) {
-            setButtonEnabled (true)
-
-        }
-        else {
-            setButtonEnabled (false)
-        }
-    }
-
-    otcCallback = (value) => {
-        setOtc(value)
-        if (otc.length == 3) {
-            setButtonEnabled (true)
-
-        }
-        else {
-            setButtonEnabled (false)
-        }
-    }
-
     function showError(message) {
         setError(true);
         setMessage(message)
@@ -67,7 +43,7 @@ export default function GetStarted(props) {
 
     function clearError() {
         setError(false);
-        if (isFirstStep) {
+        if (confirmation) {
             setMessage("A 6 digit OTP will be sent via SMS to verify your number")
         }
     }
@@ -79,7 +55,7 @@ export default function GetStarted(props) {
 
     function hideLoading() {
         setButtonEnabled(true)
-        if (isFirstStep) {
+        if (confirmation) {
              setButtonText("Get Started")
         }
         else {
@@ -88,50 +64,38 @@ export default function GetStarted(props) {
        
     }
 
-    function onValueChanged(value) {
-        if (isFirstStep) {
-            clearError()
-            setPhoneNumber(value)
+    
+   async function sendOtc () {
+     showLoading()
+        const number = countryCode+phoneNumber;
+        if (!validE164(number)) {
+                showError("Please enter valid phone number")
+                return;
         }
-        else {
-            clearError()
-            setOtc(value)
-        }
-    }
+        await api.numberSignIn(number).then ( (confirmation) => {
+             setConfirmation(confirmation)
+             setMessage("Please enter the one time password")
+             hideLoading()
+        }).catch ( err => {
+            hideLoading()
+             showError("something went wrong")
+       });
+  }
 
-    function showOtCView() {
-        setFirstStep(false)
-        setMessage("Please enter the one time password")
-    }
+  async function verifyOtc () {
+    navigate('FirstLogin');
+        // showLoading()
+        // await api.numberVerify(otc).then( (user) => {
+        //     console.log("user is " + user)
+        // }).catch (err => {
+        //     hideLoading()
+        //     showError("something went wrong")
+        // })
+
+
+   }
    
-
-   async function onClick() {
-     //showLoading()
-     try {
-         if (isFirstStep) {
-               const number = countryCode+phoneNumber;
-                if (!validE164(number)) {
-                  showError("Please enter valid phone number")
-                  return;
-                }
-               await api.phoneNumberSignin(number);
-               showOtCView()
-               hideLoading()
-          }
-        else {
-           // await api.phoneNumberVerify(otc);
-           navigate('FirstLogin');
-        }
-     }
-     catch (error){
-        // showError("res is "+JSON.stringify(error))
-         console.log("error is "+error)
-     }
-          
-    }
-
-
-    return (
+ return (
 
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
 
@@ -141,7 +105,7 @@ export default function GetStarted(props) {
 
         	<Text style={styles.thoughtsText}>thoughts</Text>
 			
-			{ isFirstStep && 
+			{ !confirmation && 
 				 <View style = {styles.phone}>
 				  <View style = {styles.phoneCodeView}>
 			 		<TextInput style={styles.phoneCodeTextView}
@@ -153,20 +117,20 @@ export default function GetStarted(props) {
 			   	</View>
 			 		 <TextInput style={styles.phoneNumberTextView}
 			 	 	 keyboardType = "phone-pad"
-                     onChangeText={(value) => onValueChanged(value)}
+                     onChangeText={(value) => { setPhoneNumber(value); clearError()}}
                      placeholder = "Phone Number"
                  	 maxLength={10}
 			 	 	 />
 				</View>
 			}
-			{ !isFirstStep && 
+			{ confirmation && 
 				<View style = {styles.otc}> 
 					<View style = {styles.otcIconView}>
 					 <Icon name={'lock'}  size={25} />
 			 		</View>
 			 			<TextInput style={styles.phoneNumberTextView}
 			 	  		keyboardType = "phone-pad"
-                        onChangeText={(value) => onValueChanged(value)}
+                        onChangeText={(value) => {setOtc(value); clearError()}}
                  		 maxLength={6}
 			 	  		/>
 					</View>
@@ -182,7 +146,7 @@ export default function GetStarted(props) {
                  style={ 
                          buttonEnabled ? styles.buttonEnabledView : styles.buttonDisabledView 
                         }
-                 onPress={() => onClick()}
+                 onPress={() => confirmation ? verifyOtc() : sendOtc()}
                  underlayColor='#fff'
                  disabled={!buttonEnabled}>
                 <Text style={styles.buttonText}>{buttonText}</Text>

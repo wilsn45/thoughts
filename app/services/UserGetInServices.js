@@ -1,11 +1,13 @@
 import axios from 'axios';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import * as c from '../constants';
+import * as c from "../storage/constants";
 import React, { useState } from 'react';
+
 //Google Map API Key : AIzaSyCr65NbaaL4JvLuuvr5-n9QYH_1YxCRT1Q
 
 
+const API_URL = "https://us-central1-thoughts-fe76a.cloudfunctions.net/"
 
 const usersCollection = firestore().collection('Users');
 const thought_peopleCollection = firestore().collection('thought_people');
@@ -13,24 +15,28 @@ let confirmation  = null
 
 
 
- export async function phoneNumberSignin(number) {
+ export async function numberSignIn(number) {
     console.log("phone number is " +number);
-     confirmation = await auth().signInWithPhoneNumber(number);
+    await auth().signInWithPhoneNumber(number).then ( (confirmationResult) =>{
+        console.log("confirmation " +confirmationResult)
+        return confirmationResult
+     }).catch (err => {
+       throw handler("something went wrong");
+     });
+ }
+
+
+ export async function numberVerify(otc,confirmation) {
+    await confirmation.confirm(otc).then( (result) =>{
+      return result.user;
+  }).catch(function (error) {
+        throw handler("something went wrong");
+    });
 }
 
 
- export async function phoneNumberVerify(otc) {
-     console.log("code is " +otc);
-   try {
-      await confirmation.confirm(otc);
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
- export async function getUserId(otc) {
-   
- } 
+
 
 
 // export function isUserExists(number) {

@@ -4,16 +4,16 @@ import { createBottomTabNavigator } from 'react-navigation-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/Feather';
 
-import Thoughts from './thoughts';
-import ChatListScreen from "../scenes/thoughts/ChatList";
-import MeScreen from "../scenes/thoughts/Me";
+import HomeStackNavigator from './HomeStackNavigator';
+import ChatListScene from "../scenes/Thoughts/ChatListScene";
+import MeScene from "../scenes/Thoughts/MeScene";
 
 
 
 const TabNavigator = createBottomTabNavigator({
 
 	Restaurant: {
-        screen: Thoughts,
+        screen: HomeStackNavigator,
         path: '/',
         navigationOptions: {
            tabBarIcon: ({ focused, tintColor }) => {
@@ -23,7 +23,7 @@ const TabNavigator = createBottomTabNavigator({
         },
     },
     Eat: {
-        screen: ChatListScreen,
+        screen: ChatListScene,
         path: '/',
         navigationOptions: {
             tabBarIcon: ({ focused, tintColor }) => {
@@ -33,7 +33,7 @@ const TabNavigator = createBottomTabNavigator({
         },
     },
     Order: {
-        screen: MeScreen,
+        screen: MeScene,
         path: '/',
         navigationOptions: {
             tabBarIcon: ({ focused, tintColor }) => {

@@ -2,9 +2,9 @@ import React from 'react';
 import {createStackNavigator} from 'react-navigation-stack';
 
 //IMPORT SCENES
-import HomeScreen from "../scenes/thoughts/Home";
-import ChatListScreen  from "../scenes/thoughts/ChatList";
-import TalkScreen from "../scenes/thoughts/Talk";
+import HomeScreen from "../scenes/Thoughts/HomeScene";
+import ChatListScreen  from "../scenes/Thoughts/ChatListScene";
+import TalkScreen from "../scenes/Thoughts/TalkScene";
 
 
 

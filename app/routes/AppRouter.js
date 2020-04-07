@@ -3,20 +3,19 @@ import React from 'react';
 import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 
 //IMPORT ROUTES
-import ThoughtsStack from "./routes/thoughts";
-import Tab from "./routes/tab";
-import Auth from "./routes/auth";
-import GetStarted from "./scenes/auth/GetStarted";
+import HomeTabNavigator from "./HomeTabNavigator";
+import GetInNavigator from "./GetInNavigator";
 
-import AuthLoading from "./scenes/auth/AuthLoading";
-import AuthProvider from "./provider";
+
+import AuthLoading from "../scenes/GetIn/AuthLoadingScene";
+import AuthProvider from "../provider";
 
 //APP ROUTES STACK
 const AppStack = createSwitchNavigator(
     {
         Loading: AuthLoading,
-        Auth: Auth,
-        App: Tab
+        Auth: GetInNavigator,
+        App: HomeTabNavigator
     },
     {initialRouteName: 'Loading'}
 );

@@ -4,16 +4,16 @@ import {View,
     Text,
     TouchableOpacity} from 'react-native';
 
-import * as api from "../../services/user";
+import * as api from "../../services/UserGetInServices";
 import { useAuth } from "../../provider";
 
 
-export default function Preference() {
+export default function Talk() {
     
     return (
 
         <View style={{flex: 1, paddingHorizontal: 16, backgroundColor:"#fff"}}>
-           <Text> Home </Text>
+           <Text> Talk </Text>
         </View>
     );
 };
@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     
 });
 
-Preference.navigationOptions = ({}) => {
+Talk.navigationOptions = ({}) => {
     return {
         title: ``
     }
