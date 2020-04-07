@@ -1,4 +1,4 @@
-
+import Contacts from 'react-native-contacts';
 
 export function getUserContactList() {
 

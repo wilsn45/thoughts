@@ -8,6 +8,7 @@ import {View,
     Keyboard} from 'react-native';
 
 import * as api from "../../services/UserGetInServices";
+import * as userStorage from "../../storage/Local/UserStorage";
 import { useAuth } from "../../provider";
 import Icon from 'react-native-vector-icons/Feather';
 
@@ -83,7 +84,9 @@ export default function GetStarted(props) {
   }
 
   async function verifyOtc () {
-    navigate('FirstLogin');
+      userStorage.setUserToken("DaniKhanWedsWilson")
+      userStorage.setUserNumber("9958565727")
+      navigate('FirstLogin');
         // showLoading()
         // await api.numberVerify(otc).then( (user) => {
         //     console.log("user is " + user)
@@ -91,9 +94,7 @@ export default function GetStarted(props) {
         //     hideLoading()
         //     showError("something went wrong")
         // })
-
-
-   }
+ }
    
  return (
 

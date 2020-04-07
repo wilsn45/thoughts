@@ -7,19 +7,25 @@ import {View,
 } from 'react-native';
 import * as api from "../../services/UserGetInServices";
 import { useAuth } from "../../provider";
-import Contacts from 'react-native-contacts';
+import * as userStorage from "../../storage/Local/UserStorage";
 import { PermissionsAndroid } from 'react-native';
 var Spinner = require('react-native-spinkit');
 
 
 
 export default function FirstLogin(props) {
- 
+
+  const [token, setToken] = useState("") 
+
+
  useEffect(() => {
    try {
-
-    
-    
+       userStorage.getUserToken().then (token => {
+        setToken(token)
+       })
+       .catch (err => {
+          console.log("error is +", err)
+       })
  }
  catch (error) {
   console.log(error)
@@ -73,7 +79,7 @@ function getContactListAndroid() {
   <View style={styles.container}>
   
   <TouchableOpacity onPress={() => getContactListiOS()}>
-  <Text> Get contact </Text>
+  <Text> {token} </Text>
   </TouchableOpacity>
   </View>
   );

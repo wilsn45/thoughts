@@ -1,7 +1,7 @@
 import axios from 'axios';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import * as c from "../storage/constants";
+import * as c from "../storage/Constants";
 import React, { useState } from 'react';
 
 //Google Map API Key : AIzaSyCr65NbaaL4JvLuuvr5-n9QYH_1YxCRT1Q
