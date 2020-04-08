@@ -3,6 +3,7 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import * as c from "../storage/Constants";
 import React, { useState } from 'react';
+import * as userStorage from ".././storage/Local/UserStorage";
 
 //Google Map API Key : AIzaSyCr65NbaaL4JvLuuvr5-n9QYH_1YxCRT1Q
 
@@ -34,6 +35,35 @@ let confirmation  = null
     });
 }
 
+
+export async function getUserStatus(){
+
+   let tokenPromise = userStorage.getUserToken()
+   let numberPromise = userStorage.getUserNumber()
+   let userToken = await tokenPromise;
+   let userNumber = await numberPromise;
+
+ return new Promise((resolve,reject) => { 
+ const apiURL = API_URL+"getUserStatus"+"?number="+userNumber
+   
+  axios.get(apiURL, { 
+    headers: {
+      'Authorization': "DaniyaLovesWilson"
+    }
+   }).then((response) => {
+    resolve(response)
+   })
+   .catch(err => {
+    reject(err)
+   })
+
+  });
+
+}
+
+export async function postContact() {
+  
+}
 
 
 

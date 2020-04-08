@@ -12,26 +12,25 @@ import { PermissionsAndroid } from 'react-native';
 var Spinner = require('react-native-spinkit');
 
 
-
+let isNewUser;
 export default function FirstLogin(props) {
 
-  const [token, setToken] = useState("") 
 
-
- useEffect(() => {
-   try {
-       userStorage.getUserToken().then (token => {
-        setToken(token)
-       })
-       .catch (err => {
-          console.log("error is +", err)
-       })
- }
- catch (error) {
-  console.log(error)
-}
+useEffect(() => {
+  getUserStatus()
 
 });
+
+ function getUserStatus () {
+     api.getUserStatus()
+       .then((response) => {
+          isNewUser = response.data.data.isNewUser
+          console.log("isNewUser", isNewUser)
+       })
+       .catch(err => {
+        console.log("err", err)
+    })
+ }
 
  function getContactListiOS() {
   try {
@@ -79,7 +78,7 @@ function getContactListAndroid() {
   <View style={styles.container}>
   
   <TouchableOpacity onPress={() => getContactListiOS()}>
-  <Text> {token} </Text>
+  <Text> Daniya </Text>
   </TouchableOpacity>
   </View>
   );
