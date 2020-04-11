@@ -13,6 +13,7 @@ import { useAuth } from "thoughts/app/provider";
 import Icon from 'react-native-vector-icons/Feather';
 import CountryCodeModal from "./CountryCodeModal";
 import Modal from 'react-native-modal';
+import DeviceInfo from 'react-native-device-info';
 
 
 export default function GetStarted(props) {
@@ -31,6 +32,7 @@ export default function GetStarted(props) {
     const [buttonEnabled, setButtonEnabled] = useState(true);
     
     const [phoneNumber, setPhoneNumber] = useState("");
+    const [dial_code, setDialCode] = useState("+91");
     const [countryCode, setCountryCode] = useState("IN +91");
     const [otc, setOtc] = useState("");
    
@@ -68,13 +70,15 @@ export default function GetStarted(props) {
        
     }
 
-    closeCountryCodeModal = () => {
-        setSelectCountryCode(false)
-    }
+    function selectCountryCallback (dial_code,code) {
+       setCountryCode(code + " " + dial_code)
+       setDialCode(dial_code)
+       setSelectCountryCode(false)
+     }
 
     
    async function sendOtc () {
-
+    
     setConfirmation("4577")
     // try {
     //     showLoading()
@@ -183,7 +187,7 @@ export default function GetStarted(props) {
         	</View>
 
             <Modal isVisible={selectCountryCode} swipeArea={50} style = {{width: 200}} >
-                <CountryCodeModal  closeCallBack = {closeCountryCodeModal}/>
+                <CountryCodeModal  selectCountryCallback = {selectCountryCallback}/>
              </Modal>
             
         </View>
@@ -226,7 +230,7 @@ const styles = StyleSheet.create({
         alignItems : "center",
     },
     phoneCodeView : {
-    	flex: 0.2,
+    	flex: 0.35,
     	height : '100%',
     	justifyContent : "center",
         marginLeft : 10
@@ -239,7 +243,6 @@ const styles = StyleSheet.create({
     phoneCodeTextView : {
     	color : 'black',
     	fontSize: 20,   
-    	marginLeft: 10,
     	marginRight: 5,
     },
     phoneNumberTextView : {
@@ -247,7 +250,6 @@ const styles = StyleSheet.create({
     	height : '100%',
     	color : 'black',
     	fontSize: 25,   
-    	marginLeft: 10
     },
 
     otc : {

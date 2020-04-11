@@ -18,14 +18,7 @@ const options = {
   },
 };
 
-export default function CountryCode ({closeCallBack}) {
-
-    
-     function onCountryClick (country) {
-
-     }
-
-
+export default function CountryCode ({selectCountryCallback}) {
 
     return (
 
@@ -34,13 +27,12 @@ export default function CountryCode ({closeCallBack}) {
           <FlatList
                data={CountryCodeList}
                 renderItem={({ item }) => <TouchableOpacity style = {styles.optionsView}
-                                       onPress={() => onCountryClick(item)}>
-                                       <Text>{item}</Text>
+                                       onPress={() => selectCountryCallback(item.dial_code,item.code)}>
+                                       <Text style = {{fontSize : 20, marginLeft : 20,
+                                          }}>{item.code + " " + item.dial_code}</Text>
                                       </TouchableOpacity> }
            />
 
-          
-     
        </View>
       
     );
@@ -59,8 +51,8 @@ const styles = StyleSheet.create({
       width : 200,
       borderBottomWidth : 1,
       borderColor: '#F0F0F0',
-      marginLeft : 20,
-      marginTop : 20
+      marginTop : 20,
+
 
     }
     
