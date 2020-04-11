@@ -7,8 +7,8 @@ import HomeTabNavigator from "./HomeTabNavigator";
 import GetInNavigator from "./GetInNavigator";
 
 
-import AuthLoading from "../scenes/GetIn/AuthLoadingScene";
-import AuthProvider from "../provider";
+import AuthLoading from "thoughts/app/scenes/GetIn/AuthLoadingScene";
+import AuthProvider from "thoughts/app/provider";
 
 //APP ROUTES STACK
 const AppStack = createSwitchNavigator(

@@ -7,9 +7,9 @@ import {View,
     TouchableWithoutFeedback,
     Keyboard} from 'react-native';
 
-import * as api from "../../services/UserGetInServices";
-import * as userStorage from "../../storage/Local/UserStorage";
-import { useAuth } from "../../provider";
+import * as api from "thoughts/app/services/UserGetInServices";
+import * as userStorage from "thoughts/app/storage/Local/UserStorage";
+import { useAuth } from "thoughts/app/provider";
 import Icon from 'react-native-vector-icons/Feather';
 
 
@@ -18,7 +18,7 @@ export default function GetStarted(props) {
      const {navigate} = navigation;
     
     //1 - DECLARE VARIABLES
-    const [confirmation, setConfirmation] = useState(4577);
+    const [confirmation, setConfirmation] = useState();
 
 
     const [error, setError] = useState(null);
@@ -67,26 +67,47 @@ export default function GetStarted(props) {
 
     
    async function sendOtc () {
-     showLoading()
+    try {
+        showLoading()
         const number = countryCode+phoneNumber;
         if (!validE164(number)) {
                 showError("Please enter valid phone number")
                 return;
+                hideLoading()
         }
-        await api.numberSignIn(number).then ( (confirmation) => {
-             setConfirmation(confirmation)
-             setMessage("Please enter the one time password")
-             hideLoading()
-        }).catch ( err => {
-            hideLoading()
-             showError("something went wrong")
-       });
-  }
+        let phoneNumberPromise = api.numberSignIn(number)
+        if(confirmation) {
+            console.log("confirmation is" +confirmation)
+        }
+        let confirmation = await phoneNumberPromise
+     }catch (err) {
+        showError("something went wrong")
+    }
+      hideLoading()
+
+   }
 
   async function verifyOtc () {
-      userStorage.setUserToken("DaniKhanWedsWilson")
-      userStorage.setUserNumber("9958565727")
-      navigate('FirstLogin');
+    try {
+        showLoading()
+        let numberVerifyPromise = api.numberVerify(otc,confirmation)
+        let user = await numberVerifyPromise;
+
+      if (user) {
+        console.log("user data is" + user.data())
+      }
+    }
+    catch(err) {
+        showError("something went wrong")
+    }
+    hideLoading()
+    
+
+
+
+      // userStorage.setUserToken("DaniKhanWedsWilson")
+      // userStorage.setUserNumber("9958565727")
+      // navigate('FirstLogin');
         // showLoading()
         // await api.numberVerify(otc).then( (user) => {
         //     console.log("user is " + user)
@@ -131,7 +152,7 @@ export default function GetStarted(props) {
 			 		</View>
 			 			<TextInput style={styles.phoneNumberTextView}
 			 	  		keyboardType = "phone-pad"
-                        onChangeText={(value) => {setOtc(value); clearError()}}
+                         onChangeText={(value) => {setOtc(value); clearError();}}
                  		 maxLength={6}
 			 	  		/>
 					</View>

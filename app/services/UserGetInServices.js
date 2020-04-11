@@ -3,8 +3,8 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import * as c from "../storage/Constants";
 import React, { useState } from 'react';
-import * as userStorage from ".././storage/Local/UserStorage";
-
+import * as userStorage from "thoughts/app/storage/Local/UserStorage";
+import * as contactListHelper from "thoughts/app/helper/ContactListtHelper";
 //Google Map API Key : AIzaSyCr65NbaaL4JvLuuvr5-n9QYH_1YxCRT1Q
 
 
@@ -17,22 +17,24 @@ let confirmation  = null
 
 
  export async function numberSignIn(number) {
-    console.log("phone number is " +number);
-    await auth().signInWithPhoneNumber(number).then ( (confirmationResult) =>{
-        console.log("confirmation " +confirmationResult)
-        return confirmationResult
+    return new Promise((resolve,reject) => { 
+     auth().signInWithPhoneNumber(number).then ( (confirmation) =>{
+        resolve (confirmation)
      }).catch (err => {
-       throw handler("something went wrong");
-     });
+       reject(err)
+     })
+    });
  }
 
 
  export async function numberVerify(otc,confirmation) {
-    await confirmation.confirm(otc).then( (result) =>{
-      return result.user;
-  }).catch(function (error) {
-        throw handler("something went wrong");
-    });
+   return new Promise((resolve,reject) => { 
+     confirmation.confirm(otc).then( (user) =>{
+         resolve(user)
+     }).catch(function (err) {
+        reject(err)
+    })
+  });
 }
 
 
@@ -47,21 +49,21 @@ export async function getUserStatus(){
  const apiURL = API_URL+"getUserStatus"+"?number="+userNumber
    
   axios.get(apiURL, { 
-    headers: {
-      'Authorization': "DaniyaLovesWilson"
-    }
-   }).then((response) => {
-    resolve(response)
-   })
-   .catch(err => {
-    reject(err)
-   })
+      headers: {
+        'Authorization': "DaniyaLovesWilson"
+       }
+       }).then((response) => {
+          resolve(response)
+       })
+       .catch(err => {
+          reject(err)
+        })
+     });
+ }
 
-  });
-
-}
-
-export async function postContact() {
+export async function isNewContactAdded() {
+   let contactList = contactListHelper.getUserContactList()
+   console.log(contactList)
   
 }
 

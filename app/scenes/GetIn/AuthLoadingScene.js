@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import {ActivityIndicator, View, Text} from 'react-native';
 import { StackActions } from 'react-navigation';
 
-import { useAuth } from "../../provider";
+import { useAuth } from "thoughts/app/provider";
 
 export default function AuthLoading(props) {
     const {navigate} = props.navigation;

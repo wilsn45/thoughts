@@ -5,8 +5,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/Feather';
 
 import HomeStackNavigator from './HomeStackNavigator';
-import ChatListScene from "../scenes/Thoughts/ChatListScene";
-import MeScene from "../scenes/Thoughts/MeScene";
+import ChatListScene from "thoughts/app/scenes/Thoughts/ChatListScene";
+import MeScene from "thoughts/app/scenes/Thoughts/MeScene";
 
 
 

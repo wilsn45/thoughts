@@ -4,8 +4,8 @@ import {View,
     Text,
     TouchableOpacity} from 'react-native';
 
-import * as api from "../../services/UserGetInServices";
-import { useAuth } from "../../provider";
+import * as api from "thoughts/app/services/UserGetInServices";
+import { useAuth } from "thoughts/app/provider";
 
 
 export default function Preference() {

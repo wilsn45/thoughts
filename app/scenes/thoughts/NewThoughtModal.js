@@ -11,7 +11,7 @@ import {View,
         ScrollView} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import ImagePicker from 'react-native-image-picker';
-import ImageView from "../../components/ImageViewComponent";
+import ImageView from "thoughts/app/components/ImageViewComponent";
 
 const options = {
   title: 'Select Image',

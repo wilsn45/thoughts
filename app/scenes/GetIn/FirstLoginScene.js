@@ -5,9 +5,9 @@ import {View,
   Platform,
   TouchableOpacity
 } from 'react-native';
-import * as api from "../../services/UserGetInServices";
-import { useAuth } from "../../provider";
-import * as userStorage from "../../storage/Local/UserStorage";
+import * as api from "thoughts/app/services/UserGetInServices";
+import { useAuth } from "thoughts/app/provider";
+import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import { PermissionsAndroid } from 'react-native';
 var Spinner = require('react-native-spinkit');
 
@@ -17,7 +17,8 @@ export default function FirstLogin(props) {
 
 
 useEffect(() => {
-  getUserStatus()
+  getUserStatus();
+  let isNewUser
 
 });
 
@@ -30,6 +31,16 @@ useEffect(() => {
        .catch(err => {
         console.log("err", err)
     })
+ }
+
+ function pushContactList() {
+    if (isNewUser) {
+       
+    }
+ }
+
+ function putAllContacts() {
+  
  }
 
  function getContactListiOS() {
