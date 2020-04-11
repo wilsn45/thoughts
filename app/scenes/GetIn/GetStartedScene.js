@@ -11,6 +11,8 @@ import * as api from "thoughts/app/services/UserGetInServices";
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import { useAuth } from "thoughts/app/provider";
 import Icon from 'react-native-vector-icons/Feather';
+import CountryCodeModal from "./CountryCodeModal";
+import Modal from 'react-native-modal';
 
 
 export default function GetStarted(props) {
@@ -19,6 +21,7 @@ export default function GetStarted(props) {
     
     //1 - DECLARE VARIABLES
     const [confirmation, setConfirmation] = useState();
+    const [selectCountryCode, setSelectCountryCode] = useState(false);
 
 
     const [error, setError] = useState(null);
@@ -28,7 +31,7 @@ export default function GetStarted(props) {
     const [buttonEnabled, setButtonEnabled] = useState(true);
     
     const [phoneNumber, setPhoneNumber] = useState("");
-    const [countryCode, setCountryCode] = useState("+1");
+    const [countryCode, setCountryCode] = useState("IN +91");
     const [otc, setOtc] = useState("");
    
 
@@ -63,6 +66,10 @@ export default function GetStarted(props) {
             setButtonText("Get In")
         }
        
+    }
+
+    closeCountryCodeModal = () => {
+        setSelectCountryCode(false)
     }
 
     
@@ -131,13 +138,11 @@ export default function GetStarted(props) {
 			
 			 <View style = {styles.phone}>
 				  <View style = {styles.phoneCodeView}>
-			 		<TextInput style={styles.phoneCodeTextView}
-			 	 	 keyboardType =  "phone-pad"
-                 	 maxLength={4}
-                 	 onChangeText={(txt) => setCountryCode(txt)}
-     			 	 value={countryCode}
-			 	 	 />
-			   	</View>
+			 		<TouchableOpacity
+                        onPress={() => setSelectCountryCode(true)}>
+                      <Text style = {styles.countryCodeText} >{countryCode}</Text>
+                    </TouchableOpacity>
+			    	</View>
 			 		 <TextInput style={styles.phoneNumberTextView}
 			 	 	 keyboardType = "phone-pad"
                      onChangeText={(value) => { setPhoneNumber(value); clearError()}}
@@ -176,6 +181,10 @@ export default function GetStarted(props) {
 
 
         	</View>
+
+            <Modal isVisible={selectCountryCode} swipeArea={50} style = {{width: 200}} >
+                <CountryCodeModal  closeCallBack = {closeCountryCodeModal}/>
+             </Modal>
             
         </View>
 
@@ -198,6 +207,7 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
         flexDirection: 'column',
         alignItems : "center",
+
     },
     thoughtsText : {
         fontSize: 38,
@@ -211,12 +221,20 @@ const styles = StyleSheet.create({
     	flexDirection: 'row',
 		borderColor: '#F0F0F0',
 		borderBottomWidth : 2,
-		borderRadius: 15,
+		borderRadius: 1,
+        justifyContent : "center",
+        alignItems : "center",
     },
     phoneCodeView : {
     	flex: 0.2,
     	height : '100%',
     	justifyContent : "center",
+        marginLeft : 10
+    },
+    countryCodeText : {
+        color : 'black',
+        fontSize: 20,  
+        fontWeight : "200" 
     },
     phoneCodeTextView : {
     	color : 'black',
@@ -263,17 +281,14 @@ const styles = StyleSheet.create({
         fontFamily: "Thonburi",
         color : "#5a5e5e",
     },
-     errorText : {
+    errorText : {
         width : 250,
         fontSize: 14,
         fontFamily: "Thonburi",
         color : "red",
     },
-
-
     buttonEnabledView: {
-    	marginTop : 20,
-        width : '70%',
+    	width : '70%',
         height : 60,
         backgroundColor:'#fb375b',
         borderRadius:15,

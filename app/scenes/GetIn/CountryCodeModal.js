@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
 import {View, 
-        Image,
         Text,
-        TextInput, 
+        FlatList,
         StyleSheet,
         TouchableOpacity,
-        TouchableWithoutFeedback,
-         Keyboard,
-        KeyboardAvoidingView,
         ScrollView} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import ImagePicker from 'react-native-image-picker';
 import ImageView from "thoughts/app/components/ImageViewComponent";
+import {CountryCodeList} from "thoughts/app/storage/Local/CountryCodeList";
 
 const options = {
   title: 'Select Image',
@@ -20,21 +17,11 @@ const options = {
     path: 'images',
   },
 };
-const DATA = [
-  1,
-  2,
-  3,
-  5,
-  6,
-  7,
-  8,
-  9,
-  10
-];
-export default function NewThought ({closeCallBack}) {
+
+export default function CountryCode ({closeCallBack}) {
 
     
-     function onPostClick () {
+     function onCountryClick (country) {
 
      }
 
@@ -42,46 +29,29 @@ export default function NewThought ({closeCallBack}) {
 
     return (
 
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      
     <View style = {styles.main}>
 
-        <TouchableOpacity
-                 style = {{marginLeft : 10,marginTop : 10}}
-                 onPress={() => closeCallBack()}>
-                 <Icon name={"x"}  size={32}  color={"gray"} style = {{marginTop : 10}}  />
-            </TouchableOpacity>
+          <FlatList
+               data={CountryCodeList}
+                renderItem={({ item }) => <TouchableOpacity style = {styles.optionsView}
+                                       onPress={() => onCountryClick(item)}>
+                                       <Text>{item}</Text>
+                                      </TouchableOpacity> }
+           />
 
-            <ScrollView style = {styles.ScrollView}>
-            
-               <FlatList
-        data={DATA}
-        renderItem={({ item }) => <Item title={item.title} />}
-        keyExtractor={item => item.id}
-      />
-
-            </ScrollView>
+          
      
        </View>
       
-    </TouchableWithoutFeedback>
-          
     );
 };
 
 
 const styles = StyleSheet.create({
     main : {
-        flex : 0.9,
+        flex : 0.7,
         width: '100%',
         backgroundColor : "#fff"
-    },
-    ScrollView : {
-       flex : 1,
-        marginTop : 10,
-        width : '100%',
-        borderColor: "pink",
-       //borderWidth : 1
     },
     optionsView : {
       flexDirection : "row",
@@ -89,6 +59,8 @@ const styles = StyleSheet.create({
       width : 200,
       borderBottomWidth : 1,
       borderColor: '#F0F0F0',
+      marginLeft : 20,
+      marginTop : 20
 
     }
     
