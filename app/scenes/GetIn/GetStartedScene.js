@@ -22,7 +22,7 @@ export default function GetStarted(props) {
 
 
     const [error, setError] = useState(null);
-    const [message, setMessage] = useState("A 6 digit OTP will be sent via SMS to verify your number");
+    const [message, setMessage] = useState("");
 
     const [buttonText, setButtonText] = useState("Get Started");
     const [buttonEnabled, setButtonEnabled] = useState(true);
@@ -67,23 +67,25 @@ export default function GetStarted(props) {
 
     
    async function sendOtc () {
-    try {
-        showLoading()
-        const number = countryCode+phoneNumber;
-        if (!validE164(number)) {
-                showError("Please enter valid phone number")
-                return;
-                hideLoading()
-        }
-        let phoneNumberPromise = api.numberSignIn(number)
-        if(confirmation) {
-            console.log("confirmation is" +confirmation)
-        }
-        let confirmation = await phoneNumberPromise
-     }catch (err) {
-        showError("something went wrong")
-    }
-      hideLoading()
+
+    setConfirmation("4577")
+    // try {
+    //     showLoading()
+    //     const number = countryCode+phoneNumber;
+    //     if (!validE164(number)) {
+    //             showError("Please enter valid phone number")
+    //             return;
+    //             hideLoading()
+    //     }
+    //     let phoneNumberPromise = api.numberSignIn(number)
+    //     if(confirmation) {
+    //         console.log("confirmation is" +confirmation)
+    //     }
+    //     let confirmation = await phoneNumberPromise
+    //  }catch (err) {
+    //     showError("something went wrong")
+    // }
+    //   hideLoading()
 
    }
 
@@ -125,10 +127,9 @@ export default function GetStarted(props) {
 
         	<View style = {styles.center}>
 
-        	<Text style={styles.thoughtsText}>thoughts</Text>
+        	<Text style={styles.thoughtsText}>Log in</Text>
 			
-			{ !confirmation && 
-				 <View style = {styles.phone}>
+			 <View style = {styles.phone}>
 				  <View style = {styles.phoneCodeView}>
 			 		<TextInput style={styles.phoneCodeTextView}
 			 	 	 keyboardType =  "phone-pad"
@@ -144,7 +145,6 @@ export default function GetStarted(props) {
                  	 maxLength={10}
 			 	 	 />
 				</View>
-			}
 			{ confirmation && 
 				<View style = {styles.otc}> 
 					<View style = {styles.otcIconView}>
@@ -202,25 +202,21 @@ const styles = StyleSheet.create({
     thoughtsText : {
         fontSize: 38,
         fontFamily: "Thonburi",
-        color : "#024a57",
-        fontWeight : "bold"
+        fontWeight : "400"
     },
     phone : {
-    	marginTop : 70,
+    	marginTop : 50,
     	height : 60,
     	width : '80%',
     	flexDirection: 'row',
 		borderColor: '#F0F0F0',
-		borderWidth : 2,
+		borderBottomWidth : 2,
 		borderRadius: 15,
     },
     phoneCodeView : {
     	flex: 0.2,
     	height : '100%',
-    	borderColor : 'grey',
-        borderRightWidth : 1,
     	justifyContent : "center",
-
     },
     phoneCodeTextView : {
     	color : 'black',
@@ -238,19 +234,17 @@ const styles = StyleSheet.create({
 
     otc : {
     	height : 60,
-    	marginTop : 70,
+    	marginTop : 30,
     	width : '80%',
     	flexDirection: 'row',
 		borderColor: '#F0F0F0',
-		borderWidth : 2,
+		borderBottomWidth : 2,
 		borderRadius: 15,
 	},
     otcIconView : {
     	marginLeft: 20,
     	marginRight: 10,
     	flex: 0.15,
-    	borderColor : 'grey',
-    	borderRightWidth : 1,
     	justifyContent : "center"
     },
     otcTextInputView : {
@@ -278,19 +272,19 @@ const styles = StyleSheet.create({
 
 
     buttonEnabledView: {
-    	marginTop : 40,
-        width : '60%',
+    	marginTop : 20,
+        width : '70%',
         height : 60,
-        backgroundColor:'#63b1bf',
-        borderRadius:25,
+        backgroundColor:'#fb375b',
+        borderRadius:15,
         justifyContent:  "center",
         alignSelf: "center"
     },
 	buttonDisabledView: {
-		marginTop : 40,
+		marginTop : 20,
         width : '60%',
         height : 60,
-        backgroundColor:'#63b1bf',
+        backgroundColor:'#fb375b',
         opacity : 0.5,
         borderRadius:25,
         justifyContent:  "center",
