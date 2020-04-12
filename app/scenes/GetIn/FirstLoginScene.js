@@ -103,10 +103,11 @@ function getContactListAndroid() {
  return (
 
   <View style={styles.container}>
-  
-  <TouchableOpacity onPress={() => getContactListiOS()}>
-  <Text> Daniya </Text>
-  </TouchableOpacity>
+   <Spinner style={styles.spinner} isVisible="true" size={40} type="ArcAlt" color="#fb375b"/>
+    <TouchableOpacity 
+    onPress={() => getContactListiOS()}>
+      <Text> Daniya </Text>
+    </TouchableOpacity>
   </View>
   );
 };
