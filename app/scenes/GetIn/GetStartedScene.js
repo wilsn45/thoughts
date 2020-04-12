@@ -13,7 +13,7 @@ import { useAuth } from "thoughts/app/provider";
 import Icon from 'react-native-vector-icons/Feather';
 import CountryCodeModal from "./CountryCodeModal";
 import Modal from 'react-native-modal';
-import DeviceInfo from 'react-native-device-info';
+import * as RNLocalize from "react-native-localize";
 
 
 export default function GetStarted(props) {
@@ -26,7 +26,7 @@ export default function GetStarted(props) {
 
 
     const [error, setError] = useState(null);
-    const [message, setMessage] = useState("To protect you from fake peoples");
+    const [message, setMessage] = useState("");
 
     const [buttonText, setButtonText] = useState("Get Started");
     const [buttonEnabled, setButtonEnabled] = useState(true);
@@ -80,6 +80,7 @@ export default function GetStarted(props) {
    async function sendOtc () {
     
     setConfirmation("4577")
+    console.log(RNLocalize.getCountry());
     // try {
     //     showLoading()
     //     const number = countryCode+phoneNumber;

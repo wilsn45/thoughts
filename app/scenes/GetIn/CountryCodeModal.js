@@ -10,13 +10,6 @@ import ImagePicker from 'react-native-image-picker';
 import ImageView from "thoughts/app/components/ImageViewComponent";
 import {CountryCodeList} from "thoughts/app/storage/Local/CountryCodeList";
 
-const options = {
-  title: 'Select Image',
-   storageOptions: {
-    skipBackup: true,
-    path: 'images',
-  },
-};
 
 export default function CountryCode ({selectCountryCallback}) {
 
@@ -25,12 +18,13 @@ export default function CountryCode ({selectCountryCallback}) {
     <View style = {styles.main}>
 
           <FlatList
-               data={CountryCodeList}
+               data={CountryCodeList.sort((a, b) => a.code.localeCompare(b.code))}
                 renderItem={({ item }) => <TouchableOpacity style = {styles.optionsView}
                                        onPress={() => selectCountryCallback(item.dial_code,item.code)}>
                                        <Text style = {{fontSize : 20, marginLeft : 20,
                                           }}>{item.code + " " + item.dial_code}</Text>
                                       </TouchableOpacity> }
+                   keyExtractor={item => item.code}
            />
 
        </View>
