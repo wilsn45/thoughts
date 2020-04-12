@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {View,
     StyleSheet,
     Text,
@@ -14,6 +14,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import CountryCodeModal from "./CountryCodeModal";
 import Modal from 'react-native-modal';
 import * as RNLocalize from "react-native-localize";
+import {CountryCodeList} from "thoughts/app/storage/Local/CountryCodeList";
 
 
 export default function GetStarted(props) {
@@ -36,6 +37,14 @@ export default function GetStarted(props) {
     const [countryCode, setCountryCode] = useState("IN +91");
     const [otc, setOtc] = useState("");
    
+
+    useEffect(() => {
+        let country = RNLocalize.getCountry()
+        var result = CountryCodeList.find(obj => {
+                return obj.code === country
+        })
+        setCountryCode(result.code + " " + result.dial_code)
+    });
 
     function validE164(num) {
      return /^\+?[1-9]\d{1,14}$/.test(num)
@@ -80,7 +89,7 @@ export default function GetStarted(props) {
    async function sendOtc () {
     
     setConfirmation("4577")
-    console.log(RNLocalize.getCountry());
+    
     // try {
     //     showLoading()
     //     const number = countryCode+phoneNumber;
