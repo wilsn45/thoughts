@@ -17,10 +17,26 @@ export default function FirstLogin(props) {
 
 
 useEffect(() => {
-  getUserStatus();
-  let isNewUser
+  //getUserStatus();
+   test()
 
 });
+
+async function test() {
+  try {
+    let tokenPromise = userStorage.getUserToken()
+   let numberPromise = userStorage.getUserNumber()
+   let userToken = await tokenPromise;
+   let userNumber = await numberPromise;
+
+   console.log("first login token "+ userToken)
+   console.log("first login number "+ userNumber)
+  }
+  catch (err) {
+    console.log("error" + err)
+  }
+  
+}
 
  function getUserStatus () {
      api.getUserStatus()

@@ -22,28 +22,38 @@ export default function GetStarted(props) {
      const {navigate} = navigation;
     
     //1 - DECLARE VARIABLES
-    const [confirmation, setConfirmation] = useState();
+    const [confirmation, setConfirmation] = useState(null);
     const [selectCountryCode, setSelectCountryCode] = useState(false);
-
+    const [otcView, setOtcView] = useState(false);
 
     const [error, setError] = useState(null);
-    const [message, setMessage] = useState("");
+    const [message, setMessage] = useState("A six digit otp will be sent on your number");
 
     const [buttonText, setButtonText] = useState("Get Started");
     const [buttonEnabled, setButtonEnabled] = useState(true);
     
     const [phoneNumber, setPhoneNumber] = useState("");
     const [dial_code, setDialCode] = useState("+91");
-    const [countryCode, setCountryCode] = useState("IN +91");
+    const [countryCode, setCountryCode] = useState(null);
     const [otc, setOtc] = useState("");
+
+     const [user, setUser] = useState(null);
    
 
     useEffect(() => {
-        let country = RNLocalize.getCountry()
-        var result = CountryCodeList.find(obj => {
+        try {
+           let country = RNLocalize.getCountry()
+            var result = CountryCodeList.find(obj => {
                 return obj.code === country
-        })
-        setCountryCode(result.code + " " + result.dial_code)
+            })
+            if (!countryCode) {
+            setCountryCode(result.code + " " + result.dial_code)
+            setDialCode(result.dial_code)
+            } 
+        }
+        catch(err) {
+            console.log("error" + err)
+        }
     });
 
     function validE164(num) {
@@ -58,8 +68,10 @@ export default function GetStarted(props) {
 
     function clearError() {
         setError(false);
-        if (confirmation) {
-            setMessage("A 6 digit OTP will be sent via SMS to verify your number")
+        if (otcView) {
+            setMessage("Enter the opt we just sent you on your number")
+        } else {
+            setMessage("A six digit otp will be sent on your number")
         }
     }
 
@@ -68,76 +80,75 @@ export default function GetStarted(props) {
         setButtonText("Loading...")
     }
 
-    function hideLoading() {
-        setButtonEnabled(true)
-        if (confirmation) {
-             setButtonText("Get Started")
-        }
-        else {
-            setButtonText("Get In")
-        }
-       
-    }
-
     function selectCountryCallback (dial_code,code) {
+       console.log(code)
        setCountryCode(code + " " + dial_code)
        setDialCode(dial_code)
        setSelectCountryCode(false)
      }
 
+     function showOtc() {
+        setButtonEnabled(true)
+        setOtcView(true)
+        setButtonText("Get In")
+        setMessage("Enter the opt we just sent you on your number")
+        setError(false)
+     }
     
    async function sendOtc () {
+
+    try {
+        showLoading()
+        const number = dial_code+phoneNumber;
+        if (!validE164(number)) {
+                showError("Please enter valid phone number")
+                 hideLoading()
+                return;
+               
+        }
+        let phoneNumberPromise = api.numberSignIn(number)
+        let confirmation = await phoneNumberPromise
+        setConfirmation(confirmation)
+        showOtc()
+        
+     }catch (err) {
+        console.log("error" + err)
+        setButtonEnabled(true)
+        setButtonText("Get Started")
+        showError("something went wrong")
+    }
     
-    setConfirmation("4577")
-    
-    // try {
-    //     showLoading()
-    //     const number = countryCode+phoneNumber;
-    //     if (!validE164(number)) {
-    //             showError("Please enter valid phone number")
-    //             return;
-    //             hideLoading()
-    //     }
-    //     let phoneNumberPromise = api.numberSignIn(number)
-    //     if(confirmation) {
-    //         console.log("confirmation is" +confirmation)
-    //     }
-    //     let confirmation = await phoneNumberPromise
-    //  }catch (err) {
-    //     showError("something went wrong")
-    // }
-    //   hideLoading()
 
    }
 
   async function verifyOtc () {
     try {
+        if (otc.length < 6) {
+             showError("Invalid one time code")
+                 hideLoading()
+                return;
+               
+        }
         showLoading()
         let numberVerifyPromise = api.numberVerify(otc,confirmation)
         let user = await numberVerifyPromise;
 
       if (user) {
-        console.log("user data is" + user.data())
+        let uid = JSON.stringify(user.uid)
+        let number = JSON.stringify(user.phoneNumber)
+        let setUidPromies =  userStorage.setUserToken(uid)
+        let setNumberPromies =  userStorage.setUserNumber(number)
+        await setUidPromies;
+        await setNumberPromies;
+        navigate('FirstLogin');
       }
     }
     catch(err) {
+        console.log("error" + err)
+        setButtonEnabled(true)
+        setButtonText("Get In")
         showError("something went wrong")
     }
-    hideLoading()
-    
-
-
-
-      // userStorage.setUserToken("DaniKhanWedsWilson")
-      // userStorage.setUserNumber("9958565727")
-      // navigate('FirstLogin');
-        // showLoading()
-        // await api.numberVerify(otc).then( (user) => {
-        //     console.log("user is " + user)
-        // }).catch (err => {
-        //     hideLoading()
-        //     showError("something went wrong")
-        // })
  }
    
  return (
@@ -153,7 +164,8 @@ export default function GetStarted(props) {
 			 <View style = {styles.phone}>
 				  <View style>
 			 		<TouchableOpacity
-                        onPress={() => setSelectCountryCode(true)}>
+                        onPress={() => setSelectCountryCode(true)}
+                        disabled={otcView} >
                       <Text style = {styles.countryCodeText} >{countryCode}</Text>
                     </TouchableOpacity>
 			    	</View>
@@ -161,10 +173,11 @@ export default function GetStarted(props) {
 			 	 	 keyboardType = "phone-pad"
                      onChangeText={(value) => { setPhoneNumber(value); clearError()}}
                      placeholder = "Phone Number"
+                     editable={!otcView}
                  	 maxLength={10}
 			 	 	 />
 				</View>
-			{ confirmation && 
+			{ otcView && 
 				<View style = {styles.otc}> 
 					<View style = {styles.otcIconView}>
 					 <Icon name={'lock'}  size={25} />
@@ -176,18 +189,21 @@ export default function GetStarted(props) {
 			 	  		/>
 					</View>
 			}
+            {
+                message && 
+                <View style={styles.messageView}>
+                 <Text style= { error ? styles.errorText : styles.messageText}> 
+                     {message}
+                </Text>
+                </View>
+            }
             
-            <View style={styles.messageView}>
-              <Text style= { error ? styles.errorText : styles.messageText}> 
-                {message}
-              </Text>
-            </View>
 			
             <TouchableOpacity
                  style={ 
                          buttonEnabled ? styles.buttonEnabledView : styles.buttonDisabledView 
                         }
-                 onPress={() => confirmation ? verifyOtc() : sendOtc()}
+                 onPress={() => otcView ? verifyOtc() : sendOtc()}
                  underlayColor='#fff'
                  disabled={!buttonEnabled}>
                 <Text style={styles.buttonText}>{buttonText}</Text>
@@ -217,7 +233,7 @@ const styles = StyleSheet.create({
     },
 	center : {
 		flex : 0.9,
-		height : '50%',
+		height : '60%',
 		alignSelf: 'center',
         flexDirection: 'column',
         alignItems : "center",
@@ -246,15 +262,15 @@ const styles = StyleSheet.create({
     },
     phoneCodeTextView : {
     	color : 'black',
-    	fontSize: 20,   
+    	fontSize: 21,   
     	marginRight: 5,
     },
     phoneNumberTextView : {
-        marginLeft : 5,
+        marginLeft : 10,
     	flex: 0.8,
     	height : '100%',
     	color : 'black',
-    	fontSize: 25,   
+    	fontSize: 24,   
     },
 
     otc : {
@@ -280,13 +296,15 @@ const styles = StyleSheet.create({
     messageView : {
         marginTop : 20,
         width : 250,
-        height : 50,
+        height : 60,
+        alignSelf : "center"
     },
     messageText : {
         width : 250,
     	fontSize: 14,
         fontFamily: "Thonburi",
         color : "#5a5e5e",
+
     },
     errorText : {
         width : 250,
@@ -295,6 +313,7 @@ const styles = StyleSheet.create({
         color : "red",
     },
     buttonEnabledView: {
+        marginTop : 40,
     	width : '70%',
         height : 60,
         backgroundColor:'#fb375b',
@@ -303,14 +322,14 @@ const styles = StyleSheet.create({
         alignSelf: "center"
     },
 	buttonDisabledView: {
-		marginTop : 20,
-        width : '60%',
+		marginTop : 40,
+        width : '70%',
         height : 60,
         backgroundColor:'#fb375b',
-        opacity : 0.5,
-        borderRadius:25,
+        borderRadius:15,
         justifyContent:  "center",
-        alignSelf: "center"
+        alignSelf: "center",
+        opacity : 0.5,
      },
 
      buttonText: {
