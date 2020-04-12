@@ -26,7 +26,7 @@ export default function GetStarted(props) {
 
 
     const [error, setError] = useState(null);
-    const [message, setMessage] = useState("");
+    const [message, setMessage] = useState("To protect you from fake peoples");
 
     const [buttonText, setButtonText] = useState("Get Started");
     const [buttonEnabled, setButtonEnabled] = useState(true);
@@ -141,7 +141,7 @@ export default function GetStarted(props) {
         	<Text style={styles.thoughtsText}>Log in</Text>
 			
 			 <View style = {styles.phone}>
-				  <View style = {styles.phoneCodeView}>
+				  <View style>
 			 		<TouchableOpacity
                         onPress={() => setSelectCountryCode(true)}>
                       <Text style = {styles.countryCodeText} >{countryCode}</Text>
@@ -229,12 +229,6 @@ const styles = StyleSheet.create({
         justifyContent : "center",
         alignItems : "center",
     },
-    phoneCodeView : {
-    	flex: 0.35,
-    	height : '100%',
-    	justifyContent : "center",
-        marginLeft : 10
-    },
     countryCodeText : {
         color : 'black',
         fontSize: 20,  
@@ -246,6 +240,7 @@ const styles = StyleSheet.create({
     	marginRight: 5,
     },
     phoneNumberTextView : {
+        marginLeft : 5,
     	flex: 0.8,
     	height : '100%',
     	color : 'black',
