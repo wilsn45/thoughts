@@ -1,8 +1,9 @@
 import React, {useEffect} from 'react';
-import {ActivityIndicator, View, Text} from 'react-native';
+import {StyleSheet, View, Text} from 'react-native';
 import { StackActions } from 'react-navigation';
-
 import { useAuth } from "thoughts/app/provider";
+var Spinner = require('react-native-spinkit');
+import {AuthStatus} from "thoughts/app/storage/Constants"
 
 export default function AuthLoading(props) {
     const {navigate} = props.navigation;
@@ -14,25 +15,35 @@ export default function AuthLoading(props) {
 
     async function initialize() {
         try {
-            const {user} = await getAuthState();
+             let status = await getAuthState();
 
-            if (user) {
-                //check if username exist
-                // let username = !!(user.username);
-
-                // if (username) navigate('App');
-                // else navigate('Auth', {}, StackActions.replace({ routeName: "Username" }))
-
-            } else navigate('Auth');
+             if (status == AuthStatus.ACTIVATED) {
+                navigate('App');
+             }
+             else if (status == AuthStatus.LOGGED_IN) {
+                navigate('FirstLogin');
+             }
+             else {
+                navigate('Auth')
+             }
         } catch (e) {
-            navigate('Auth');
+           console.log("error is" + e) 
         }
     }
 
     return (
         <View style={{backgroundColor: "#fff", alignItems: 'center', justifyContent: 'center', flex: 1}}>
-            <ActivityIndicator/>
-            <Text>"Loading "</Text>
+            <Spinner style={styles.spinner} isVisible={true} size={40} type="ArcAlt" color="#fb375b"/>
         </View>
     );
 };
+const styles = StyleSheet.create({ 
+
+
+spinner: {
+  marginBottom: 50
+},
+
+
+
+});

@@ -1,7 +1,8 @@
 
-import {AsyncStorage} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage'
 
 const UserTokenKey = "@UserToken"
+const UserActiveKey = "@UserActive"
 const UserNumberKey = "@UserNumber"
 const UserNameKey = "@UserName"
 const UserSexKey = "@UserSex"
@@ -24,6 +25,25 @@ export var getUserToken = () =>{
   return new Promise((resolve,reject) =>{
      AsyncStorage.getItem(UserTokenKey)
      .then( token => resolve(token))
+     .catch(err => reject(err))
+ });
+}
+
+export var setUserActive = () => {
+   return new Promise((resolve,reject) => {
+   AsyncStorage.setItem(UserActiveKey,"true")
+   .then( (success) => {
+    resolve(success)
+   })
+   .catch(err => reject(err))
+   
+ });
+}
+
+export var getIsUserActive = () =>{
+  return new Promise((resolve,reject) =>{
+     AsyncStorage.getItem(UserActiveKey)
+     .then( value => resolve(value))
      .catch(err => reject(err))
  });
 }
@@ -117,5 +137,22 @@ export var getUserContactList = () => {
    
  });
 }
+
+export async function setUserData(token,number)  {
+    let tokenPromise =  setUserToken(token)
+    let numberPromise = setUserNumber(number)
+    let userToken = await tokenPromise;
+    let userNumber = await numberPromise;
+
+   return new Promise((resolve,reject) => {
+    try {
+        resolve("success")
+    }
+    catch (err) {
+        reject(err)
+    }
+   
+ });
+ }
 
 

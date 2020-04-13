@@ -74,10 +74,9 @@ import {View,
 }
 
 function selectCountryCallback (dial_code,code) {
- console.log(code)
- setCountryCode(code + " " + dial_code)
- setDialCode(dial_code)
- setSelectCountryCode(false)
+    setCountryCode(code + " " + dial_code)
+    setDialCode(dial_code)
+    setSelectCountryCode(false)
 }
 
 function showOtc() {
@@ -93,7 +92,7 @@ async function sendOtc () {
     try {
         const number = dial_code+phoneNumber;
         if (!validE164(number)) {
-            showError("Please enter a valid phone number")
+            showError("Invalid Phone Number.")
             return;
 
         }
@@ -103,8 +102,13 @@ async function sendOtc () {
         showOtc()
         
     } catch (err) {
-        console.log("error" + err)
-        showError()
+        if(err.message.includes("[auth/invalid-phone-number]"))
+         {
+            showError("Invalid Phone Number.")
+            return
+         }
+         console.log("error is " + err)
+         showError()
     }
 }
 
@@ -112,8 +116,7 @@ async function verifyOtc () {
     setIsLoading(true)
     try {
         if (otc.length < 6) {
-           showError("Invalid one time code")
-           hideLoading()
+           showError("Invalid one time code.")
            return;
 
        }
@@ -124,37 +127,36 @@ async function verifyOtc () {
          showError() 
          return
         }
-
+        // let uid =    "DD9jnDWbPKYPOFD4C355b1ja7bF2"
+        // let number =  "+919958565727"  
+        // console.log("data is " +JSON.stringify(user))
         let uid =    JSON.stringify(user.uid) 
         let number =  JSON.stringify(user.phoneNumber)  
-        console.log("uid is is " + JSON.stringify(user.uid))
-        console.log("uid is is " + JSON.stringify(user.phoneNumber))
-
-        // let uid =    "BeTjD5KIdue2hEwqLfugnVP3qDy2"
-        // let number =  "+919958565727"
-
-        let setUidPromies =  userStorage.setUserToken(uid)
-        let setNumberPromies =  userStorage.setUserNumber(number)
-        await setUidPromies;
-        await setNumberPromies;
-
-        let userStatusPromise = api.getUserStatus()
+        console.log("id is " +uid)
+        console.log("number is " +number)
+        
+        let userStatusPromise = api.getUserStatus(uid,number)
         let status = await userStatusPromise
-
-        console.log("response is " + JSON.stringify(status.data.data.isNewUser))
-        let isNewUser = JSON.stringify(status.data.data.isNewUser)
+        let isNewUser = JSON.stringify(status.data.isNewUser)
+         console.log("is new user" + isNewUser)
         if (isNewUser == "true") {
-            console.log("in true")
            navigate('FirstLogin');
+        }
+        else if (isNewUser == "false"){
+          navigate('App');
+        } else {
+
+            showError()
        }
-       else {
-        console.log("in false")
-        navigate('App');
-    }
-}
+ }
  catch(err) {
-    console.log("error" + err)
-    showError()
+        if(err.message.includes("[auth/invalid-verification-code]"))
+         {
+            showError("Invalid one time code.")
+            return
+         }
+        showError()
+        console.log("error is " + err)
     }
 }
 
@@ -320,7 +322,7 @@ messageText : {
 },
 errorText : {
     width : 250,
-    fontSize: 14,
+    fontSize: 19,
     fontFamily: "Thonburi",
     color : "red",
 },

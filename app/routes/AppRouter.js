@@ -6,7 +6,7 @@ import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 import HomeTabNavigator from "./HomeTabNavigator";
 import GetInNavigator from "./GetInNavigator";
 
-
+import FirstLoginScene  from "thoughts/app/scenes/GetIn/FirstLoginScene";
 import AuthLoading from "thoughts/app/scenes/GetIn/AuthLoadingScene";
 import AuthProvider from "thoughts/app/provider";
 
@@ -14,6 +14,7 @@ import AuthProvider from "thoughts/app/provider";
 const AppStack = createSwitchNavigator(
     {
         Loading: AuthLoading,
+        FirstLoginScene : FirstLoginScene,
         Auth: GetInNavigator,
         App: HomeTabNavigator
     },

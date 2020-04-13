@@ -38,22 +38,17 @@ let confirmation  = null
 }
 
 
-export async function getUserStatus(){
-
-   let tokenPromise = userStorage.getUserToken()
-   let numberPromise = userStorage.getUserNumber()
-   let userToken = await tokenPromise;
-   let userNumber = await numberPromise;
+export async function getUserStatus(uid,number){
 
  return new Promise((resolve,reject) => { 
- const apiURL = API_URL+"getUserStatus"+"?number="+userNumber
-   
+ const apiURL = API_URL+"getUserStatus"
   axios.get(apiURL, { 
       headers: {
-        'Authorization': "DaniyaLovesWilson"
+        'Authorization': uid
        }
        }).then((response) => {
-          resolve(response)
+          userStorage.setUserData(uid,number)
+          resolve(response.data)
        })
        .catch(err => {
           reject(err)

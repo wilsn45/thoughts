@@ -1,9 +1,10 @@
 import React, {useMemo, useReducer, useContext} from 'react';
-import AsyncStorage from '@react-native-community/async-storage';
 import axios from "axios";
+import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 
 //IMPORT REDUCER, INITIAL STATE AND ACTION TYPES
 import reducer, {initialState, LOGGED_IN, LOGGED_OUT} from "./reducer";
+import {AuthStatus} from "thoughts/app/storage/Constants"
 
 // CONFIG KEYS [Storage Keys]===================================
 export const TOKEN_KEY = 'token';
@@ -16,55 +17,24 @@ const AuthContext = React.createContext();
 function AuthProvider(props) {
     const [state, dispatch] = useReducer(reducer, initialState || {});
 
-    // Get Auth state
     const getAuthState = async () => {
         try {
-            //GET DATA
-            let data = false;
-
-            if (data) await handleGetIn(data);
-            else await handleLogout(data);
-
-            return data;
+            let token = await getUserToken();
+            let registered = await getIsUserActive();
+              
+            if (token) {
+               return registered ? AuthStatus.ACTIVATED : AuthStatus.LOGGED_IN
+            } else {
+                return AuthStatus.LOGGED_OUT
+            }
+            
         } catch (error) {
             throw new Error(error)
         }
     };
 
-    // Handle GetIn
-    const handleGetIn = async (data) => {
-        try{
-            await setStorageData(data); //STORE DATA
-            setAuthorization(data.token); //AXIOS AUTHORIZATION HEADER
-            dispatch({type: LOGGED_IN, user:data.user}); //DISPATCH TO REDUCER
-        }catch (error) {
-            throw new Error(error);
-        }
-    };
-
-    // Handle Logout
-    const handleLogout = async () => {
-        try{
-            await setStorageData(); //REMOVE DATA
-            setAuthorization(null); //AXIOS AUTHORIZATION HEADER
-            dispatch({type: LOGGED_OUT});//DISPATCH TO REDUCER
-        }catch (error) {
-            throw new Error(error);
-        }
-    };
-
-    //UPDATE USER LOCAL STORAGE DATA AND DISPATCH TO REDUCER
-    const updateUser = async (user) => {
-        try {
-            await AsyncStorage.setItem(USER_KEY, JSON.stringify(user));
-            dispatch({type: LOGGED_IN, user}); //DISPATCH TO REDUCER
-        } catch (error) {
-            throw new Error(error);
-        }
-    };
-
     const value = useMemo(() => {
-        return {state, getAuthState, handleGetIn, handleLogout, updateUser};
+        return {state, getAuthState};
     }, [state]);
 
     return (
@@ -80,34 +50,24 @@ export default AuthProvider;
 
 
 // HELPERS ===================================
-export const setAuthorization = (token) => {
-    // Apply authorization token to every request if logged in
-    if (!token) delete axios.defaults.headers.common["Authorization"];
-    else axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+export const getUserToken = async () => {
+    try {
+        let tokenPromise = userStorage.getUserToken()
+        let userToken = await tokenPromise;
+        return userToken
+    } catch (error) {
+        throw new Error(error)
+   }
 };
 
-export const getStorageData = async () => {
-    // try {
-    //     let token = await AsyncStorage.getItem(TOKEN_KEY);
-    //     let user = await AsyncStorage.getItem(USER_KEY);
-
-    //     if (token !== null && user!== null) return {token, user:JSON.parse(user)};
-    //     else return null;
-
-    // } catch (error) {
-    //     throw new Error(error)
-   // }
+export const getIsUserActive = async () => {
+    try {
+        let activePromise = userStorage.getIsUserActive()
+        let isActive = await activePromise;
+        return isActive
+    } catch (error) {
+        throw new Error(error)
+   }
 };
 
-export const setStorageData = async (data) => {
-    // try {
-    //     if (!data) await AsyncStorage.multiRemove(keys);
-    //     else {
-    //         let {token, user} = data;
-    //         let data_ = [[USER_KEY, JSON.stringify(user)], [TOKEN_KEY, token]];
-    //         await AsyncStorage.multiSet(data_);
-    //     }
-    // } catch (error) {
-    //     throw new Error(error)
-   // }
-};

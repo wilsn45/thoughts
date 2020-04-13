@@ -29,83 +29,24 @@ async function test() {
    let userToken = await tokenPromise;
    let userNumber = await numberPromise;
 
-   console.log("first login token "+ userToken)
-   console.log("first login number "+ userNumber)
+   // console.log("first login token "+ userToken)
+   // console.log("first login number "+ userNumber)
   }
   catch (err) {
     console.log("error" + err)
   }
   
 }
-
- function getUserStatus () {
-     api.getUserStatus()
-       .then((response) => {
-          isNewUser = response.data.data.isNewUser
-          console.log("isNewUser", isNewUser)
-       })
-       .catch(err => {
-        console.log("err", err)
-    })
- }
-
- function pushContactList() {
-    if (isNewUser) {
-       
-    }
- }
-
- function putAllContacts() {
-  
- }
-
- function getContactListiOS() {
-  try {
-   Contacts.getAll((err, contacts) => {
-     if (err) {
-       throw err;
-     }
-     const phoneNumbersList = contacts.map((contact) => contact.phoneNumbers);
-     var phoneNumberArray = []
-     for(let i = 0; i < phoneNumbersList.length; i++) {
-       phoneNumberArray = [].concat(phoneNumberArray,phoneNumbersList[i].map((number) => number.number))
-     }
-     
-   })
- }catch (error) {
-  console.log(error)
+async function updateActiveToken() {
+    let activePromise = userStorage.setUserActive()
+    await activePromise;
 }
-}
-
-function getContactListAndroid() {
-
-  PermissionsAndroid.request(
-   PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
-   {
-     'title': 'Contacts',
-     'message': 'This app would like to view your contacts.',
-     'buttonPositive': 'Please accept bare mortal'
-   }
-   ).then(() => {
-     Contacts.getAll((err, contacts) => {
-       if (err === 'denied'){
-             // error
-           } else {
-            console.log(contacts)
-          }
-        })
-   })
-   
- }
- 
-
 
  return (
 
   <View style={styles.container}>
-   <Spinner style={styles.spinner} isVisible="true" size={40} type="ArcAlt" color="#fb375b"/>
-    <TouchableOpacity 
-    onPress={() => getContactListiOS()}>
+   <TouchableOpacity 
+    onPress={() => updateActiveToken()}>
       <Text> Daniya </Text>
     </TouchableOpacity>
   </View>
