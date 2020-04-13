@@ -8,6 +8,7 @@ import {View,
 import Icon from 'react-native-vector-icons/Feather';
 import ImagePicker from 'react-native-image-picker';
 import ImageView from "thoughts/app/components/ImageViewComponent";
+import { Flag } from 'react-native-svg-flagkit'
 import {CountryCodeList} from "thoughts/app/storage/Local/CountryCodeList";
 
 
@@ -21,8 +22,14 @@ export default function CountryCode ({selectCountryCallback}) {
                data={CountryCodeList.sort((a, b) => a.code.localeCompare(b.code))}
                 renderItem={({ item }) => <TouchableOpacity style = {styles.optionsView}
                                        onPress={() => selectCountryCallback(item.dial_code,item.code)}>
-                                       <Text style = {{fontSize : 20, marginLeft : 20,
+                                       <Text style = {{fontSize : 20, marginLeft : 10, width : 80, marginRight : 20
                                           }}>{item.code + " " + item.dial_code}</Text>
+                                          <View style = {{marginLeft : 20 }}>
+                                          <Flag 
+                                             id={item.code}
+                                             size={0.2}
+                                          />
+                                          </View>
                                       </TouchableOpacity> }
                    keyExtractor={item => item.code}
            />
