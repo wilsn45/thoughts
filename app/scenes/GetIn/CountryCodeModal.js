@@ -22,7 +22,7 @@ export default function CountryCode ({selectCountryCallback}) {
                data={CountryCodeList.sort((a, b) => a.code.localeCompare(b.code))}
                 renderItem={({ item }) => <TouchableOpacity style = {styles.optionsView}
                                        onPress={() => selectCountryCallback(item.dial_code,item.code)}>
-                                       <Text style = {{fontSize : 20, marginLeft : 10, width : 80, marginRight : 20
+                                       <Text style = {{fontSize : 20, marginLeft : 10, width : 95, marginRight : 10
                                           }}>{item.code + " " + item.dial_code}</Text>
                                           <View style = {{marginLeft : 20 }}>
                                           <Flag 
