@@ -132,6 +132,9 @@ async function verifyOtc () {
         // console.log("data is " +JSON.stringify(user))
         let uid =    JSON.stringify(user.uid) 
         let number =  JSON.stringify(user.phoneNumber)  
+        uid = uid.replace(/(^"|"$)/g, '');
+        number = number.replace(/(^"|"$)/g, '');
+        
         console.log("id is " +uid)
         console.log("number is " +number)
         
