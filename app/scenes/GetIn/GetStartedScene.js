@@ -7,15 +7,15 @@ import {View,
     TouchableWithoutFeedback,
     Keyboard} from 'react-native';
 
-    import * as api from "thoughts/app/services/UserGetInServices";
-    import * as userStorage from "thoughts/app/storage/Local/UserStorage";
-    import { useAuth } from "thoughts/app/provider";
-    import Icon from 'react-native-vector-icons/Feather';
-    import CountryCodeModal from "./CountryCodeModal";
-    import Modal from 'react-native-modal';
-    import * as RNLocalize from "react-native-localize";
-    import {CountryCodeList} from "thoughts/app/storage/Local/CountryCodeList";
-    var Spinner = require('react-native-spinkit');
+import * as api from "thoughts/app/services/UserGetInServices";
+import * as userStorage from "thoughts/app/storage/Local/UserStorage";
+import { useAuth } from "thoughts/app/provider";
+import Icon from 'react-native-vector-icons/Feather';
+import CountryCodeModal from "./CountryCodeModal";
+import Modal from 'react-native-modal';
+import * as RNLocalize from "react-native-localize";
+import {CountryCodeList} from "thoughts/app/storage/Local/CountryCodeList";
+var Spinner = require('react-native-spinkit');
 
     export default function GetStarted(props) {
        const {navigation} = props;
@@ -90,15 +90,15 @@ function showOtc() {
 async function sendOtc () {
     setIsLoading(true)
     try {
-        const number = dial_code+phoneNumber;
-        if (!validE164(number)) {
-            showError("Invalid Phone Number.")
-            return;
+        // const number = dial_code+phoneNumber;
+        // if (!validE164(number)) {
+        //     showError("Invalid Phone Number.")
+        //     return;
 
-        }
-        let phoneNumberPromise = api.numberSignIn(number)
-        let confirmation = await phoneNumberPromise
-        setConfirmation(confirmation)
+        // }
+        // let phoneNumberPromise = api.numberSignIn(number)
+        // let confirmation = await phoneNumberPromise
+        // setConfirmation(confirmation)
         showOtc()
         
     } catch (err) {
@@ -115,42 +115,52 @@ async function sendOtc () {
 async function verifyOtc () {
     setIsLoading(true)
     try {
-        if (otc.length < 6) {
-           showError("Invalid one time code.")
-           return;
+    //     if (otc.length < 6) {
+    //        showError("Invalid one time code.")
+    //        return;
 
-       }
-       let numberVerifyPromise = api.numberVerify(otc,confirmation)
-       let user = await numberVerifyPromise;
+    //    }
+    //    let numberVerifyPromise = api.numberVerify(otc,confirmation)
+    //    let user = await numberVerifyPromise;
 
-        if (!user) { 
-         showError() 
-         return
-        }
-        // let uid =    "DD9jnDWbPKYPOFD4C355b1ja7bF2"
-        // let number =  "+919958565727"  
+    //     if (!user) { 
+    //      showError() 
+    //      return
+        // }
+        let uid =    "DD9jnDWbPKYPOFD4C355b1ja7bF2"
+        let number =  "+919958565727"  
         // console.log("data is " +JSON.stringify(user))
-        let uid =    JSON.stringify(user.uid) 
-        let number =  JSON.stringify(user.phoneNumber)  
-        uid = uid.replace(/(^"|"$)/g, '');
-        number = number.replace(/(^"|"$)/g, '');
-        
+        // let uid =    user.uid
+        // let number =  user.phoneNumber 
+        // uid = uid.replace(/(^"|"$)/g, '');
+        // number = number.replace(/(^"|"$)/g, '');
+
         console.log("id is " +uid)
         console.log("number is " +number)
         
         let userStatusPromise = api.getUserStatus(uid,number)
-        let status = await userStatusPromise
-        let isNewUser = JSON.stringify(status.data.isNewUser)
-         console.log("is new user" + isNewUser)
-        if (isNewUser == "true") {
-           navigate('FirstLogin');
+        let response = await userStatusPromise
+        
+        if(!response) {
+            console.log("new user")
         }
-        else if (isNewUser == "false"){
-          navigate('App');
-        } else {
+        else {
+            await userStorage.initUser(response)
+        }
 
-            showError()
-       }
+       //  let isNewUser = JSON.stringify(status.data.isNewUser)
+       //   console.log("is new user" + isNewUser)
+       //  if (isNewUser == "true") {
+       //     navigate('FirstLogin');
+       //  }
+       //  else if (isNewUser == "false"){
+       //     let userActivePromise =  UserStorage.setUserActive()
+       //     await userActivePromise
+       //    navigate('App');
+       //  } else {
+       //      showError()
+       // }
+       showError()
  }
  catch(err) {
         if(err.message.includes("[auth/invalid-verification-code]"))
@@ -162,6 +172,8 @@ async function verifyOtc () {
         console.log("error is " + err)
     }
 }
+
+
 
 return (
 

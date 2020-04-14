@@ -21,33 +21,24 @@ exports.getUserStatus = functions.https.onRequest((req, resp) => {
 	try {
 
 		const authToken = req.headers.authorization
-		var number = req.query.number;
 		const usersRef = db.collection('user').doc(authToken)
 		usersRef.get()
 		.then((docSnapshot) => {
 			if (docSnapshot.exists) {
-				let data = {
-					isNewUser : false
-				}
-				console.log("getUserStatus Success", data)
-				resp.send(responseBuilder(true,data))
+				resp.status(200).send(docSnapshot.data())
 			} 
 			else {
-				let data = {
-					isNewUser : true
-				}
-				let respo =  newUserOnBoard(number,authToken)
-				respo ? resp.send(responseBuilder(true,data)) : resp.send(responseBuilder(false,"couldn't add new user"))
+				resp.status(200).send(null)
 			} 
 			return
 		})
 		.catch( err => {
 			console.log("getUserStatus failure", err)
-			resp.send(responseBuilder(false,err.message))
+			resp.status(400).send(new Error("Failed to process"))
 		});
 	}catch(error) {
 		console.log("getUserStatus failure", error)
-		resp.send(responseBuilder(false,error.message))
+		resp.status(400).send(new Error("Failed to process"))
 	}
 });
 
