@@ -13,7 +13,7 @@ import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import NewThought from "./NewThoughtModal";
 import Modal from 'react-native-modal';
-import * as fileHelper from "thoughts/app/helper/FileHelper";
+
 
 export default function Home(props) {
   const [locationViewWidth, setLocationViewWidth] = useState(100);

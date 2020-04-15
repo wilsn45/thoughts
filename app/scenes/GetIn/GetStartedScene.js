@@ -9,7 +9,7 @@ import {View,
 
 import * as api from "thoughts/app/services/UserGetInServices";
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
-import * as fileHelper from "thoughts/app/helper/FileHelper";
+import * as imageHelper from "thoughts/app/helper/ImageHelper";
 import { useAuth } from "thoughts/app/provider";
 import Icon from 'react-native-vector-icons/Feather';
 import CountryCodeModal from "./CountryCodeModal";
@@ -59,7 +59,7 @@ var Spinner = require('react-native-spinkit');
    }
 
    
-   function showError(message="something went wrong.") {
+   function showError(message="something went wrong.g") {
     setIsLoading(false)
     setError(true);
     setMessage(message)
@@ -147,8 +147,8 @@ async function verifyOtc () {
         }
         else {
             
-            let fileHelperPromise = fileHelper.saveProfileBase64(response.profile_min_url)
-            let profileBase64 = await fileHelperPromise
+            let imageHelperPromise = imageHelper.saveProfileBase64(response.profile_min_url)
+            let profileBase64 = await imageHelperPromise
             console.log("login base 64 "+ profileBase64)
             await userStorage.initUser(response,profileBase64)
             navigate('App');

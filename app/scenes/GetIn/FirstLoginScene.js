@@ -10,7 +10,6 @@ import { useAuth } from "thoughts/app/provider";
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import { PermissionsAndroid } from 'react-native';
 var Spinner = require('react-native-spinkit');
-import * as fileHelper from "thoughts/app/helper/FileHelper";
 
 
 let isNewUser;
