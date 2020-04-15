@@ -34,7 +34,6 @@ export default function Home(props) {
     userStorage.getUserProfileMinBase64()
     .then(data => {
       setPicData(data) 
-      console.log("home data is "+ picData)
     })
     .catch(err => {
       console.log("error is " +err)
