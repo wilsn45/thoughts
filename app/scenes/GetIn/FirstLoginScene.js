@@ -10,6 +10,7 @@ import { useAuth } from "thoughts/app/provider";
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import { PermissionsAndroid } from 'react-native';
 var Spinner = require('react-native-spinkit');
+import * as fileHelper from "thoughts/app/helper/FileHelper";
 
 
 let isNewUser;
@@ -17,26 +18,9 @@ export default function FirstLogin(props) {
 
 
 useEffect(() => {
-  //getUserStatus();
-   test()
 
 });
 
-async function test() {
-  try {
-    let tokenPromise = userStorage.getUserToken()
-   let numberPromise = userStorage.getUserNumber()
-   let userToken = await tokenPromise;
-   let userNumber = await numberPromise;
-
-   // console.log("first login token "+ userToken)
-   // console.log("first login number "+ userNumber)
-  }
-  catch (err) {
-    console.log("error" + err)
-  }
-  
-}
 async function updateActiveToken() {
     let activePromise = userStorage.setUserActive()
     await activePromise;
@@ -49,6 +33,7 @@ async function updateActiveToken() {
     onPress={() => updateActiveToken()}>
       <Text> Daniya </Text>
     </TouchableOpacity>
+
   </View>
   );
 };

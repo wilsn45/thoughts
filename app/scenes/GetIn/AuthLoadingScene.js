@@ -16,17 +16,17 @@ export default function AuthLoading(props) {
     async function initialize() {
         try {
              let status = await getAuthState();
-             navigate('Auth')
+             // navigate('Auth')
 
-             // if (status == AuthStatus.ACTIVATED) {
-             //    navigate('App');
-             // }
-             // else if (status == AuthStatus.LOGGED_IN) {
-             //    navigate('FirstLogin');
-             // }
-             // else {
-             //    navigate('Auth')
-             // }
+             if (status == AuthStatus.ACTIVATED) {
+                navigate('App');
+             }
+             else if (status == AuthStatus.LOGGED_IN) {
+                navigate('FirstLogin');
+             }
+             else {
+                navigate('Auth')
+             }
         } catch (e) {
            console.log("error is" + e) 
         }

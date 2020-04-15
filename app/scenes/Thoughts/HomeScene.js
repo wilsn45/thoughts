@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { View, 
         StyleSheet,
         Text,
@@ -10,15 +10,15 @@ import { View,
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
-
+import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import NewThought from "./NewThoughtModal";
 import Modal from 'react-native-modal';
-
+import * as fileHelper from "thoughts/app/helper/FileHelper";
 
 export default function Home(props) {
-
   const [locationViewWidth, setLocationViewWidth] = useState(100);
   const [newThought, showNewThought] = useState(false);
+  const [picData, setPicData] = useState(null);
   const { navigate } = useNavigation();
 
     toggleDrawer = () => {
@@ -28,39 +28,29 @@ export default function Home(props) {
     closeNewThoughtModal = () => {
         showNewThought(false)
     }
+
+  useEffect(() => {
+
+    userStorage.getUserProfileMinBase64()
+    .then(data => {
+      setPicData(data) 
+      console.log("home data is "+ picData)
+    })
+    .catch(err => {
+      console.log("error is " +err)
+    })
     
-    
+
+  });
+
   return (
       
     <View style = {styles.main}>
-     <View style = {styles.headerView}>
-       <Text style = {styles.userNameText}> Hola! Dani</Text>
-        <Icon name= "globe" size={30} color= "grey" style = {{marginRight : 10}} />
-      
-     </View>
+       { picData && 
 
-
-      <View style = {styles.thoughtsView}>
-
-       <View style = {styles.thoughtsListView}>
-        
-       </View>
-
-        <View style = {styles.newThoughtView}>
-
-          <TouchableOpacity
-                 style={ styles.featherView }
-                 onPress={() => showNewThought(true)}>
-                 <Icon name= "feather" size={50} color= "black" />
-               </TouchableOpacity>
-        </View>
-      
-      </View>
-
-        <Modal isVisible={newThought} swipeArea={50}  >
-          <NewThought  closeCallBack = {closeNewThoughtModal}/>
-        </Modal>
-      
+      <Image style={{width: 100, height: 50, borderWidth: 1}} source={{uri: picData}}/> 
+       }
+     
 
     </View>
     );

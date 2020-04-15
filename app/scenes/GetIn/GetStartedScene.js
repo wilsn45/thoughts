@@ -9,6 +9,7 @@ import {View,
 
 import * as api from "thoughts/app/services/UserGetInServices";
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
+import * as fileHelper from "thoughts/app/helper/FileHelper";
 import { useAuth } from "thoughts/app/provider";
 import Icon from 'react-native-vector-icons/Feather';
 import CountryCodeModal from "./CountryCodeModal";
@@ -58,7 +59,7 @@ var Spinner = require('react-native-spinkit');
    }
 
    
-   function showError(message="something went wrong") {
+   function showError(message="something went wrong.") {
     setIsLoading(false)
     setError(true);
     setMessage(message)
@@ -90,15 +91,15 @@ function showOtc() {
 async function sendOtc () {
     setIsLoading(true)
     try {
-        // const number = dial_code+phoneNumber;
-        // if (!validE164(number)) {
-        //     showError("Invalid Phone Number.")
-        //     return;
+        const number = dial_code+phoneNumber;
+        if (!validE164(number)) {
+            showError("Invalid Phone Number.")
+            return;
 
-        // }
-        // let phoneNumberPromise = api.numberSignIn(number)
-        // let confirmation = await phoneNumberPromise
-        // setConfirmation(confirmation)
+        }
+        let phoneNumberPromise = api.numberSignIn(number)
+        let confirmation = await phoneNumberPromise
+        setConfirmation(confirmation)
         showOtc()
         
     } catch (err) {
@@ -115,26 +116,24 @@ async function sendOtc () {
 async function verifyOtc () {
     setIsLoading(true)
     try {
-    //     if (otc.length < 6) {
-    //        showError("Invalid one time code.")
-    //        return;
+        if (otc.length < 6) {
+           showError("Invalid one time code.")
+           return;
 
-    //    }
-    //    let numberVerifyPromise = api.numberVerify(otc,confirmation)
-    //    let user = await numberVerifyPromise;
+       }
+       let numberVerifyPromise = api.numberVerify(otc,confirmation)
+       let user = await numberVerifyPromise;
 
-    //     if (!user) { 
-    //      showError() 
-    //      return
-        // }
-        let uid =    "DD9jnDWbPKYPOFD4C355b1ja7bF2"
-        let number =  "+919958565727"  
-        // console.log("data is " +JSON.stringify(user))
-        // let uid =    user.uid
-        // let number =  user.phoneNumber 
-        // uid = uid.replace(/(^"|"$)/g, '');
-        // number = number.replace(/(^"|"$)/g, '');
+        if (!user) { 
+         showError() 
+         return
+        }
 
+        // let uid =    "DD9jnDWbPKYPOFD4C355b1ja7bF2"
+        // let number =  "+919958565727"  
+        let uid =    user.uid
+        let number =  user.phoneNumber 
+        
         console.log("id is " +uid)
         console.log("number is " +number)
         
@@ -143,24 +142,17 @@ async function verifyOtc () {
         
         if(!response) {
             console.log("new user")
+            await userStorage.setUserData(uid,number)
+            navigate('FirstLogin');
         }
         else {
-            await userStorage.initUser(response)
+            
+            let fileHelperPromise = fileHelper.saveProfileBase64(response.profile_min_url)
+            let profileBase64 = await fileHelperPromise
+            console.log("login base 64 "+ profileBase64)
+            await userStorage.initUser(response,profileBase64)
+            navigate('App');
         }
-
-       //  let isNewUser = JSON.stringify(status.data.isNewUser)
-       //   console.log("is new user" + isNewUser)
-       //  if (isNewUser == "true") {
-       //     navigate('FirstLogin');
-       //  }
-       //  else if (isNewUser == "false"){
-       //     let userActivePromise =  UserStorage.setUserActive()
-       //     await userActivePromise
-       //    navigate('App');
-       //  } else {
-       //      showError()
-       // }
-       showError()
  }
  catch(err) {
         if(err.message.includes("[auth/invalid-verification-code]"))
