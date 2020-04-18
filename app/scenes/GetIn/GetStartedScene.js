@@ -28,7 +28,7 @@ var Spinner = require('react-native-spinkit');
     const [otcView, setOtcView] = useState(false);
 
     const [error, setError] = useState(null);
-    const [message, setMessage] = useState("Help us with your phone number");
+    const [message, setMessage] = useState("Can I get your number?");
 
     const [buttonText, setButtonText] = useState("Get Started");
     const [isLoading, setIsLoading] = useState(false);
@@ -59,18 +59,18 @@ var Spinner = require('react-native-spinkit');
    }
 
 
-   function showError(message="something went wrong.g") {
+   function showError(message="Oops..we are broken.") {
     setIsLoading(false)
     setError(true);
     setMessage(message)
  }
 
-    function clearError() {
+function clearError() {
     setError(false);
-    if (otcView) {
-        setMessage("Your number please")
+    if (!otcView) {
+        setMessage("We will keep it safe.")
     } else {
-        setMessage("A six digit otp will be sent on your number")
+        setMessage("We just sent you a code, please let us know that")
     }
 }
 
@@ -91,21 +91,21 @@ function showOtc() {
 async function sendOtc () {
     setIsLoading(true)
     try {
-        // const number = dial_code+phoneNumber;
-        // if (!validE164(number)) {
-        //     showError("Invalid Phone Number.")
-        //     return;
-        //
-        // }
-        // let phoneNumberPromise = api.numberSignIn(number)
-        // let confirmation = await phoneNumberPromise
-        // setConfirmation(confirmation)
+        const number = dial_code+phoneNumber;
+        if (!validE164(number)) {
+            showError("Incorrect phone number")
+            return;
+
+        }
+        let phoneNumberPromise = api.numberSignIn(number)
+        let confirmation = await phoneNumberPromise
+        setConfirmation(confirmation)
         showOtc()
 
     } catch (err) {
         if(err.message.includes("[auth/invalid-phone-number]"))
          {
-            showError("Invalid Phone Number.")
+            showError("Incorrect phone number")
             return
          }
          console.log("error is " + err)
@@ -114,14 +114,15 @@ async function sendOtc () {
 }
 
 async function verifyOtc () {
+     let code = otc.replace(/ /g, "")
     setIsLoading(true)
     try {
         if (otc.length < 6) {
-           showError("Invalid one time code.")
+           showError("Thats not the code")
            return;
 
        }
-       let numberVerifyPromise = api.numberVerify(otc,confirmation)
+       let numberVerifyPromise = api.numberVerify(code,confirmation)
        let user = await numberVerifyPromise;
 
         if (!user) {
@@ -143,13 +144,12 @@ async function verifyOtc () {
         if(!response) {
             console.log("new user")
             await userStorage.setUserData(uid,number)
-            navigate('SetUserName');
+            navigate('SetUserInfo');
         }
         else {
            console.log("old user")
             let imageHelperPromise = imageHelper.saveProfileBase64(response.profile_min_url)
             let profileBase64 = await imageHelperPromise
-            console.log("login base 64 "+ profileBase64)
             await userStorage.initUser(response,profileBase64)
             navigate('App');
         }
@@ -157,14 +157,22 @@ async function verifyOtc () {
  catch(err) {
         if(err.message.includes("[auth/invalid-verification-code]"))
          {
-            showError("Invalid one time code.")
+            showError("Thats not the code")
             return
          }
         showError()
         console.log("error is " + err)
     }
 }
+function updateOtcValue(value) {
+  if(otc.length > value.length) {
+    value = value.slice(0,value.length-2)
+    setOtc(value)
+  }else {
+    setOtc(value + "  ")
 
+  }
+}
 
 
 return (
@@ -202,8 +210,9 @@ return (
         </View>
         <TextInput style={styles.phoneNumberTextView}
         keyboardType = "phone-pad"
-        onChangeText={(value) => {setOtc(value); clearError();}}
-        maxLength={6}
+        onChangeText={(value) => updateOtcValue(value)}
+        maxLength={18}
+        value = {otc}
         autoFocus = {true}
         />
         </View>
@@ -217,7 +226,7 @@ return (
     {
         isLoading &&
         <View style = {styles.loadingView}>
-        <Spinner style={styles.spinner} isVisible={true} size={40} type="Arc" color="#189afd"/>
+        <Spinner style={styles.spinner} isVisible={true} size={50} type="Arc" color="#189afd"/>
         </View>
 
     }
@@ -295,6 +304,7 @@ phoneNumberTextView : {
     height : '100%',
     color : 'black',
     fontSize: 24,
+    textAlign : "auto"
 },
 
 otc : {
@@ -315,7 +325,8 @@ otcIconView : {
 otcTextInputView : {
    flex: 0.8,
    height : '100%',
-   marginLeft: 10
+   marginLeft: 10,
+   textAlign : "center"
 },
 messageView : {
     width : '70%',
@@ -330,7 +341,6 @@ messageText : {
     fontSize: 16,
     fontFamily: "Thonburi",
     color : '#189afd',
-    marginLeft : 20,
     fontWeight : "100",
     textAlign : "center"
 },
@@ -345,7 +355,7 @@ getButtonView: {
     width : '70%',
     height : 60,
     backgroundColor:'#189afd',
-    borderRadius:15,
+    borderRadius:25,
     justifyContent:  "center",
     alignSelf: "center"
 },
@@ -353,9 +363,9 @@ loadingView: {
   marginTop : 40,
   width : '70%',
   height : 60,
-  borderColor : "#189afd",
-  borderWidth : 1,
-  borderRadius:15,
+  // borderColor : "#189afd",
+  // borderWidth : 1,
+  // borderRadius:15,
   justifyContent:  "center",
   alignSelf: "center",
   alignItems : "center"
@@ -366,7 +376,7 @@ buttonText: {
   textAlign:'center',
   fontSize: 23,
   fontFamily: "Thonburi",
-  fontWeight : "bold"
+  fontWeight : "100",
 }
 
 

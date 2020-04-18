@@ -3,8 +3,7 @@ import {createStackNavigator} from 'react-navigation-stack';
 
 //IMPORT SCENES
 import GetStartedScene from "thoughts/app/scenes/GetIn/GetStartedScene";
-import SetUserNameScene  from "thoughts/app/scenes/GetIn/SetUserNameScene";
-import SetProfileScreen  from "thoughts/app/scenes/GetIn/SetProfileScreen";
+import SetUserInfoScene  from "thoughts/app/scenes/GetIn/SetUserInfoScene";
 import HomeTabNavigator from "./HomeTabNavigator";
 
 
@@ -12,8 +11,7 @@ import HomeTabNavigator from "./HomeTabNavigator";
 const Auth = createStackNavigator(
     {
         GetStarted: GetStartedScene,
-        SetUserName: SetUserNameScene,
-        SetProfile : SetProfileScreen,
+        SetUserInfo: SetUserInfoScene,
         App: HomeTabNavigator,
     },
     { headerMode: 'none' },

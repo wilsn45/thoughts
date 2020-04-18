@@ -23,36 +23,8 @@ export default function AuthLoading(props) {
                 navigate('App');
              }
              else if (status == AuthStatus.LOGGED_IN) {
-                let userNamePromise =  userStorage.getUserName()
-                let userProfilePromise =  userStorage.getUserProfileMinBase64()
-                let userSexPromise =  userStorage.getUserSex()
-                let userCategoriesPromise =  userStorage.getUserCategories()
-
-                let username = await userNamePromise;
-                console.log("set username "+username)
-                if (!username) {
-                  navigate('SetUserName');
-                  return
-                }
-                let profilePic = await userProfilePromise;
-                if (!profilePic) {
-                  navigate("SetProfile")
-                  return
-                }
-
-                let sex = await userSexPromise
-                if(!sex) {
-                  navigate("SetSex")
-                  return
-                }
-
-                let categories = await userCategoriesPromise
-                if(!categories) {
-                  navigate("SetCategories")
-                  return
-                }
-
-             }
+               navigate('SetUserInfo');
+            }
              else {
                 navigate('Auth')
              }
