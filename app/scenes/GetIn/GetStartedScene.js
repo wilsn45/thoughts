@@ -28,7 +28,7 @@ var Spinner = require('react-native-spinkit');
     const [otcView, setOtcView] = useState(false);
 
     const [error, setError] = useState(null);
-    const [message, setMessage] = useState("A six digit otp will be sent on your number");
+    const [message, setMessage] = useState("Help us with your phone number");
 
     const [buttonText, setButtonText] = useState("Get Started");
     const [isLoading, setIsLoading] = useState(false);
@@ -68,7 +68,7 @@ var Spinner = require('react-native-spinkit');
     function clearError() {
     setError(false);
     if (otcView) {
-        setMessage("Enter the opt we just sent you on your number")
+        setMessage("Your number please")
     } else {
         setMessage("A six digit otp will be sent on your number")
     }
@@ -84,22 +84,22 @@ function showOtc() {
     setIsLoading(false)
     setOtcView(true)
     setButtonText("Get In")
-    setMessage("Enter the opt we just sent you on your number")
+    setMessage("We just sent you a code, please let us know that.")
     setError(false)
 }
 
 async function sendOtc () {
     setIsLoading(true)
     try {
-        const number = dial_code+phoneNumber;
-        if (!validE164(number)) {
-            showError("Invalid Phone Number.")
-            return;
-
-        }
-        let phoneNumberPromise = api.numberSignIn(number)
-        let confirmation = await phoneNumberPromise
-        setConfirmation(confirmation)
+        // const number = dial_code+phoneNumber;
+        // if (!validE164(number)) {
+        //     showError("Invalid Phone Number.")
+        //     return;
+        //
+        // }
+        // let phoneNumberPromise = api.numberSignIn(number)
+        // let confirmation = await phoneNumberPromise
+        // setConfirmation(confirmation)
         showOtc()
 
     } catch (err) {
@@ -175,40 +175,43 @@ return (
 
     <View style = {styles.center}>
 
-    <Text style={styles.thoughtsText}>Log in</Text>
+    <Text style={styles.thoughtsText}>Hey</Text>
 
+    { !otcView &&
     <View style = {styles.phone}>
     <View style>
     <TouchableOpacity
-    onPress={() => setSelectCountryCode(true)}
-    disabled={otcView} >
+      onPress={() => setSelectCountryCode(true)}
+      disabled={otcView} >
     <Text style = {styles.countryCodeText} >{countryCode}</Text>
     </TouchableOpacity>
     </View>
     <TextInput style={styles.phoneNumberTextView}
-    keyboardType = "phone-pad"
-    onChangeText={(value) => { setPhoneNumber(value); clearError()}}
-    placeholder = "Phone Number"
-    editable={!otcView}
-    maxLength={10}
+      keyboardType = "phone-pad"
+      onChangeText={(value) => { setPhoneNumber(value); clearError()}}
+      editable={true}
+      maxLength={10}
+      autoFocus = {true}
     />
     </View>
+    }
     { otcView &&
         <View style = {styles.otc}>
         <View style = {styles.otcIconView}>
-        <Icon name={'lock'}  size={25} />
+        <Icon name={'lock'}  size={30} />
         </View>
         <TextInput style={styles.phoneNumberTextView}
         keyboardType = "phone-pad"
         onChangeText={(value) => {setOtc(value); clearError();}}
         maxLength={6}
+        autoFocus = {true}
         />
         </View>
     }
     <View style={styles.messageView}>
-    <Text style= { error ? styles.errorText : styles.messageText}>
-    {message}
-    </Text>
+      <Text style= { error ? styles.errorText : styles.messageText}>
+        {message}
+      </Text>
     </View>
 
     {
@@ -254,32 +257,32 @@ const styles = StyleSheet.create({
     },
     center : {
       flex : 0.9,
-      height : '50%',
+      height : '40%',
       alignSelf: 'center',
       flexDirection: 'column',
       alignItems : "center",
 
   },
   thoughtsText : {
-    fontSize: 38,
+    fontSize: 28,
     fontFamily: "Thonburi",
-    fontWeight : "400"
+    fontWeight : "100"
 },
 phone : {
    marginTop : 50,
    height : 60,
    width : '80%',
    flexDirection: 'row',
-   borderColor: '#F0F0F0',
-   borderBottomWidth : 2,
+   // borderColor: '#F0F0F0',
+   // borderBottomWidth : 2,
    borderRadius: 1,
    justifyContent : "center",
    alignItems : "center",
 },
 countryCodeText : {
     color : 'black',
-    fontSize: 20,
-    fontWeight : "200"
+    fontSize: 24,
+    fontWeight : "400"
 },
 phoneCodeTextView : {
    color : 'black',
@@ -296,15 +299,15 @@ phoneNumberTextView : {
 
 otc : {
    height : 60,
-   marginTop : 30,
+   marginTop : 50,
    width : '80%',
    flexDirection: 'row',
-   borderColor: '#F0F0F0',
-   borderBottomWidth : 2,
+   // borderColor: '#F0F0F0',
+   // borderBottomWidth : 2,
    borderRadius: 15,
 },
 otcIconView : {
-   marginLeft: 20,
+   marginLeft: 30,
    marginRight: 10,
    flex: 0.15,
    justifyContent : "center"
@@ -315,17 +318,21 @@ otcTextInputView : {
    marginLeft: 10
 },
 messageView : {
-    marginTop : 20,
-    width : 250,
+    width : '70%',
     height : 60,
-    alignSelf : "center"
+    alignItems : "center",
+    justifyContent : "center",
+    // borderColor : "red",
+    // borderWidth : 1
 },
 messageText : {
-    width : 250,
-    fontSize: 14,
+    width : '100%',
+    fontSize: 16,
     fontFamily: "Thonburi",
-    color : "#5a5e5e",
-
+    color : '#189afd',
+    marginLeft : 20,
+    fontWeight : "100",
+    textAlign : "center"
 },
 errorText : {
     width : 250,
