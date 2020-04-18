@@ -32,7 +32,7 @@ var Spinner = require('react-native-spinkit');
 
     const [buttonText, setButtonText] = useState("Get Started");
     const [isLoading, setIsLoading] = useState(false);
-    
+
     const [phoneNumber, setPhoneNumber] = useState("");
     const [dial_code, setDialCode] = useState("+91");
     const [countryCode, setCountryCode] = useState(null);
@@ -47,7 +47,7 @@ var Spinner = require('react-native-spinkit');
          if (!countryCode) {
             setCountryCode(result.code + " " + result.dial_code)
             setDialCode(result.dial_code)
-        } 
+        }
     }
     catch(err) {
         console.log("error" + err)
@@ -58,7 +58,7 @@ var Spinner = require('react-native-spinkit');
        return /^\+?[1-9]\d{1,14}$/.test(num)
    }
 
-   
+
    function showError(message="something went wrong.g") {
     setIsLoading(false)
     setError(true);
@@ -101,7 +101,7 @@ async function sendOtc () {
         let confirmation = await phoneNumberPromise
         setConfirmation(confirmation)
         showOtc()
-        
+
     } catch (err) {
         if(err.message.includes("[auth/invalid-phone-number]"))
          {
@@ -124,29 +124,29 @@ async function verifyOtc () {
        let numberVerifyPromise = api.numberVerify(otc,confirmation)
        let user = await numberVerifyPromise;
 
-        if (!user) { 
-         showError() 
+        if (!user) {
+         showError()
          return
         }
 
-        // let uid =    "DD9jnDWbPKYPOFD4C355b1ja7bF2"
-        // let number =  "+919958565727"  
+        // let uid =    "DaniyaWIlson"
+        // let number =  "+919958565727"
         let uid =    user.uid
-        let number =  user.phoneNumber 
-        
+        let number =  user.phoneNumber
+
         console.log("id is " +uid)
         console.log("number is " +number)
-        
-        let userStatusPromise = api.getUserStatus(uid,number)
+
+        let userStatusPromise = api.getUserData(uid,number)
         let response = await userStatusPromise
-        
+
         if(!response) {
             console.log("new user")
             await userStorage.setUserData(uid,number)
-            navigate('FirstLogin');
+            navigate('SetUserName');
         }
         else {
-            
+           console.log("old user")
             let imageHelperPromise = imageHelper.saveProfileBase64(response.profile_min_url)
             let profileBase64 = await imageHelperPromise
             console.log("login base 64 "+ profileBase64)
@@ -193,8 +193,8 @@ return (
     maxLength={10}
     />
     </View>
-    { otcView && 
-        <View style = {styles.otc}> 
+    { otcView &&
+        <View style = {styles.otc}>
         <View style = {styles.otcIconView}>
         <Icon name={'lock'}  size={25} />
         </View>
@@ -206,20 +206,20 @@ return (
         </View>
     }
     <View style={styles.messageView}>
-    <Text style= { error ? styles.errorText : styles.messageText}> 
+    <Text style= { error ? styles.errorText : styles.messageText}>
     {message}
     </Text>
     </View>
 
     {
-        isLoading && 
+        isLoading &&
         <View style = {styles.loadingView}>
-        <Spinner style={styles.spinner} isVisible={true} size={40} type="Arc" color="#fb375b"/>
+        <Spinner style={styles.spinner} isVisible={true} size={40} type="Arc" color="#189afd"/>
         </View>
 
     }
     {
-        !isLoading && 
+        !isLoading &&
         <TouchableOpacity
         style={ styles.getButtonView}
         onPress={() => otcView ? verifyOtc() : sendOtc()}
@@ -243,7 +243,7 @@ return (
     );
 };
 
-const styles = StyleSheet.create({ 
+const styles = StyleSheet.create({
     main : {
         flex : 1,
         alignItems : "center",
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     },
     center : {
       flex : 0.9,
-      height : '60%',
+      height : '50%',
       alignSelf: 'center',
       flexDirection: 'column',
       alignItems : "center",
@@ -278,12 +278,12 @@ phone : {
 },
 countryCodeText : {
     color : 'black',
-    fontSize: 20,  
-    fontWeight : "200" 
+    fontSize: 20,
+    fontWeight : "200"
 },
 phoneCodeTextView : {
    color : 'black',
-   fontSize: 21,   
+   fontSize: 21,
    marginRight: 5,
 },
 phoneNumberTextView : {
@@ -291,7 +291,7 @@ phoneNumberTextView : {
     flex: 0.8,
     height : '100%',
     color : 'black',
-    fontSize: 24,   
+    fontSize: 24,
 },
 
 otc : {
@@ -337,7 +337,7 @@ getButtonView: {
     marginTop : 40,
     width : '70%',
     height : 60,
-    backgroundColor:'#fb375b',
+    backgroundColor:'#189afd',
     borderRadius:15,
     justifyContent:  "center",
     alignSelf: "center"
@@ -346,7 +346,7 @@ loadingView: {
   marginTop : 40,
   width : '70%',
   height : 60,
-  borderColor : "#fb375b",
+  borderColor : "#189afd",
   borderWidth : 1,
   borderRadius:15,
   justifyContent:  "center",

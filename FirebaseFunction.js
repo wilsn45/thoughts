@@ -6,7 +6,7 @@ const db = admin.firestore();
 
 
 const { parse } = require('querystring');
-//twillo 
+//twillo
 // const twilio = require('twilio')
 // const accountSid = functions.config().twilio.sid
 // const accountToken = functions.config().twilio.token
@@ -26,10 +26,10 @@ exports.getUserStatus = functions.https.onRequest((req, resp) => {
 		.then((docSnapshot) => {
 			if (docSnapshot.exists) {
 				resp.status(200).send(docSnapshot.data())
-			} 
+			}
 			else {
 				resp.status(200).send(null)
-			} 
+			}
 			return
 		})
 		.catch( err => {
@@ -38,6 +38,34 @@ exports.getUserStatus = functions.https.onRequest((req, resp) => {
 		});
 	}catch(error) {
 		console.log("getUserStatus failure", error)
+		resp.status(400).send(new Error("Failed to process"))
+	}
+});
+// .collection("user")
+// .where("username", "==", "daniya")
+
+exports.isUserNameAvailable = functions.https.onRequest((req, resp) => {
+	try {
+		 let username = req.query.username
+		 console.log("got username = "+ username)
+
+		let userRef = db.collection("user");
+	  let query = userRef.where("username", "==", username).get()
+	  .then(snapshot => {
+			if(snapshot.empty) {
+			resp.status(200).json({ isAvailable: true })
+		 }else {
+				resp.status(200).json({ isAvailable: false })
+			}
+			return
+		})
+	 .catch(err => {
+			console.log("isUserNameAvailable failure", err)
+			resp.status(400).send(new Error("Failed to process"))
+ 		});
+	}
+	catch(error) {
+		console.log("isUserNameAvailable failure", error)
 		resp.status(400).send(new Error("Failed to process"))
 	}
 });
@@ -65,10 +93,10 @@ exports.getMissedThoughts = functions.https.onRequest((req, resp) => {
 		getUserSeeArray(authToken)
 		.then ((see) => {
 
-			
+
 			getUserUid(see)
 			.then ( (users) => {
-				
+
 				users.push(authToken)
 				getThoughtsId(users)
 				.then ( (thoughtsId) => {
@@ -112,7 +140,7 @@ var getUserSeeArray = (uid) => {
 			if (!seeSnapshot.exists) {
 				console.log("getUserSeeArray : see array empty")
 				reject(Error("User doesn't exist"))
-			} 
+			}
 			console.log("getUserSeeArray Success", seeSnapshot.data().see)
 			resolve(seeSnapshot.data().see)
 			return
@@ -140,7 +168,7 @@ var getUserUid = (numberArray) => {
 		})
 		.catch(err => {
 			console.log("getUserUid failure", err)
-			reject(err) 
+			reject(err)
 		});
 	});
 }
@@ -179,5 +207,3 @@ function responseBuilder(isSuccess,data=null,error="") {
 		data : data
 	}
 }
-
-

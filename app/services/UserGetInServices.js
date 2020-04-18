@@ -17,7 +17,7 @@ let confirmation  = null
 
 
  export async function numberSignIn(number) {
-    return new Promise((resolve,reject) => { 
+    return new Promise((resolve,reject) => {
      auth().signInWithPhoneNumber(number).then ( (confirmation) =>{
         resolve (confirmation)
      }).catch (err => {
@@ -28,7 +28,7 @@ let confirmation  = null
 
 
  export async function numberVerify(otc,confirmation) {
-   return new Promise((resolve,reject) => { 
+   return new Promise((resolve,reject) => {
      confirmation.confirm(otc).then( (user) =>{
          resolve(user)
      }).catch(function (err) {
@@ -38,28 +38,49 @@ let confirmation  = null
 }
 
 
-export async function getUserStatus(uid,number){
+export async function getUserData(uid){
 
- return new Promise((resolve,reject) => { 
- const apiURL = API_URL+"getUserStatus"
-  axios.get(apiURL, { 
-      headers: {
-        'Authorization': uid
-       }
-       }).then((response) => {
-          userStorage.setUserData(uid,number)
-          resolve(response.data)
-       })
-       .catch(err => {
-          reject(err)
-        })
-     });
+ return new Promise((resolve,reject) => {
+  const userRef = firestore().collection('user').doc(uid);
+    userRef.get()
+    .then(snapshot => {
+      if(snapshot.exists) {
+       resolve(snapshot.data())
+      }else {
+        resolve(null)
+      }
+        return
+    })
+    .catch(err => {
+        reject(err)
+      });
+    });
  }
+
+ export async function isUserNameAvailable(username){
+   return new Promise((resolve,reject) => {
+      const userRef = firestore().collection('user');
+      userRef.where("username", "==", username).get()
+  	  .then(snapshot => {
+  			if(snapshot.empty) {
+  			 console.log("available")
+         resolve(true)
+  		  }else {
+  				console.log("not available")
+          resolve(false)
+  			}
+  			return
+  		})
+  	 .catch(err => {
+  			 reject(err)
+   		});
+    });
+  }
 
 export async function isNewContactAdded() {
    let contactList = contactListHelper.getUserContactList()
    console.log(contactList)
-  
+
 }
 
 
@@ -73,13 +94,13 @@ export async function isNewContactAdded() {
 //               if (!doc.exists) {
 //                    console.log('No such document!');
 //               } else {
-//                    console.log('Document exists'); 
+//                    console.log('Document exists');
 //                 }
 //           })
 //     .catch(err => {
 //       console.log('Error getting document', err);
 //     })
-    
+
 // }
 
 // export async function GetIn(data){
