@@ -91,8 +91,7 @@ return (
    <Text style={styles.thoughtsText}>Choose a username</Text>
    <View style={styles.middleSubView}>
     <TextInput style={styles.userNameTextView}
-       keyboardType = "phone-pad"
-        onChangeText={(value) => userNameCallBack(value)}
+       onChangeText={(value) => userNameCallBack(value)}
         autoFocus = {true}
     />
     {
@@ -168,16 +167,17 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: "Thonburi",
     fontWeight : "100",
-    textAlign : "auto"
+    textAlign : "auto",
+    marginBottom : 30
   },
   middleSubView : {
-    marginTop : 50,
-    height : 100,
+    marginTop : 30,
+    height : 60,
     flexDirection : "row",
     alignSelf : "center",
     alignItems : "flex-start",
     justifyContent : "center",
-    // borderColor: 'red',
+    borderColor: 'red',
     // borderWidth : 2
   },
   userNameTextView : {
@@ -199,12 +199,11 @@ const styles = StyleSheet.create({
 
   },
   errorText : {
-     marginTop : 30,
      width : 300,
      fontSize: 19,
      fontFamily: "Thonburi",
      color : "red",
-     alignSelf : "center"
+     textAlign:'center',
  },
  sexView : {
    flex : 0.4,
