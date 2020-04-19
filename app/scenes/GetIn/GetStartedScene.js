@@ -17,7 +17,6 @@ import Modal from 'react-native-modal';
 import * as RNLocalize from "react-native-localize";
 import {CountryCodeList} from "thoughts/app/storage/Local/CountryCodeList";
 var Spinner = require('react-native-spinkit');
-
     export default function GetStarted(props) {
        const {navigation} = props;
        const {navigate} = navigation;
@@ -97,6 +96,7 @@ async function sendOtc () {
             return;
 
         }
+        Keyboard.dismiss()
         let phoneNumberPromise = api.numberSignIn(number)
         let confirmation = await phoneNumberPromise
         setConfirmation(confirmation)
@@ -122,6 +122,7 @@ async function verifyOtc () {
            return;
 
        }
+       Keyboard.dismiss()
        let numberVerifyPromise = api.numberVerify(code,confirmation)
        let user = await numberVerifyPromise;
 

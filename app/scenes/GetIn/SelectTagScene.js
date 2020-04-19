@@ -11,13 +11,12 @@ import { useAuth } from "thoughts/app/provider";
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import Icon from 'react-native-vector-icons/Feather';
 var Spinner = require('react-native-spinkit');
-import {Keyboard} from 'react-native'
 
 
 let isNewUser;
 
 
-export default function SetUserInfoScene(props) {
+export default function SelectTagScene(props) {
   const {navigation} = props;
   const {navigate} = navigation;
 const[userName, setUserName] = useState(null);
@@ -60,7 +59,6 @@ function isUsernameAvailable(value) {
         setError("oops! username not availale")
     }
     else {
-      Keyboard.dismiss()
       setUserNameFound(true)
     }
     setIsFinding(false)
@@ -83,18 +81,16 @@ async function setUserInfo() {
   let userSexPromise =  userStorage.setUserSex(sex)
   await userNamePromise;
   await userSexPromise;
-  navigate('SelectTag');
+  console.log("saved")
+  //navigate('SetProfile');
 }
 
 return (
   <View style={styles.main}>
    <View style = {styles.middleView}>
-   <Text style={styles.thoughtsText}>Choose a username</Text>
-
-   <View style = {styles.usernameView}>
-    <View style={styles.middleSubView}>
-
-     <TextInput style={styles.userNameTextView}
+   <Text style={styles.thoughtsText}>Select Tag</Text>
+   <View style={styles.middleSubView}>
+    <TextInput style={styles.userNameTextView}
        onChangeText={(value) => userNameCallBack(value)}
         autoFocus = {true}
     />
@@ -105,8 +101,6 @@ return (
     {
       error &&  <Text style = {styles.errorText}> {error} </Text>
     }
-   </View>
-
 
     { userNameFound &&
 
@@ -186,13 +180,6 @@ const styles = StyleSheet.create({
     borderColor: 'red',
     // borderWidth : 2
   },
-  usernameView : {
-    width : '80%',
-    flex : 0.2,
-    // borderColor : "red",
-    // borderWidth : 2
-
-  },
   userNameTextView : {
    width : '50%',
    color : '#189afd',
@@ -200,22 +187,16 @@ const styles = StyleSheet.create({
    marginRight : 25,
    textAlign:'center',
   },
+  buttomView : {
+    marginTop : 80,
+    width : 80,
+    height : 80,
+    borderRadius : 40,
+    alignItems : "center",
+    justifyContent : "center",
+    backgroundColor : '#189afd',
+    alignSelf : "flex-end"
 
-  setButtonView: {
-      marginTop : 10,
-      width : '70%',
-      flex : 0.1,
-      backgroundColor:'#189afd',
-      borderRadius:25,
-      justifyContent:  "center",
-      alignSelf: "center"
-  },
-  buttonText: {
-    color:'#fff',
-    textAlign:'center',
-    fontSize: 23,
-    fontFamily: "Thonburi",
-    fontWeight : "100",
   },
   errorText : {
      width : 300,
@@ -311,11 +292,26 @@ const styles = StyleSheet.create({
    color : '#fff',
  },
 
-
+ setButtonView: {
+     marginTop : 40,
+     width : '70%',
+     height : 60,
+     backgroundColor:'#189afd',
+     borderRadius:25,
+     justifyContent:  "center",
+     alignSelf: "center"
+ },
+ buttonText: {
+   color:'#fff',
+   textAlign:'center',
+   fontSize: 23,
+   fontFamily: "Thonburi",
+   fontWeight : "100",
+ }
 
 });
 
-SetUserInfoScene.navigationOptions = ({}) => {
+SelectTagScene.navigationOptions = ({}) => {
   return {
     title: ``
   }
