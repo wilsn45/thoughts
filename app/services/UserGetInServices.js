@@ -75,7 +75,28 @@ export async function getUserData(uid){
   			 reject(err)
    		});
     });
-  }
+}
+
+// export async function getMostPopularTags(){
+//   return new Promise((resolve,reject) => {
+//      let userSexPromise =
+//      const userRef = firestore().collection('tags');
+//      userRef.where("username", "==", username).get()
+//      .then(snapshot => {
+//        if(snapshot.empty) {
+//         console.log("available")
+//         resolve(true)
+//        }else {
+//          console.log("not available")
+//          resolve(false)
+//        }
+//        return
+//      })
+//     .catch(err => {
+//         reject(err)
+//      });
+//    });
+// }
 
 export async function isNewContactAdded() {
    let contactList = contactListHelper.getUserContactList()

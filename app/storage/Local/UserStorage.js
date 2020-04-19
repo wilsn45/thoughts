@@ -19,7 +19,7 @@ export var setUserToken = (token) => {
     resolve(success)
    })
    .catch(err => reject(err))
-   
+
  });
 }
 
@@ -38,7 +38,7 @@ export var setUserActive = () => {
     resolve(success)
    })
    .catch(err => reject(err))
-   
+
  });
 }
 
@@ -57,7 +57,7 @@ export var setUserNumber = (number) => {
     resolve(success)
    })
    .catch(err => reject(err))
-   
+
  });
 }
 
@@ -77,7 +77,7 @@ export var setUserName = (name)  =>{
     resolve(success)
    })
    .catch(err => reject(err))
-   
+
  });
 }
 
@@ -96,7 +96,7 @@ export var setUserSex = (sex) => {
     resolve(success)
    })
    .catch(err => reject(err))
-   
+
  });
 }
 
@@ -115,7 +115,7 @@ export var setUserCategories = (categories) => {
     resolve(success)
    })
    .catch(err => reject(err))
-   
+
  });
 }
 
@@ -134,7 +134,7 @@ export var setUserProfileMinBase64 = (data) => {
     resolve(data)
    })
    .catch(err => reject(err))
-   
+
  });
 }
 
@@ -153,7 +153,7 @@ export var setUserContactListEmpty = () => {
     resolve(success)
    })
    .catch(err => reject(err))
-   
+
  });
 }
 
@@ -164,7 +164,7 @@ export var setUserContactList = (contactList) => {
     resolve(success)
    })
    .catch(err => reject(err))
-   
+
  });
 }
 
@@ -174,8 +174,30 @@ export var getUserContactList = () => {
    .then(contactList => JSON.parse(contactList))
    .then(array => resolve(array))
    .catch(err => reject(err));
-   
+
  });
+}
+
+export async function setTest()  {
+  try {
+    let testPromise = AsyncStorage.setItem(UserContactListKey,"DaniyaWedsWilson")
+    await testPromise
+  } catch (err) {
+    console.log("error is "+err)
+     throw new Error(err.message)
+  }
+}
+
+export async function getTest() {
+  try {
+    let testPromise = AsyncStorage.getItem(UserContactListKey)
+    let value = await testPromise
+    console.log("test value storage is "+value)
+    return value
+  } catch (err) {
+    console.log("error is "+err)
+     throw new Error(err.message)
+  }
 }
 
 export async function setUserData(token,number)  {
@@ -186,9 +208,9 @@ export async function setUserData(token,number)  {
     let userNumber = await numberPromise;
   }
   catch (err) {
-    throw handler(err); 
+    throw handler(err);
   }
-    
+
 }
 
 export async function initUser(response,profileBase64) {
@@ -197,14 +219,14 @@ export async function initUser(response,profileBase64) {
     let sex = response.sex
     let userName = response.user_name
     let categories = response.categories
-    
+
 
     let userNamePromise =  setUserName(userName)
     let userSexPromise = setUserSex(sex)
     let UserCategoriesPromise = setUserCategories(categories)
     let activePromise    =      setUserActive()
     let userProfileBasePromise = setUserProfileMinBase64(profileBase64)
-    
+
     await userNamePromise;
     await userSexPromise;
     await UserCategoriesPromise;
@@ -213,7 +235,6 @@ export async function initUser(response,profileBase64) {
   }
    catch (err) {
 
-    throw Error(err); 
+    throw Error(err);
    }
 }
-
