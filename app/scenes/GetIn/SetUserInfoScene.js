@@ -36,8 +36,7 @@ useEffect(() => {
 });
 
 async function updateActiveToken() {
-    let activePromise = userStorage.setUserActive()
-    await activePromise;
+    await userStorage.setUserActive()
 }
 
 function userNameCallBack(value) {
@@ -67,23 +66,19 @@ function isUsernameAvailable(value) {
   })
   .catch(err => {
      setIsFinding(false)
-      console.log("console.error() "+err)
+      console.log("console error "+err)
 
   })
 }
 
-async function saveUserName() {
-  let userNamePromise =  userStorage.setUserName(userName)
-  await userNamePromise;
-  navigate('SetProfile');
-}
-
 async function setUserInfo() {
-  let userNamePromise =  userStorage.setUserName(userName)
-  let userSexPromise =  userStorage.setUserSex(sex)
-  await userNamePromise;
-  await userSexPromise;
-  navigate('SelectTag');
+  try {
+    await  userStorage.setUserName(userName)
+    await userStorage.setUserSex(sex)
+    navigate('SelectTag');
+  }catch (err) {
+    console.log("idher error is "+err)
+  }
 }
 
 return (

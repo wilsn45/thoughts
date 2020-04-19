@@ -19,15 +19,15 @@ function AuthProvider(props) {
 
     const getAuthState = async () => {
         try {
-            let token = await getUserToken();
-            let registered = await getIsUserActive();
-              
+            let token = await userStorage.getUserToken();
+            let registered = await userStorage.getIsUserActive()
+
             if (token) {
                return registered ? AuthStatus.ACTIVATED : AuthStatus.LOGGED_IN
             } else {
                 return AuthStatus.LOGGED_OUT
             }
-            
+
         } catch (error) {
             throw new Error(error)
         }
@@ -47,27 +47,3 @@ function AuthProvider(props) {
 const useAuth = () => useContext(AuthContext);
 export { AuthContext, useAuth }
 export default AuthProvider;
-
-
-// HELPERS ===================================
-
-export const getUserToken = async () => {
-    try {
-        let tokenPromise = userStorage.getUserToken()
-        let userToken = await tokenPromise;
-        return userToken
-    } catch (error) {
-        throw new Error(error)
-   }
-};
-
-export const getIsUserActive = async () => {
-    try {
-        let activePromise = userStorage.getIsUserActive()
-        let isActive = await activePromise;
-        return isActive
-    } catch (error) {
-        throw new Error(error)
-   }
-};
-

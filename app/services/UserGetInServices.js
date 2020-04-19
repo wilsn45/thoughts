@@ -39,7 +39,6 @@ let confirmation  = null
 
 
 export async function getUserData(uid){
-
  return new Promise((resolve,reject) => {
   const userRef = firestore().collection('user').doc(uid);
     userRef.get()
@@ -77,26 +76,26 @@ export async function getUserData(uid){
     });
 }
 
-// export async function getMostPopularTags(){
-//   return new Promise((resolve,reject) => {
-//      let userSexPromise =
-//      const userRef = firestore().collection('tags');
-//      userRef.where("username", "==", username).get()
-//      .then(snapshot => {
-//        if(snapshot.empty) {
-//         console.log("available")
-//         resolve(true)
-//        }else {
-//          console.log("not available")
-//          resolve(false)
-//        }
-//        return
-//      })
-//     .catch(err => {
-//         reject(err)
-//      });
-//    });
-// }
+export async function getMostPopularTags(){
+  return new Promise((resolve,reject) => {
+     const userRef = firestore().collection('tags');
+     let tags = []
+     userRef.orderBy('impression', 'desc').limit(10).get()
+     .then(snapshot => {
+       if(snapshot.empty) {
+        reject(new Error("Oops, could'not fetch tags"))
+       }
+       snapshot.forEach(doc => {
+         tags.push(doc.id)
+         resolve(tags)
+       });
+       return
+     })
+    .catch(err => {
+        reject(err)
+     });
+   });
+}
 
 export async function isNewContactAdded() {
    let contactList = contactListHelper.getUserContactList()

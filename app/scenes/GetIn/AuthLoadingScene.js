@@ -23,8 +23,7 @@ export default function AuthLoading(props) {
                 navigate('App');
              }
              else if (status == AuthStatus.LOGGED_IN) {
-               let userNamePromise = userStorage.getUserName()
-               let userName = await userNamePromise;
+               let userName = await userStorage.getUserName()
 
                if(!userName) {
                  navigate('SetUserInfo');

@@ -33,8 +33,9 @@ var Spinner = require('react-native-spinkit');
     const [isLoading, setIsLoading] = useState(false);
 
     const [phoneNumber, setPhoneNumber] = useState("");
-    const [dial_code, setDialCode] = useState("+91");
+    const [dial_code, setDialCode] = useState("");
     const [countryCode, setCountryCode] = useState(null);
+    const [country, setCountry] = useState(null);
     const [otc, setOtc] = useState("");
 
     useEffect(() => {
@@ -46,6 +47,7 @@ var Spinner = require('react-native-spinkit');
          if (!countryCode) {
             setCountryCode(result.code + " " + result.dial_code)
             setDialCode(result.dial_code)
+            setCountry(result.code)
         }
     }
     catch(err) {
@@ -76,6 +78,7 @@ function clearError() {
 function selectCountryCallback (dial_code,code) {
     setCountryCode(code + " " + dial_code)
     setDialCode(dial_code)
+    setCountry(code)
     setSelectCountryCode(false)
 }
 
@@ -144,7 +147,7 @@ async function verifyOtc () {
 
         if(!response) {
             console.log("new user")
-            await userStorage.setUserData(uid,number)
+            await userStorage.setUserData(uid,number,country)
             navigate('SetUserInfo');
         }
         else {
