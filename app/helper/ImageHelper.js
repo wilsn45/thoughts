@@ -1,10 +1,14 @@
 
 import RNFetchBlob from 'rn-fetch-blob'
-import storage from '@react-native-firebase/storage';
+import { firebase } from '@react-native-firebase/storage';
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 
 export async function saveProfileBase64 (url){
 	try {
+		   // const storage = firebase.storage()
+	     // const ref = await storage.ref('/profile_pic_max/GirlPlaceholderMax.jpg')
+			 // let downloadURL = await ref.getDownloadURL();
+			 // console.log("download url is "+downloadURL)
 
 	return new Promise((resolve,reject) => {
 	 RNFetchBlob.fetch('GET', url, {
@@ -15,7 +19,7 @@ export async function saveProfileBase64 (url){
     if(status == 200) {
       let base64Str = 'data:image/png;base64,'+res.base64()
       resolve(base64Str)
-    } 
+    }
   })
   .catch((errorMessage, statusCode) => {
     reject(errorMessage)
@@ -53,7 +57,6 @@ try {
 catch(err) {
 	console.log("error is "+ err)
 }
-	
+
 
 }
-

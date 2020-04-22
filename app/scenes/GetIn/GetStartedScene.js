@@ -134,17 +134,16 @@ async function verifyOtc () {
          return
         }
 
-        // let uid =    "DaniyaWIlson"
-        // let number =  "+919958565727"
-        let uid =    user.uid
-        let number =  user.phoneNumber
+        let uid =    "DD9jnDWbPKYPOFD4C355b1ja7bF2"
+        let number =  "+919958565727"
+        // let uid =    user.uid
+        // let number =  user.phoneNumber
 
         console.log("id is " +uid)
         console.log("number is " +number)
 
         let userStatusPromise = api.getUserData(uid,number)
         let response = await userStatusPromise
-
         if(!response) {
             console.log("new user")
             await userStorage.setUserData(uid,number,country)
@@ -152,9 +151,9 @@ async function verifyOtc () {
         }
         else {
            console.log("old user")
-            let imageHelperPromise = imageHelper.saveProfileBase64(response.profile_min_url)
+            let imageHelperPromise = imageHelper.saveProfileBase64(response.profileMinUrl)
             let profileBase64 = await imageHelperPromise
-            await userStorage.initUser(response,profileBase64)
+            await userStorage.initUser(uid,response,profileBase64)
             navigate('App');
         }
  }

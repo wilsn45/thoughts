@@ -5,9 +5,12 @@ import * as c from "../storage/Constants";
 import React, { useState } from 'react';
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import * as contactListHelper from "thoughts/app/helper/ContactListtHelper";
+import * as imageHelper from "thoughts/app/helper/ImageHelper";
 //Google Map API Key : AIzaSyCr65NbaaL4JvLuuvr5-n9QYH_1YxCRT1Q
-
-
+const BoyProfileMaxURL = "https://firebasestorage.googleapis.com/v0/b/thoughts-fe76a.appspot.com/o/profile_pic_max%2FBoyPlaceholderMax.jpg?alt=media&token=15231ea9-7a5c-4206-a3ba-a40c7711d13f"
+const BoyProfileMinURL = "https://firebasestorage.googleapis.com/v0/b/thoughts-fe76a.appspot.com/o/profile_pic_min%2FBoyPlaceholderMin.jpg?alt=media&token=bc2cbc39-23b7-4c6e-995c-a93bc33a270e"
+const GirlProfileMaxURL = "https://firebasestorage.googleapis.com/v0/b/thoughts-fe76a.appspot.com/o/profile_pic_max%2FGirlPlaceholderMax.jpg?alt=media&token=1f122094-c8cb-4d85-9196-2ab5564895ef"
+const GirlProfileMinURL = "https://firebasestorage.googleapis.com/v0/b/thoughts-fe76a.appspot.com/o/profile_pic_min%2FGirlPlaceholderMin.jpg?alt=media&token=281c8637-cb10-4e0c-83ae-8980c7d723da"
 const API_URL = "https://us-central1-thoughts-fe76a.cloudfunctions.net/"
 
 const usersCollection = firestore().collection('Users');
@@ -54,7 +57,7 @@ export async function getUserData(uid){
         reject(err)
       });
     });
- }
+}
 
  export async function isUserNameAvailable(username){
    return new Promise((resolve,reject) => {
@@ -95,6 +98,54 @@ export async function getMostPopularTags(){
         reject(err)
      });
    });
+}
+
+export async function addNewUser(){
+  try {
+   let token = await userStorage.getUserToken()
+    let number = await userStorage.getUserNumber()
+    let username = await userStorage.getUserName()
+    let country = await userStorage.getUserCountry()
+    let sex = await userStorage.getUserSex()
+    let tags = await userStorage.getTags()
+    let profileMaxUrl = ""
+    let profileMinUrl = ""
+    if (sex == "Male") {
+      profileMaxUrl = BoyProfileMaxURL
+      profileMinUrl = BoyProfileMinURL
+    }else {
+      profileMaxUrl = GirlProfileMaxURL
+      profileMinUrl = GirlProfileMinURL
+    }
+    console.log("profile min "+ profileMinUrl)
+    console.log("profile max "+ profileMaxUrl)
+    let imageHelperPromise = imageHelper.saveProfileBase64(profileMinUrl)
+    let profileBase64 = await imageHelperPromise
+    userStorage.setUserProfileMinBase64(profileBase64)
+    return new Promise((resolve,reject) => {
+
+    let newUserDocument = {
+     number : number,
+     username : username,
+     tags : tags,
+     sex : sex,
+     country : country,
+     profileMinUrl : profileMinUrl,
+     profileMaxUrl : profileMaxUrl
+   }
+   firestore().collection('user').doc(token).set(newUserDocument).
+    then(resp => {
+      resolve(true)
+    })
+    .catch(err => {
+      reject(new Error("Something went wrong"))
+    })
+   });
+  }catch(err) {
+    throw new Error(err)
+    console.log("error is "+err)
+  }
+
 }
 
 export async function isNewContactAdded() {

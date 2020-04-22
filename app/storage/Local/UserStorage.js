@@ -132,7 +132,8 @@ export async function setTags(tags) {
 export async function getTags () {
   try {
     let tagsPromise = AsyncStorage.getItem(UserTagsKey)
-    return await tagsPromise
+    let tags = await tagsPromise
+    return JSON.parse(tags)
   } catch (err) {
     throw new Error(err.message)
   }
@@ -167,9 +168,11 @@ export async function setUserData(token,number,country)  {
   }
 }
 
-export async function initUser(response,profileBase64) {
+export async function initUser(uid,response,profileBase64) {
    try {
-    await setUserName(response.user_name)
+    await setUserToken(uid)
+    await setUserNumber(response.number)
+    await setUserName(response.username)
     await setUserSex(response.sex)
     await setTags(response.tags)
     await setUserCountry(response.country)

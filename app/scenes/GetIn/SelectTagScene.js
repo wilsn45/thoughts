@@ -21,6 +21,7 @@ export default function SelectTagScene(props) {
 
   const[popularTags, setPopularTags] = useState([])
   const[selectedTags, setSelectedTags] = useState([])
+  const[isNavigating, setIsNavigating] = useState(false);
 
 
 useEffect(() => {
@@ -33,8 +34,7 @@ function getMostPopularTags () {
   }
   api.getMostPopularTags()
   .then(tags => {
-    console.log("tags are "+tags)
-     setPopularTags(tags)
+    setPopularTags(tags)
      setIsLoading(false)
   })
   .catch(err => {
@@ -54,16 +54,24 @@ function tagTap(value) {
 }
 
 async function skipClick() {
-  // await userStorage.setUserActive()
-  // navigate('App')
+  setIsNavigating(true)
+  await userStorage.setUserActive()
+  await api.addNewUser()
+  navigate('App')
 }
 
 async function setTagsClick() {
+  try {
+    setIsNavigating(true)
     await userStorage.setTags(selectedTags)
-    let selectedTags = userStorage.getTags()
-    console.log("selcted tags are "+selectedTags)
-    // await userStorage.setUserActive()
-    // navigate('App')
+    await api.addNewUser()
+    await userStorage.setUserActive()
+    navigate('App')
+  }
+  catch(err) {
+    console.log("error is "+err)
+  }
+
 }
 
 return (
@@ -174,20 +182,30 @@ return (
 
      <Text style={styles.belowText}>There are thousands other tags you can choose from your profile.</Text>
 
-     <TouchableOpacity
-       onPress={() => skipClick()}
-       underlayColor='#fff'>
-       <Text style={styles.skipText}>SKIP</Text>
-       </TouchableOpacity>
+     {
+         isNavigating &&
+         <View style = {styles.loadingView}>
+         <Spinner style={styles.spinner} isVisible={true} size={50} type="Arc" color="#189afd"/>
+         </View>
 
-      <TouchableOpacity
-        style={ styles.setButtonView}
-        onPress={() => setTagsClick()}
-        underlayColor='#fff'>
-        <Text style={styles.buttonText}>Done</Text>
-        </TouchableOpacity>
+     }
+     {
+       !isNavigating &&
+       <View>
+       <TouchableOpacity
+         onPress={() => skipClick()}
+         underlayColor='#fff'>
+         <Text style={styles.skipText}>SKIP</Text>
+         </TouchableOpacity>
 
-
+        <TouchableOpacity
+          style={ styles.setButtonView}
+          onPress={() => setTagsClick()}
+          underlayColor='#fff'>
+          <Text style={styles.buttonText}>Done</Text>
+          </TouchableOpacity>
+           </View>
+     }
      </View>
 
     }
@@ -262,6 +280,7 @@ const styles = StyleSheet.create({
    fontSize: 20,
    fontFamily: "Thonburi",
    fontWeight : "100",
+   marginBottom : 15
  },
 
  tagView : {
@@ -294,6 +313,17 @@ const styles = StyleSheet.create({
    fontSize: 19,
    fontFamily: "Thonburi",
    color : '#fff',
+ },
+ loadingView: {
+   marginTop : 40,
+   width : '70%',
+   height : 60,
+   // borderColor : "#189afd",
+   // borderWidth : 1,
+   // borderRadius:15,
+   justifyContent:  "center",
+   alignSelf: "center",
+   alignItems : "center"
  },
 
 });

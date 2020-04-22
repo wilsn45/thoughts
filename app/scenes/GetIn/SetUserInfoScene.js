@@ -121,12 +121,7 @@ return (
         <Text  style={ female ? styles.femaleSelctedText : styles.femaleText}> Female </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={ nonBinary ? styles.nonBinarySelctedView : styles.nonBinaryView}
-        onPress={() => {setNonBinary(true); setSex("nonbinary"); setFemale(false); setMale(false)}}
-       >
-        <Text  style={ nonBinary ? styles.nonBinarySelctedText : styles.nonBinaryText}> Non Binary </Text>
-      </TouchableOpacity>
+
 
       </View>
     }
@@ -223,22 +218,24 @@ const styles = StyleSheet.create({
    flex : 0.4,
    width : '95%',
    flexDirection : "row",
-   justifyContent: 'space-between'
+   justifyContent: 'center',
  },
  maleView : {
-   width : '30%',
-   height : '60%',
+   width : '35%',
+   height : '50%',
    alignItems: 'center',
    justifyContent: 'center',
    borderColor: '#149cea',
+   marginRight : 50,
    borderWidth : 2,
 
  },
  maleSelctedView : {
-   width : '30%',
-   height : '60%',
+   width : '35%',
+   height : '50%',
    alignItems: 'center',
    justifyContent: 'center',
+   marginRight : 50,
    backgroundColor: '#149cea',
  },
  maleText : {
@@ -253,8 +250,8 @@ const styles = StyleSheet.create({
  },
 
  femaleView : {
-   width : '30%',
-   height : '60%',
+   width : '35%',
+   height : '50%',
    alignItems: 'center',
    justifyContent: 'center',
    borderColor: '#e6007b',
@@ -262,8 +259,8 @@ const styles = StyleSheet.create({
 
  },
  femaleSelctedView : {
-   width : '30%',
-   height : '60%',
+   width : '35%',
+   height : '50%',
    alignItems: 'center',
    justifyContent: 'center',
    backgroundColor: '#e6007b',
