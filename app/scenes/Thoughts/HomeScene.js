@@ -16,7 +16,7 @@ import NewThought from "./NewThoughtModal";
 import Modal from 'react-native-modal';
 
 
-export default function Home(props) {
+export default function HomeScene(props) {
   const [locationViewWidth, setLocationViewWidth] = useState(100);
   const [newThought, showNewThought] = useState(false);
   const [picData, setPicData] = useState(null);
@@ -44,7 +44,8 @@ export default function Home(props) {
   });
 
   function navigateToProfile() {
-      navigate('profile')
+     console.log("navigating to profile")
+      navigate('Profile')
   }
 
   return (
@@ -169,6 +170,10 @@ const styles = StyleSheet.create({
       alignSelf : "flex-end"
   }
 
+});
 
-
-  });
+HomeScene.navigationOptions = ({}) => {
+  return {
+    title: ``
+  }
+};

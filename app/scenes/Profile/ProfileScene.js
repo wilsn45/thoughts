@@ -15,7 +15,7 @@ import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 
 
 
-export default function Profile(props) {
+export default function ProfileScene(props) {
   const [locationViewWidth, setLocationViewWidth] = useState(100);
   const [newThought, showNewThought] = useState(false);
   const [picData, setPicData] = useState(null);
@@ -73,3 +73,9 @@ const styles = StyleSheet.create({
   },
 
 });
+
+ProfileScene.navigationOptions = ({}) => {
+  return {
+    title: ``
+  }
+};
