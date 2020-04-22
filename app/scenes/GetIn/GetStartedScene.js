@@ -134,10 +134,10 @@ async function verifyOtc () {
          return
         }
 
-        let uid =    "DD9jnDWbPKYPOFD4C355b1ja7bF2"
-        let number =  "+919958565727"
-        // let uid =    user.uid
-        // let number =  user.phoneNumber
+        // let uid =    "DD9jnDWbPKYPOFD4C355b1ja7bF2"
+        // let number =  "+919958565727"
+        let uid =    user.uid
+        let number =  user.phoneNumber
 
         console.log("id is " +uid)
         console.log("number is " +number)

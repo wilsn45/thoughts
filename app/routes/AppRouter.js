@@ -3,7 +3,7 @@ import React from 'react';
 import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 
 //IMPORT ROUTES
-import HomeTabNavigator from "./HomeTabNavigator";
+import HomeStackNavigator from "./HomeStackNavigator";
 import GetInNavigator from "./GetInNavigator";
 
 import SetUserInfoScene  from "thoughts/app/scenes/GetIn/SetUserInfoScene";
@@ -18,7 +18,7 @@ const AppStack = createSwitchNavigator(
         SetUserInfo : SetUserInfoScene,
         SelectTag : SelectTagScene,
         Auth: GetInNavigator,
-        App: HomeTabNavigator
+        App: HomeStackNavigator
     },
     {initialRouteName: 'Loading'}
 );

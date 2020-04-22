@@ -1,10 +1,11 @@
 import React, { useState,useEffect } from 'react';
-import { View, 
+import { View,
         StyleSheet,
         Text,
         Image,
         TextInput,
         TouchableOpacity,
+        SafeAreaView,
         FlatList } from 'react-native';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -33,23 +34,76 @@ export default function Home(props) {
 
     userStorage.getUserProfileMinBase64()
     .then(data => {
-      setPicData(data) 
+      setPicData(data)
     })
     .catch(err => {
       console.log("error is " +err)
     })
-    
+
 
   });
 
-  return (
-      
-    <View style = {styles.main}>
-       { picData && 
+  function navigateToProfile() {
+      navigate('profile')
+  }
 
-      <Image style={{width: 100, height: 50, borderWidth: 1}} source={{uri: picData}}/> 
-       }
-     
+  return (
+
+    <View style = {styles.main}>
+      <View style = {styles.headerView}>
+      <TouchableOpacity
+        style = {styles.superViewHeader}
+        onPress={() => navigateToProfile()}
+        underlayColor='#fff'
+       >
+
+       {picData && <Image style={styles.profileView} source={{uri: picData}}/>}
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style = {styles.superViewHeader}
+        onPress={() => navigateToAMessages()}
+        underlayColor='#fff'
+       >
+       <Icon name={'message-square'}  style = {styles.messageView} size={40} />
+      </TouchableOpacity>
+
+
+      </View>
+
+      <View style = {styles.centerView}>
+
+      </View>
+
+
+      <View style={styles.bottomView}>
+
+      <TouchableOpacity
+        style = {styles.superViewBottom}
+        onPress={() => navigateToProfile()}
+        underlayColor='#fff'
+       >
+        <Icon name={'slack'}  style = {styles.slackView} size={50} />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style = {styles.superViewBottom}
+        onPress={() => navigateToProfile()}
+        underlayColor='#fff'
+       >
+        <Icon name={'circle'}  style = {styles.thoughtsView} size={80} />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style = {styles.superViewBottom}
+        onPress={() => navigateToAMessages()}
+        underlayColor='#fff'
+       >
+       <Icon name={'zap'}  style = {styles.zapView} size={50} />
+      </TouchableOpacity>
+
+      </View>
+
 
     </View>
     );
@@ -58,54 +112,63 @@ export default function Home(props) {
 const styles = StyleSheet.create({
 
   main : {
-        flex : 1,
+      flex : 1,
+      alignItems : "center",
+      justifyContent : "center",
+      backgroundColor : "#fff",
   },
   headerView : {
-    marginTop : 50,
-    flex : 0.05,
-    flexDirection : "row",
-    justifyContent: 'space-between',
-    marginLeft : 20,
-    marginRight : 20,
-  },
-  userNameText : {
-    fontSize : 25,
-    fontWeight: 'bold'
-  },
-  thoughtsView : {
-    marginTop : 10,
-    flex : 0.95,
-    marginBottom : 5,
-    width : '90%',
-    borderColor : "purple",
-    borderWidth : 0,
-    alignSelf: "center",
-    flexDirection : "column-reverse",
-  },
-  thoughtsListView : {
+    flex : 0.15,
     width : '100%',
-    height : '100%',
+    marginTop : 40,
+    justifyContent : "space-between",
+    flexDirection : "row"
   },
-
-  newThoughtView : {
-    height : 90,
-    width : 90,
-    position : 'absolute',
-    alignSelf: "flex-end",
+  centerView : {
+    flex : 0.8,
+    width : '100%',
+    // borderColor  : "purple",
+    // borderWidth : 1,
   },
-
-  featherView : {
+  bottomView : {
+    flex : 0.1,
+    width : '100%',
+    marginBottom : 10,
+    justifyContent : "space-around",
+    flexDirection : "row"
+  },
+  superViewHeader : {
+    marginLeft : 10,
+    marginRight : 20,
+    width : 50,
+    height : 50,
+  },
+  profileView : {
+      width : 50,
+      height : 50,
+      borderRadius : 25,
+      alignSelf : "flex-start"
+  },
+  messageView : {
+      alignSelf : "flex-end"
+  },
+  superViewBottom : {
     width : 80,
     height : 80,
-    backgroundColor : "#fff",
-    borderRadius : 40,
-    borderColor : "grey",
-    borderWidth : 1.5,
-    alignItems : "center",
-    justifyContent : "center"
-  }
-  
 
-  
+    // borderColor  : "purple",
+    // borderWidth : 1,
+  },
+  slackView : {
+      alignSelf : "flex-start"
+  },
+  thoughtsView : {
+      alignSelf : "center"
+  },
+  zapView : {
+      alignSelf : "flex-end"
+  }
+
+
 
   });

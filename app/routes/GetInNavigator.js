@@ -5,7 +5,6 @@ import {createStackNavigator} from 'react-navigation-stack';
 import GetStartedScene from "thoughts/app/scenes/GetIn/GetStartedScene";
 import SetUserInfoScene  from "thoughts/app/scenes/GetIn/SetUserInfoScene";
 import SelectTagScene  from "thoughts/app/scenes/GetIn/SelectTagScene";
-import HomeTabNavigator from "./HomeTabNavigator";
 
 
 
@@ -14,7 +13,6 @@ const Auth = createStackNavigator(
         GetStarted: GetStartedScene,
         SetUserInfo: SetUserInfoScene,
         SelectTag : SelectTagScene,
-        App: HomeTabNavigator,
     },
     { headerMode: 'none' },
     {
