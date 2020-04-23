@@ -44,8 +44,7 @@ export default function HomeScene(props) {
   });
 
   function navigateToProfile() {
-     console.log("navigating to profile")
-      navigate('Profile')
+     navigate('Profile')
   }
 
   return (
