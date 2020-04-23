@@ -102,7 +102,7 @@ export async function getMostPopularTags(){
 
 export async function addNewUser(){
   try {
-   let token = await userStorage.getUserToken()
+    let token = await userStorage.getUserToken()
     let number = await userStorage.getUserNumber()
     let username = await userStorage.getUserName()
     let country = await userStorage.getUserCountry()

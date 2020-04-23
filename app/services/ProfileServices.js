@@ -30,14 +30,7 @@ export async function getProfileOverView(uid){
        if(!snapshot.exists) {
         reject(new Error("Oops, could'not fetch userdetail"))
        }
-        console.log("response is "+snapshot.data())
-       let data = {
-         username : snapshot.get('username'),
-         followerCount : snapshot.get('followerCount'),
-         followingCount : snapshot.get('followingCount'),
-         profileURL : snapshot.get('profileMaxUrl')
-       }
-       resolve(data)
+       resolve(snapshot)
 
        return
      })

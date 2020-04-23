@@ -9,17 +9,27 @@ import { View,
         FlatList } from 'react-native';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import * as api from "thoughts/app/services/ProfileServices";
+import UserListModal from "./UserListModal";
 var Spinner = require('react-native-spinkit');
 
 
 
 export default function ProfileScene(props) {
   const[isLoading, setIsLoading] = useState(true);
+  const[showUserList, setShowUserList] = useState(false);
+  const[showFollowing, setShowFollowing] = useState(true);
   const { navigate } = useNavigation();
+
+  const[username, setUsername] = useState("");
+  const[followerCount, setFollowerCount] = useState("");
+  const[followingCount, setFollowingCount] = useState("");
+  const[sex, setSex] = useState("");
+  const[profileURL, setProfileURL] = useState("");
 
     useEffect(() => {
       getUserProfileData()
@@ -30,14 +40,43 @@ async function getUserProfileData () {
       return;
   }
   await api.getProfileOverView()
-  .then(response => {
-     console.log("response is "+JSON.stringify(response))
+  .then(snapshot => {
+
+     setUsername(snapshot.get('username'))
+     setSex(snapshot.get('sex'))
+     let followerCount = snapshot.get('followerCount')
+     let followingCount = snapshot.get('followingCount')
+
+     if (!followerCount) {
+       setFollowerCount("Followers _")
+     }else {
+       setFollowerCount("Followers "+followerCount)
+     }
+     if(!followingCount) {
+       setFollowingCount("Followings _")
+     }else {
+       setFollowingCount("Followings "+followingCount)
+     }
+     setProfileURL(snapshot.get('profileMaxUrl'))
      setIsLoading(false)
   })
   .catch(err => {
     console.log("Error is "+err)
     setIsLoading(false)
   })
+}
+
+function modalCallBack () {
+    setShowUserList(false)
+}
+function navigateToFollowerCount() {
+  setShowFollowing(false)
+  setShowUserList(true)
+}
+
+function navigateToFollowingCount() {
+  setShowFollowing(true)
+  setShowUserList(true)
 }
 
   return (
@@ -72,6 +111,28 @@ async function getUserProfileData () {
       </View>
 
       <View style = {styles.centerView}>
+       <View style = {styles.userView}>
+          <Image style={sex == "Female" ? styles.imageViewFemale : styles.imageViewMale} source={{uri: profileURL}}/>
+          <Text style = {styles.userNameText}> ishakisswilson </Text>
+       </View>
+       <View style = {styles.userinfoView}>
+          <TouchableOpacity
+          onPress={() => navigateToFollowerCount()}
+          underlayColor='#fff'
+          >
+          <Text style = {styles.followerText}> {followerCount} </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+          onPress={() => navigateToFollowingCount()}
+          underlayColor='#fff'
+          >
+            <Text style = {styles.followerText}> {followingCount} </Text>
+            </TouchableOpacity>
+       </View>
+
+
+
 
       </View>
 
@@ -79,7 +140,10 @@ async function getUserProfileData () {
       </View>
 
     </View>
-  }
+   }
+   <Modal isVisible={showUserList} swipeArea={50} style = {{alignSelf : "center",width : '90%'}} >
+      <UserListModal  closeCallBack = {modalCallBack} username = {username} showFollowing = {showFollowing}/>
+   </Modal>
     </View>
     );
 }
@@ -97,7 +161,7 @@ const styles = StyleSheet.create({
       width : '100%',
   },
   headerView : {
-    flex : 0.1,
+    flex : 0.07,
     width : '100%',
     marginTop : 40,
     justifyContent : "space-between",
@@ -108,13 +172,57 @@ const styles = StyleSheet.create({
     height : 50,
   },
   centerView : {
-    flex : 0.3,
+    flex : 0.2,
     width : '100%',
-    borderColor  : "purple",
-    borderWidth : 1,
+    flexDirection : 'row',
+    // borderColor : "#149cea",
+    // borderWidth : 2,
+  },
+  userView : {
+    width : '45%',
+    alignItems : "center",
+    justifyContent : "center",
+    // borderColor : "#149cea",
+    // borderWidth : 2,
+  },
+  userinfoView : {
+    width : '55%',
+    justifyContent : "center",
+    // borderColor : "#149cea",
+    // borderWidth : 2,
+  },
+  imageViewMale : {
+    width : 100,
+    height : 100,
+    borderRadius : 50,
+    borderColor : "#149cea",
+    borderWidth : 2,
+    alignSelf : "center",
+    marginBottom : 20,
+  },
+  imageViewFemale : {
+    width : 100,
+    height : 100,
+    borderRadius : 50,
+    borderColor : '#e6007b',
+    borderWidth : 2,
+    alignSelf : "center",
+    marginBottom : 20,
+  },
+  userNameText : {
+    fontSize: 23,
+    fontFamily: "Thonburi",
+    fontWeight : "400",
+    marginBottom : 5,
+  },
+  followerText : {
+    fontSize: 20,
+    fontFamily: "Thonburi",
+    fontWeight : "100",
+    marginBottom : 15,
   },
   thoughtsView : {
-    flex : 0.6,
+    flex : 0.63,
     width : '100%',
     borderColor  : "purple",
     borderWidth : 1,
