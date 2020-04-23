@@ -19,6 +19,7 @@ var Spinner = require('react-native-spinkit');
 
 
 
+
 export default function ProfileScene(props) {
   const[isLoading, setIsLoading] = useState(true);
   const[showUserList, setShowUserList] = useState(false);
@@ -31,39 +32,38 @@ export default function ProfileScene(props) {
   const[sex, setSex] = useState("");
   const[profileURL, setProfileURL] = useState("");
 
-    useEffect(() => {
+  useEffect(() => {
       getUserProfileData()
-    });
+    }, []);
 
 async function getUserProfileData () {
-  if(!isLoading) {
-      return;
+  try {
+    if(!isLoading) {
+        return;
+    }
+    let getProfilePromise = api.getProfileOverView()
+    let snapshot = await getProfilePromise;
+    setUsername(snapshot.get('username'))
+    setSex(snapshot.get('sex'))
+    let followerCount = snapshot.get('followerCount')
+    let followingCount = snapshot.get('followingCount')
+
+    if (!followerCount) {
+      setFollowerCount("Followers _")
+    }else {
+      setFollowerCount("Followers "+followerCount)
+    }
+    if(!followingCount) {
+      setFollowingCount("Followings _")
+    }else {
+      setFollowingCount("Followings "+followingCount)
+    }
+    setProfileURL(snapshot.get('profileMaxUrl'))
   }
-  await api.getProfileOverView()
-  .then(snapshot => {
-
-     setUsername(snapshot.get('username'))
-     setSex(snapshot.get('sex'))
-     let followerCount = snapshot.get('followerCount')
-     let followingCount = snapshot.get('followingCount')
-
-     if (!followerCount) {
-       setFollowerCount("Followers _")
-     }else {
-       setFollowerCount("Followers "+followerCount)
-     }
-     if(!followingCount) {
-       setFollowingCount("Followings _")
-     }else {
-       setFollowingCount("Followings "+followingCount)
-     }
-     setProfileURL(snapshot.get('profileMaxUrl'))
-     setIsLoading(false)
-  })
-  .catch(err => {
-    console.log("Error is "+err)
-    setIsLoading(false)
-  })
+  catch (err) {
+    console.log("error is "+err)
+  }
+  setIsLoading(false)
 }
 
 function modalCallBack () {
@@ -111,10 +111,10 @@ function navigateToFollowingCount() {
       </View>
 
       <View style = {styles.centerView}>
+      <View style= {styles.upperView}>
        <View style = {styles.userView}>
           <Image style={sex == "Female" ? styles.imageViewFemale : styles.imageViewMale} source={{uri: profileURL}}/>
-          <Text style = {styles.userNameText}> ishakisswilson </Text>
-       </View>
+      </View>
        <View style = {styles.userinfoView}>
           <TouchableOpacity
           onPress={() => navigateToFollowerCount()}
@@ -130,7 +130,10 @@ function navigateToFollowingCount() {
             <Text style = {styles.followerText}> {followingCount} </Text>
             </TouchableOpacity>
        </View>
-
+       </View>
+       <View>
+        <Text style = {styles.userNameText}> {username}</Text>
+       </View>
 
 
 
@@ -174,14 +177,21 @@ const styles = StyleSheet.create({
   centerView : {
     flex : 0.2,
     width : '100%',
-    flexDirection : 'row',
+
     // borderColor : "#149cea",
     // borderWidth : 2,
   },
+  upperView : {
+      width : '100%',
+      flexDirection : 'row',
+      // borderColor : "#149cea",
+      // borderWidth : 2,
+  },
   userView : {
-    width : '45%',
+    width : '40%',
     alignItems : "center",
     justifyContent : "center",
+    marginLeft : 40
     // borderColor : "#149cea",
     // borderWidth : 2,
   },
@@ -197,8 +207,9 @@ const styles = StyleSheet.create({
     borderRadius : 50,
     borderColor : "#149cea",
     borderWidth : 2,
-    alignSelf : "center",
+    alignSelf : "flex-start",
     marginBottom : 20,
+
   },
   imageViewFemale : {
     width : 100,
@@ -206,7 +217,6 @@ const styles = StyleSheet.create({
     borderRadius : 50,
     borderColor : '#e6007b',
     borderWidth : 2,
-    alignSelf : "center",
     marginBottom : 20,
   },
   userNameText : {
@@ -214,6 +224,7 @@ const styles = StyleSheet.create({
     fontFamily: "Thonburi",
     fontWeight : "400",
     marginBottom : 5,
+    marginLeft : 25
   },
   followerText : {
     fontSize: 20,
@@ -222,7 +233,7 @@ const styles = StyleSheet.create({
     marginBottom : 15,
   },
   thoughtsView : {
-    flex : 0.63,
+    flex : 0.81,
     width : '100%',
     borderColor  : "purple",
     borderWidth : 1,

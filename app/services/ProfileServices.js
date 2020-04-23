@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import * as contactListHelper from "thoughts/app/helper/ContactListtHelper";
 import * as imageHelper from "thoughts/app/helper/ImageHelper";
+
 //Google Map API Key : AIzaSyCr65NbaaL4JvLuuvr5-n9QYH_1YxCRT1Q
 
 const usersCollection = firestore().collection('Users');
@@ -33,6 +34,27 @@ export async function getProfileOverView(uid){
        resolve(snapshot)
 
        return
+     })
+    .catch(err => {
+        reject(err)
+      })
+   });
+}
+
+export async function getUserList(username,showFollowing){
+  return new Promise((resolve,reject) => {
+    const userRef = firestore().collection('followers').doc(username);
+     userRef.get()
+     .then(snapshot => {
+       if(!snapshot.exists) {
+        reject(new Error("Oops, could'not fetch user list"))
+       }
+       if (showFollowing) {
+         resolve(snapshot.get('followings'))
+      }else {
+         resolve(snapshot.get('followers'))
+       }
+      return
      })
     .catch(err => {
         reject(err)
