@@ -144,7 +144,7 @@ function navigateToFollowingCount() {
 
     </View>
    }
-   <Modal isVisible={showUserList} swipeArea={50} style = {{alignSelf : "center",width : '90%'}} >
+   <Modal isVisible={showUserList} swipeArea={50} style = {{alignSelf : "center",width : '95%'}} >
       <UserListModal  closeCallBack = {modalCallBack} username = {username} showFollowing = {showFollowing}/>
    </Modal>
     </View>

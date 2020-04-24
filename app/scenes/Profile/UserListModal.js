@@ -14,9 +14,15 @@ import UserCell  from "thoughts/app/components/UserCell";
 export default function UserList ({closeCallBack,username,showFollowing}) {
   const[isLoading, setIsLoading] = useState(true);
   const[userList, setUserList] = useState(null);
+  const[title, setTitle] = useState("");
 
 
   useEffect(() => {
+    if (showFollowing) {
+      setTitle("Followings")
+    }else {
+      setTitle("Followers")
+    }
     getUserList()
     }, []);
 
@@ -59,10 +65,12 @@ return (
     <View style = {styles.superView}>
       <View style = {styles.headerView}>
       <TouchableOpacity
-               style = {{marginLeft : 10,marginTop : 10}}
+               style = {{marginLeft : 10,marginTop : 10,flex : 0.5}}
                onPress={() => closeCallBack()}>
-               <Icon name={"x"}  size={32}  color={"gray"} style = {{marginTop : 10}}  />
+               <Icon name={"x"}  size={28}  color={"gray"}   />
           </TouchableOpacity>
+
+          <Text style = {styles.topText}> {title} </Text>
         </View>
 
         <View style={styles.tableView}>
@@ -96,16 +104,26 @@ const styles = StyleSheet.create({
       backgroundColor : "#fff",
     },
     headerView : {
-       flex : 0.08,
+       flex : 0.07,
        width : '100%',
+       flexDirection : 'row',
        // borderColor : "#149cea",
        // borderWidth : 2,
 
     },
     tableView : {
-      flex : 0.92,
+      flex : 0.93,
       alignSelf : "center",
-      width : '90%'
+      width : '95%',
+      marginTop : 25
+     //  borderColor : "#149cea",
+     // borderWidth : 2,
+    },
+    topText  : {
+        fontSize: 20,
+        fontFamily: "Thonburi",
+        fontWeight : "100",
+        marginTop : 15
     }
 
 
