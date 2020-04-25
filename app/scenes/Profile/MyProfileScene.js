@@ -20,17 +20,19 @@ var Spinner = require('react-native-spinkit');
 import { firebase } from '@react-native-firebase/storage';
 
 
-export default function ProfileScene(props) {
+export default function MyProfileScene(props) {
   const[isLoading, setIsLoading] = useState(true);
   const[showUserList, setShowUserList] = useState(false);
   const[showFollowing, setShowFollowing] = useState(true);
   const { navigate } = useNavigation();
   const uid = useNavigationParam('uid');
+
   const[username, setUsername] = useState("");
   const[followerCount, setFollowerCount] = useState("Followers _");
   const[followingCount, setFollowingCount] = useState("Followings _");
   const[sex, setSex] = useState("");
   const[profileURL, setProfileURL] = useState("");
+  const[token, setToken] = useState("");
 
 
   useEffect(() => {
@@ -68,20 +70,12 @@ function modalCloseCallBack () {
 }
 
 function navigateToHome() {
-    navigate('Home')
+    navigate.pop()
 }
 
 async function modalNavigateCallBack (uid) {
-  try {
-    setIsLoading(true)
-    setShowUserList(false)
-    console.log("taking you to "+uid)
-    await userStorage.setViewingUserToken(uid)
-    console.log("viewing token set")
-    await getUserProfileData()
-  }catch(err) {
-    console.log("err is "+err)
-  }
+   setShowUserList(false)
+   navigate('Profile',{uid : uid})
 }
 
 function navigateToFollowerCount() {
@@ -256,7 +250,7 @@ const styles = StyleSheet.create({
 
 });
 
-ProfileScene.navigationOptions = ({}) => {
+MyProfileScene.navigationOptions = ({}) => {
   return {
     title: ``
   }

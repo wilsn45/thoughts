@@ -21,7 +21,6 @@ function AuthProvider(props) {
         try {
             let token = await userStorage.getUserToken();
             let registered = await userStorage.getIsUserActive()
-
             if (token) {
                return registered ? AuthStatus.ACTIVATED : AuthStatus.LOGGED_IN
             } else {

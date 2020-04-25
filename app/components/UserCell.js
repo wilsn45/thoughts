@@ -4,39 +4,39 @@ import {View,
         Image,
         StyleSheet,
         TouchableOpacity} from 'react-native';
+import * as api from "thoughts/app/services/ProfileServices";
+import * as userStorage from "thoughts/app/storage/Local/UserStorage";
+import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 
-export default function UserCell({user}) {
+export default function UserCell({cellNavigateCallBack,user}) {
+const[profileURL, setProfileURL] = useState(".");
+const { navigate } = useNavigation();
 
-  useEffect(() => {
-      console.log("usename is "+user.username)
-    }, []);
+useEffect(() => {
+  getURL()
+}, []);
 
-function navigateToUser() {
-
+async function getURL() {
+  let url = await api.getMinProfileUrl(user.uid)
+  setProfileURL(url)
+}
+async function navigateToUser() {
+  await userStorage.setViewingUserToken()
 }
   return (
     <View style = {styles.container}>
     <View style = {styles.leftView}>
+
       <TouchableOpacity
-        onPress={() => navigateToUser()}
-        underlayColor='#fff'
-        >
-
-       <Image style={styles.imageView} source={{uri: user.profileURL}}/>
-    </TouchableOpacity>
-
+          onPress={() => cellNavigateCallBack(user.uid)}
+          underlayColor='#fff'>
+          <Image style={styles.imageView} source={{uri: profileURL}}/>
+        </TouchableOpacity>
     </View>
+
 
     <View style = {styles.rightView}>
     <Text style = {styles.usernameText}> {user.username} </Text>
-
-    <TouchableOpacity
-      onPress={() => navigateToUser()}
-      underlayColor='#fff'
-      >
-
-     <Text style = {styles.followText}> Follow </Text>
-  </TouchableOpacity>
     </View>
 
 
@@ -49,7 +49,8 @@ function navigateToUser() {
 const styles = StyleSheet.create ({
  container : {
 		flex : 1,
-	   width : '100%',
+	   width : '90%',
+     alignSelf : "center",
     flexDirection : 'row',
     borderColor : "grey",
     borderBottomWidth : 0.5,
@@ -65,15 +66,25 @@ const styles = StyleSheet.create ({
   },
   leftView : {
     width : '30%',
-    alignItems : 'center',
+    alignItems : 'flex-start',
     justifyContent : 'center',
+
+   //  borderColor : "#149cea",
+   // borderWidth : 2,
+  },
+  rightView : {
+    width : '70%',
+    alignItems : 'flex-start',
+    justifyContent : 'center',
+
    //  borderColor : "#149cea",
    // borderWidth : 2,
   },
   usernameText : {
     fontSize: 20,
     fontFamily: "Thonburi",
-    fontWeight : "100"
+    fontWeight : "100",
+    marginBottom : 20,
   },
   followingText : {
     fontSize: 15,

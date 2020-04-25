@@ -20,6 +20,7 @@ export default function HomeScene(props) {
   const [locationViewWidth, setLocationViewWidth] = useState(100);
   const [newThought, showNewThought] = useState(false);
   const [picData, setPicData] = useState(null);
+  const [uid, setUID] = useState(null);
   const { navigate } = useNavigation();
 
     toggleDrawer = () => {
@@ -31,7 +32,7 @@ export default function HomeScene(props) {
     }
 
   useEffect(() => {
-
+    getUID()
     userStorage.getUserProfileMinBase64()
     .then(data => {
       setPicData(data)
@@ -39,12 +40,15 @@ export default function HomeScene(props) {
     .catch(err => {
       console.log("error is " +err)
     })
+  },[]);
 
+  async function getUID() {
+    let uid = await userStorage.getUserToken()
+    setUID(uid)
+  }
 
-  });
-
-  function navigateToProfile() {
-     navigate('Profile')
+  async function navigateToProfile() {
+    navigate('MyProfile', {uid : uid})
   }
 
   return (

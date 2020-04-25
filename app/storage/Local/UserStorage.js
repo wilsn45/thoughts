@@ -9,6 +9,7 @@ const UserSexKey = "@UserSex"
 const UserTagsKey = "@UserTags"
 const UserProfileBaseDataKey = "@UserProfileBaseData"
 const UserCountryKey = "@UserCountry"
+const ViewingUserKey = "@ViewingUserKey"
 
 
 

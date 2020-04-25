@@ -11,13 +11,14 @@ import * as api from "thoughts/app/services/ProfileServices";
 import UserCell  from "thoughts/app/components/UserCell";
 
 
-export default function UserList ({closeCallBack,username,showFollowing}) {
+export default function UserList ({closeCallBack,navigateCallBack,uid,showFollowing}) {
   const[isLoading, setIsLoading] = useState(true);
   const[userList, setUserList] = useState(null);
   const[title, setTitle] = useState("");
 
 
   useEffect(() => {
+    console.log("finidng followers for "+uid)
     if (showFollowing) {
       setTitle("Followings")
     }else {
@@ -28,10 +29,9 @@ export default function UserList ({closeCallBack,username,showFollowing}) {
 
   async function getUserList() {
     try {
-      let userListPromise =  api.getUserList(username,showFollowing)
+      let userListPromise =  api.getUserList(uid,showFollowing)
       let list = await userListPromise
       let dicArray = getUserDictArray(list)
-      console.log("dicArray is"+dicArray)
       setUserList(dicArray)
     }
     catch(err) {
@@ -44,8 +44,8 @@ export default function UserList ({closeCallBack,username,showFollowing}) {
     let dicArray = []
      for (var user in userList) {
        let dic = {
-         username : user,
-         profileURL : userList[user]
+         uid : user,
+         username : userList[user]
        }
       dicArray.push(dic)
     }
@@ -76,7 +76,7 @@ return (
         <View style={styles.tableView}>
           <FlatList
             data={userList}
-            renderItem={({ item }) => <UserCell user={item} />}
+            renderItem={({ item }) => <UserCell cellNavigateCallBack = {navigateCallBack} user={item} />}
             keyExtractor={user => user.username}
           />
         </View>
