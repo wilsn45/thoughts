@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import * as contactListHelper from "thoughts/app/helper/ContactListtHelper";
 import * as imageHelper from "thoughts/app/helper/ImageHelper";
-
+const API_URL = "https://us-central1-thoughts-fe76a.cloudfunctions.net/"
 //Google Map API Key : AIzaSyCr65NbaaL4JvLuuvr5-n9QYH_1YxCRT1Q
 
 const usersCollection = firestore().collection('Users');
@@ -64,4 +64,16 @@ export async function getMinProfileUrl(token){
   let resourceName = '/profile_pic_min/'+token+'.jpg'
   const ref = await storage.ref(resourceName)
   return await ref.getDownloadURL();
+}
+
+export async function getUserProfileOverView(useruid){
+    try{
+        let myuid = await userStorage.getUserToken()
+        let url = API_URL+"getUserProfileOverView?useruid="+useruid+"&&myuid="+myuid
+        let res = await axios.get(url);
+        console.log("response is "+JSON.stringify(res.data))
+        return res.data;
+    }catch (e) {
+        throw handler(e);
+    }
 }

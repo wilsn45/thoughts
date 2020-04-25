@@ -25,12 +25,17 @@ export default function ProfileScene(props) {
   const[showUserList, setShowUserList] = useState(false);
   const[showFollowing, setShowFollowing] = useState(true);
   const { navigate } = useNavigation();
-  const uid = useNavigationParam('uid');
+  let uid = useNavigationParam('uid');
   const[username, setUsername] = useState("");
   const[followerCount, setFollowerCount] = useState("Followers _");
   const[followingCount, setFollowingCount] = useState("Followings _");
   const[sex, setSex] = useState("");
-  const[profileURL, setProfileURL] = useState("");
+  const[profileURL, setProfileURL] = useState(null);
+
+  const[status, setStatus] = useState(null);
+  const[isPrivate, setIsPrivate] = useState(true);
+
+
 
 
   useEffect(() => {
@@ -39,50 +44,79 @@ export default function ProfileScene(props) {
 
 async function getUserProfileData () {
   try {
-    if(!isLoading) {
-        return;
+
+    console.log("here")
+    let response = await api.getUserProfileOverView(uid)
+    if(response.youareblocked) {
+      setIsLoading(false)
+      navigatePop()
+
     }
-    let getProfilePromise = api.getProfileOverView(uid)
-    let snapshot = await getProfilePromise;
-    setUsername(snapshot.get('username'))
-    setSex(snapshot.get('sex'))
-    let followerCount = snapshot.get('followersCount')
-    let followingCount = snapshot.get('followingsCount')
+    if(response.isFollowing) {
+      setStatus("Following")
+      setIsPrivate(false)
+    }
+    else if(response.isRequested) {
+      setStatus("Requested")
+      setIsPrivate(true)
+    }
+    else if(response.isPrivate) {
+      setStatus("Follow")
+      setIsPrivate(true)
+    }else {
+      setStatus("Follow")
+      setIsPrivate(false)
+    }
+
+    let username = response.username
+    let sex = response.sex
+    let followerCount = response.followersCount
+    let followingCount = response.followingsCount
+    setUsername(username)
+    setSex(sex)
     if (followerCount) {
       setFollowerCount("Followers "+followerCount)
+    }else {
+      setFollowerCount("Followers _")
     }
     if(followingCount) {
       setFollowingCount("Followings "+followingCount)
+    }else {
+        setFollowingCount("Followings _")
     }
     let profileURl = await api.getMaxProfileUrl(uid)
     setProfileURL(profileURl)
+    setIsLoading(false)
+
   }
   catch (err) {
     console.log("here error is "+err)
   }
-  setIsLoading(false)
+
 }
 
 function modalCloseCallBack () {
     setShowUserList(false)
 }
 
-function navigateToHome() {
+function navigatePop() {
     navigate('Home')
 }
 
-async function modalNavigateCallBack (uid) {
+async function modalNavigateCallBack (newuid) {
   try {
-    setIsLoading(true)
     setShowUserList(false)
-    console.log("taking you to "+uid)
-    await userStorage.setViewingUserToken(uid)
-    console.log("viewing token set")
-    await getUserProfileData()
+     navigate('Profile',{uid : newuid})
   }catch(err) {
     console.log("err is "+err)
   }
 }
+//  function updateFlags(newuid) {
+//   setUid(newuid)
+//    setIsLoading(true)
+//    setShowUserList(false)
+//    getUserProfileData()
+// }
 
 function navigateToFollowerCount() {
   setShowFollowing(false)
@@ -128,7 +162,7 @@ function navigateToFollowingCount() {
       <View style = {styles.centerView}>
       <View style= {styles.upperView}>
        <View style = {styles.userView}>
-        <Image style={sex == "Female" ? styles.imageViewFemale : styles.imageViewMale} source={{uri: profileURL}}/>
+        <Image style={sex == "female" ? styles.imageViewFemale : styles.imageViewMale} source={{uri: profileURL}}/>
       </View>
        <View style = {styles.userinfoView}>
           <TouchableOpacity
@@ -143,7 +177,14 @@ function navigateToFollowingCount() {
           underlayColor='#fff'
           >
             <Text style = {styles.followerText}> {followingCount} </Text>
-            </TouchableOpacity>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+          onPress={() => navigateToFollowingCount()}
+          underlayColor='#fff'
+          >
+            <Text style = {status == "Follow"? styles.statusTextFollow : styles.statusTextFollowing}> {status} </Text>
+          </TouchableOpacity>
        </View>
        </View>
        <View>
@@ -250,9 +291,20 @@ const styles = StyleSheet.create({
   thoughtsView : {
     flex : 0.81,
     width : '100%',
-    borderColor  : "purple",
-    borderWidth : 1,
-  }
+    // borderColor  : "purple",
+    // borderWidth : 1,
+  },
+  statusTextFollowing : {
+    fontSize: 17,
+    fontFamily: "Thonburi",
+    fontWeight : "100",
+  },
+  statusTextFollow : {
+    color : "#149cea",
+    fontSize: 17,
+    fontFamily: "Thonburi",
+    fontWeight : "100",
+  },
 
 });
 

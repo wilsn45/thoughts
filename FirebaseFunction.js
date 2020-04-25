@@ -3,6 +3,7 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp();
 const db = admin.firestore();
+const storage = admin.storage();
 
 
 const { parse } = require('querystring');
@@ -44,31 +45,203 @@ exports.getUserStatus = functions.https.onRequest((req, resp) => {
 // .collection("user")
 // .where("username", "==", "daniya")
 
-exports.isUserNameAvailable = functions.https.onRequest((req, resp) => {
-	try {
-		 let username = req.query.username
-		 console.log("got username = "+ username)
+// exports.isUserNameAvailable = functions.https.onRequest((req, resp) => {
+// 	try {
+// 		 let username = req.query.username
+// 		 console.log("got username = "+ username)
+//
+// 		let userRef = db.collection("user");
+// 	  let query = userRef.where("username", "==", username).get()
+// 	  .then(snapshot => {
+// 			if(snapshot.empty) {
+// 			resp.status(200).json({ isAvailable: true })
+// 		 }else {
+// 				resp.status(200).json({ isAvailable: false })
+// 			}
+// 			return
+// 		})
+// 	 .catch(err => {
+// 			console.log("isUserNameAvailable failure", err)
+// 			resp.status(400).send(new Error("Failed to process"))
+//  		});
+// 	}
+// 	catch(error) {
+// 		console.log("isUserNameAvailable failure", error)
+// 		resp.status(400).send(new Error("Failed to process"))
+// 	}
+// });
 
-		let userRef = db.collection("user");
-	  let query = userRef.where("username", "==", username).get()
-	  .then(snapshot => {
-			if(snapshot.empty) {
-			resp.status(200).json({ isAvailable: true })
-		 }else {
-				resp.status(200).json({ isAvailable: false })
-			}
-			return
+exports.getUserProfileOverView = functions.https.onRequest((req, resp) => {
+	try {
+		 let useruid = req.query.useruid
+		 let myuid = req.query.myuid
+     getUserData(useruid)
+		 .then( userData => {
+			 console.log("userData "+JSON.stringify(userData))
+			 	getUserInfo(useruid)
+				.then(userInfo => {
+					getMyData(myuid,useruid)
+						.then( myData => {
+							let data = userOverviewResponseBuilder(userInfo,userData,myData,myuid,useruid)
+								resp.status(200).json(data)
+								return
+						})
+						.catch(err => {
+							resp.status(400).send(err)
+							console.log("error is "+err)
+						})
+						return
+			})
+		.catch(err => {
+				resp.status(400).send(err)
+				console.log("error is "+err)
+		 });
+		 return
 		})
-	 .catch(err => {
-			console.log("isUserNameAvailable failure", err)
-			resp.status(400).send(new Error("Failed to process"))
- 		});
+		 .catch(err => {
+				resp.status(400).send(err)
+				console.log("error is "+err)
+	 		});
+
 	}
 	catch(error) {
-		console.log("isUserNameAvailable failure", error)
+		console.log("getUserProfileOverView failure", error)
 		resp.status(400).send(new Error("Failed to process"))
 	}
 });
+
+
+function getUserData(useruid) {
+	return new Promise((resolve,reject) => {
+		const usersRef = db.collection('followers').doc(useruid)
+		usersRef.get()
+		.then((snapshot) => {
+			if (!snapshot.exists) {
+				reject(Error("User doesn't exist"))
+			}
+			 console.log("whole data "+JSON.stringify(snapshot.data()))
+			let data = {
+				blocked : snapshot.data().blocked,
+				pendings : snapshot.data().pendings,
+				isPrivate : snapshot.data().isPrivate
+			}
+			resolve(data)
+			return
+		})
+		.catch( err => {
+			reject(err)
+		});
+	});
+}
+
+function getUserInfo(uid) {
+	return new Promise((resolve,reject) => {
+		const usersRef = db.collection('user').doc(uid)
+		usersRef.get()
+		.then((snapshot) => {
+			if (!snapshot.exists) {
+				reject(Error("User doesn't exist"))
+			}
+			let data = {
+				username : snapshot.data().username,
+				sex : snapshot.data().sex,
+				tags : snapshot.data().tags,
+				followersCount : snapshot.data().followersCount,
+				followingsCount : snapshot.data().followingsCount,
+			}
+			resolve(data)
+			return
+		})
+		.catch( err => {
+			console.log("getUserData failure", err)
+			reject(err)
+		});
+	});
+
+}
+
+function getMyData(myuid,useruid) {
+	return new Promise((resolve,reject) => {
+		const usersRef = db.collection('followers').doc(myuid)
+		usersRef.get()
+		.then((snapshot) => {
+			if (!snapshot.exists) {
+				reject(Error("User doesn't exist"))
+			}
+			let followings = snapshot.data().followings
+			let blocked = snapshot.data().blocked
+			let isFollowing = false
+			for (user in followings) {
+				if(user === useruid) {
+					isFollowing = true
+				}
+			}
+			let data = {
+				isFollowing : isFollowing,
+				blocked : blocked
+			}
+			resolve(data)
+			return
+		})
+		.catch( err => {
+			reject(err)
+		});
+	});
+}
+
+
+function userOverviewResponseBuilder (userInfo,userData,myData,myuid,useruid) {
+
+	let userBlocked = userData.blocked
+	let userPendingRequest = userData.pendings
+	let myBlocked =  myData.blocked
+	let isFollowing = myData.isFollowing
+	let youareblocked =  false
+	let youblocked = false
+	let isRequested = false
+
+	for (index in userBlocked) {
+		if(userBlocked[index] === myuid) {
+			youareblocked = true
+		}
+	}
+
+	for (index in userPendingRequest) {
+		if(userPendingRequest[index] === myuid) {
+			isRequested = true
+		}
+	}
+
+	for (index in myBlocked) {
+		if(myBlocked[index] === useruid) {
+			youblocked = true
+		}
+	}
+
+	if(youareblocked) {
+		return { youareblocked: true }
+	}
+	else {
+		return {
+			youareblocked: false,
+			youblocked : youblocked,
+			isRequested: isRequested,
+			isFollowing: isFollowing,
+			isPrivate: userData.isPrivate,
+			followersCount : userInfo.followersCount,
+			followingsCount : userInfo.followingsCount,
+			username : userInfo.username,
+			sex : userInfo.sex,
+			tags : userInfo.tags
+		}
+	}
+
+}
+
+
+
+
+
 
 function newUserOnBoard(number,authToken) {
 	console.log(" newUserOnBoarduser token is", authToken)
@@ -85,118 +258,6 @@ function newUserOnBoard(number,authToken) {
 }
 
 
-exports.getMissedThoughts = functions.https.onRequest((req, resp) => {
-	try {
-		const authToken = req.headers.authorization
-		const userNumber = req.query.number
-
-		getUserSeeArray(authToken)
-		.then ((see) => {
-
-
-			getUserUid(see)
-			.then ( (users) => {
-
-				users.push(authToken)
-				getThoughtsId(users)
-				.then ( (thoughtsId) => {
-				  let data = {
-				    thoughtsId : thoughtsId
-				  }
-				  resp.send(responseBuilder(true,data))
-				  return
-				})
-				.catch ( err => {
-					console.log("getMissedThoughts failure", err)
-					resp.send(responseBuilder(false,err.message))
-				});
-
-				return
-			})
-			.catch(err => {
-				console.log("getMissedThoughts failure", err)
-			   resp.send(responseBuilder(false,err.message))
-			})
-		  return
-		})
-		.catch (err => {
-			console.log("getMissedThoughts failure", err)
-			resp.send(responseBuilder(false,err.message))
-		});
-
-	}
-	catch (error) {
-		console.log("getMissedThoughts failure", error)
-		resp.send(responseBuilder(false,error.message))
-	}
-});
-
-var getUserSeeArray = (uid) => {
-	return new Promise((resolve,reject) => {
-		console.log("auth token ", uid)
-		const usersRef = db.collection('user').doc(uid)
-		usersRef.get()
-		.then((seeSnapshot) => {
-			if (!seeSnapshot.exists) {
-				console.log("getUserSeeArray : see array empty")
-				reject(Error("User doesn't exist"))
-			}
-			console.log("getUserSeeArray Success", seeSnapshot.data().see)
-			resolve(seeSnapshot.data().see)
-			return
-		})
-		.catch( err => {
-			console.log("getUserSeeArray failure", err)
-			reject(err)
-		});
-	});
-}
-
-var getUserUid = (numberArray) => {
-	return new Promise((resolve,reject) => {
-		var uidArray = []
-		let userRef = db.collection('user');
-		userRef.where('number', 'in', numberArray).get()
-		.then( userSnapshot => {
-
-			userSnapshot.forEach(doc => {
-				uidArray.push(doc.id)
-			});
-			resolve(uidArray)
-			console.log("getUserUid Success ", uidArray)
-			return
-		})
-		.catch(err => {
-			console.log("getUserUid failure", err)
-			reject(err)
-		});
-	});
-}
-
-
-var getThoughtsId = (uidArray)  => {
-	return new Promise((resolve,reject) => {
-		let thoughtsRef = db.collection('thoughts');
-		var thoughtIdArray = []
-		console.log("input getThoughtsId ", uidArray)
-		thoughtsRef.where('user_key', 'in', uidArray).get()
-		.then( (thoughtsSnapshot) => {
-
-			thoughtsSnapshot.forEach(thoughts => {
-				thoughtIdArray.push(thoughts.data())
-			});
-			resolve(thoughtIdArray)
-			console.log("getThoughtsId Success ", thoughtIdArray)
-			return
-		})
-		.catch(err => {
-			console.log("getThoughtsId failure", err)
-			reject(err)
-		});
-
-	});
-
-}
 
 
 function responseBuilder(isSuccess,data=null,error="") {
@@ -206,4 +267,5 @@ function responseBuilder(isSuccess,data=null,error="") {
 		error : error,
 		data : data
 	}
+
 }

@@ -21,7 +21,7 @@ import { firebase } from '@react-native-firebase/storage';
 
 
 export default function MyProfileScene(props) {
-  const[isLoading, setIsLoading] = useState(true);
+  const[isLoading, setIsLoading] = useState(false);
   const[showUserList, setShowUserList] = useState(false);
   const[showFollowing, setShowFollowing] = useState(true);
   const { navigate } = useNavigation();
@@ -41,13 +41,17 @@ export default function MyProfileScene(props) {
 
 async function getUserProfileData () {
   try {
-    if(!isLoading) {
-        return;
-    }
+
+    let username = await userStorage.getUserName()
+    let sex = await userStorage.getUserSex()
+    setUsername(username)
+    setSex(sex)
+    let profileURl = await api.getMaxProfileUrl(uid)
+    setProfileURL(profileURl)
+
     let getProfilePromise = api.getProfileOverView(uid)
     let snapshot = await getProfilePromise;
-    setUsername(snapshot.get('username'))
-    setSex(snapshot.get('sex'))
+
     let followerCount = snapshot.get('followersCount')
     let followingCount = snapshot.get('followingsCount')
     if (followerCount) {
@@ -56,8 +60,7 @@ async function getUserProfileData () {
     if(followingCount) {
       setFollowingCount("Followings "+followingCount)
     }
-    let profileURl = await api.getMaxProfileUrl(uid)
-    setProfileURL(profileURl)
+
   }
   catch (err) {
     console.log("here error is "+err)
@@ -244,8 +247,6 @@ const styles = StyleSheet.create({
   thoughtsView : {
     flex : 0.81,
     width : '100%',
-    borderColor  : "purple",
-    borderWidth : 1,
   }
 
 });
