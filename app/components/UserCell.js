@@ -9,7 +9,7 @@ import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 
 export default function UserCell({cellNavigateCallBack,user}) {
-const[profileURL, setProfileURL] = useState(".");
+const[profileURL, setProfileURL] = useState();
 const { navigate } = useNavigation();
 
 useEffect(() => {

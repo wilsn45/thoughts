@@ -31,7 +31,7 @@ export default function MyProfileScene(props) {
   const[followerCount, setFollowerCount] = useState("Followers _");
   const[followingCount, setFollowingCount] = useState("Followings _");
   const[sex, setSex] = useState("");
-  const[profileURL, setProfileURL] = useState("");
+  const[profileURL, setProfileURL] = useState();
   const[token, setToken] = useState("");
 
 
