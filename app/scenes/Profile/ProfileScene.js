@@ -34,9 +34,7 @@ export default function ProfileScene(props) {
 
   const[status, setStatus] = useState(null);
   const[isPrivate, setIsPrivate] = useState(true);
-
-
-
+  const[useruid, setUseruid] = useState(useruid);
 
   useEffect(() => {
     getUserProfileData()
@@ -45,12 +43,11 @@ export default function ProfileScene(props) {
 async function getUserProfileData () {
   try {
 
-    console.log("here")
+    setUseruid(uid)
     let response = await api.getUserProfileOverView(uid)
     if(response.youareblocked) {
       setIsLoading(false)
       navigatePop()
-
     }
     if(response.isFollowing) {
       setStatus("Following")
@@ -99,24 +96,27 @@ function modalCloseCallBack () {
     setShowUserList(false)
 }
 
-function navigatePop() {
+function navigateToHome() {
     navigate('Home')
 }
 
-async function modalNavigateCallBack (newuid) {
+ function modalNavigateCallBack (newuid) {
   try {
-    setShowUserList(false)
-     navigate('Profile',{uid : newuid})
+     updateFlags(newuid)
   }catch(err) {
     console.log("err is "+err)
   }
 }
-//  function updateFlags(newuid) {
-//   setUid(newuid)
-//    setIsLoading(true)
-//    setShowUserList(false)
-//    getUserProfileData()
-// }
+ function updateFlags(newuid) {
+   console.log("new uid "+newuid)
+   console.log("before uid "+uid)
+   uid = newuid
+   //setUid(newuid)
+   console.log("after uid "+uid)
+   setIsLoading(true)
+   setShowUserList(false)
+   getUserProfileData()
+}
 
 function navigateToFollowerCount() {
   setShowFollowing(false)
@@ -201,7 +201,7 @@ function navigateToFollowingCount() {
     </View>
    }
    <Modal isVisible={showUserList} swipeArea={50} style = {{alignSelf : "flex-end",width : '65%'}} >
-      <UserListModal  closeCallBack = {modalCloseCallBack} navigateCallBack = {modalNavigateCallBack} uid = {uid} showFollowing = {showFollowing}/>
+      <UserListModal  closeCallBack = {modalCloseCallBack} navigateCallBack = {modalNavigateCallBack} uid = {useruid} showFollowing = {showFollowing}/>
    </Modal>
     </View>
     );
