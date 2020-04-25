@@ -151,7 +151,8 @@ async function verifyOtc () {
         }
         else {
            console.log("old user")
-            let imageHelperPromise = imageHelper.saveProfileBase64(response.profileMinUrl)
+            let url = await api.getMinProfileUrl(uid)
+            let imageHelperPromise = imageHelper.saveProfileBase64(url)
             let profileBase64 = await imageHelperPromise
             await userStorage.initUser(uid,response,profileBase64)
             navigate('App');

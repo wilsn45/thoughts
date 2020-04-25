@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import * as contactListHelper from "thoughts/app/helper/ContactListtHelper";
 import * as imageHelper from "thoughts/app/helper/ImageHelper";
+import { firebase } from '@react-native-firebase/storage';
 //Google Map API Key : AIzaSyCr65NbaaL4JvLuuvr5-n9QYH_1YxCRT1Q
 const BoyProfileMaxURL = "https://firebasestorage.googleapis.com/v0/b/thoughts-fe76a.appspot.com/o/profile_pic_max%2FBoyPlaceholderMax.jpg?alt=media&token=15231ea9-7a5c-4206-a3ba-a40c7711d13f"
 const BoyProfileMinURL = "https://firebasestorage.googleapis.com/v0/b/thoughts-fe76a.appspot.com/o/profile_pic_min%2FBoyPlaceholderMin.jpg?alt=media&token=bc2cbc39-23b7-4c6e-995c-a93bc33a270e"
@@ -16,7 +17,7 @@ const API_URL = "https://us-central1-thoughts-fe76a.cloudfunctions.net/"
 const usersCollection = firestore().collection('Users');
 const thought_peopleCollection = firestore().collection('thought_people');
 let confirmation  = null
-
+const storage = firebase.storage()
 
 
  export async function numberSignIn(number) {
@@ -147,12 +148,12 @@ export async function addNewUser(){
   }
 
 }
-
-export async function isNewContactAdded() {
-   let contactList = contactListHelper.getUserContactList()
-   console.log(contactList)
-
+export async function getMinProfileUrl(token){
+  let resourceName = '/profile_pic_min/'+token+'.jpg'
+  const ref = await storage.ref(resourceName)
+  return await ref.getDownloadURL();
 }
+
 
 
 

@@ -108,11 +108,7 @@ function navigateToHome() {
   }
 }
  function updateFlags(newuid) {
-   console.log("new uid "+newuid)
-   console.log("before uid "+uid)
    uid = newuid
-   //setUid(newuid)
-   console.log("after uid "+uid)
    setIsLoading(true)
    setShowUserList(false)
    getUserProfileData()

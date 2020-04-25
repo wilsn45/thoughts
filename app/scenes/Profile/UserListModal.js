@@ -18,7 +18,6 @@ export default function UserList ({closeCallBack,navigateCallBack,uid,showFollow
 
 
   useEffect(() => {
-    console.log("finidng followers for "+uid)
     if (showFollowing) {
       setTitle("Followings")
     }else {
