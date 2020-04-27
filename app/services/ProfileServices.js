@@ -77,3 +77,63 @@ export async function getUserProfileOverView(useruid){
         throw handler(e);
     }
 }
+
+export async function follow(useruid,followingname){
+  try{
+      let myuid = await userStorage.getUserToken()
+      let followername = await userStorage.getUserName()
+      let url = API_URL+"follow?followingusername="+followingname+"&&followerusername="+followername
+      console.log("url is "+url)
+      const headers = {
+        myuid: myuid,
+        useruid :useruid
+      }
+      let res = await axios.get(url, {headers});
+      if(res.status==200) {
+        return true
+      }
+      return false
+  }catch (e) {
+      console.log("api follow is "+e)
+      throw new Error(e);
+  }
+}
+
+export async function unfollow(useruid){
+  try{
+      let myuid = await userStorage.getUserToken()
+      let url = API_URL+"unfollow"
+      const headers = {
+        myuid: myuid,
+        useruid :useruid
+      }
+      let res = await axios.get(url, {headers});
+      if(res.status==200) {
+        return true
+      }else
+        return false
+  }catch (e) {
+      console.log("api unfollow is "+e)
+      throw new Error(e);
+  }
+
+}
+
+export async function cancelRequest(useruid){
+  try{
+      let myuid = await userStorage.getUserToken()
+      let url = API_URL+"cancelRequest"
+      const headers = {
+        myuid: myuid,
+        useruid :useruid
+      }
+      let res = await axios.get(url, {headers});
+      if(res.status==200) {
+        return true
+      }
+      return false
+  }catch (e) {
+      console.log("api cancelRequest is "+e)
+      throw new Error(e);
+  }
+}

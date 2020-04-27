@@ -239,8 +239,518 @@ function userOverviewResponseBuilder (userInfo,userData,myData,myuid,useruid) {
 }
 
 
+exports.unfollow= functions.https.onRequest((req, resp) => {
+	try {
+		 let useruid = req.headers.useruid
+		 let myuid = req.headers.myuid
+		 removeFollowing(myuid,useruid)
+		 .then(mSuccess => {
+			 		removeFollower(useruid,myuid)
+					.then(tSuccess => {
+						resp.status(200).send()
+						updateCount(myuid,useruid)
+						return
+					})
+					.catch(err => {
+						resp.status(400).send(err)
+					})
+					return
+		 })
+		 .catch(err => {
+			 resp.status(400).send(err)
+		 })
+	}
+	catch(error) {
+		console.log("unfollowUser error is "+err)
+		resp.status(400).send(new Error("Failed to process"))
+	}
+});
+
+exports.follow = functions.https.onRequest((req, resp) => {
+	try {
+		 let useruid = req.headers.useruid
+		 let myuid = req.headers.myuid
+		 let followingusername = req.query.followingusername
+		 let followerusername = req.query.followerusername
+		 addFollowerIsPrivate(useruid,myuid,followerusername)
+		 .then(isPrivate => {
+			 		if(isPrivate) {
+						 resp.status(200).send()
+					}else {
+							addFollowing(myuid,useruid,followingusername)
+							.then(success => {
+									resp.status(200).send()
+									updateCount(myuid,useruid)
+									return
+							})
+							.catch(err => {
+								resp.status(400).send(err)
+							})
+					}
+					return
+		 })
+		 .catch(err => {
+			 resp.status(400).send(err)
+		 })
+	}
+	catch(error) {
+		console.log("followUser error is "+err)
+		resp.status(400).send(error)
+	}
+});
 
 
+
+exports.acceptRequest = functions.https.onRequest((req, resp) => {
+	try {
+		 let useruid = req.headers.useruid
+		 let myuid = req.headers.myuid
+		 let followingusername = req.query.followingusername
+		 let followerusername = req.query.followerusername
+		 removePendingsAcceptRequest(myuid,useruid,followerusername)
+		 .then(success => {
+			 			addFollowing(useruid,myuid,followingusername)
+						.then(success => {
+							resp.status(200).send()
+							updateCount(myuid,useruid)
+							return
+						})
+						.catch(err => {
+							resp.status(400).send(err)
+						})
+					return
+		 })
+		 .catch(err => {
+			 resp.status(400).send(err)
+		 })
+	}
+	catch(error) {
+		console.log("followUser error is "+err)
+		resp.status(400).send(error)
+	}
+});
+
+exports.cancelRequest = functions.https.onRequest((req, resp) => {
+	try {
+		 let useruid = req.headers.useruid
+		 let myuid = req.headers.myuid
+		  removePendings(useruid,myuid)
+		 .then(success => {
+			 			resp.status(200).send()
+					return
+		 })
+		 .catch(err => {
+			 resp.status(400).send(err)
+		 })
+	}
+	catch(error) {
+		console.log("followUser error is "+err)
+		resp.status(400).send(error)
+	}
+});
+
+exports.block = functions.https.onRequest((req, resp) => {
+	try {
+		 let useruid = req.headers.useruid
+		 let myuid = req.headers.myuid
+		 let blockingusername = req.query.blockingusername
+		 addingToBlock(myuid,useruid,blockingusername)
+		 .then(success => {
+			 			removeFollowingBlock(useruid,myuid)
+						.then(success => {
+							resp.status(200).send()
+							updateCount(myuid,useruid)
+							return
+						})
+						.catch(err => {
+							resp.status(400).send(err)
+						})
+					return
+		 })
+		 .catch(err => {
+			 resp.status(400).send(err)
+		 })
+	}
+	catch(error) {
+		console.log("followUser error is "+err)
+		resp.status(400).send(error)
+	}
+});
+
+
+exports.unblock = functions.https.onRequest((req, resp) => {
+	try {
+		 let useruid = req.headers.useruid
+		 let myuid = req.headers.myuid
+		 removeBlock(myuid,useruid)
+		 .then(success => {
+			 			resp.status(200).send()
+					return
+		 })
+		 .catch(err => {
+			 resp.status(400).send(err)
+		 })
+	}
+	catch(error) {
+		console.log("followUser error is "+err)
+		resp.status(400).send(error)
+	}
+});
+
+function addFollowing(to,uid,username) {
+	return new Promise((resolve,reject) => {
+		const usersRef = db.collection('followers').doc(to)
+		usersRef.get()
+		.then((snapshot) => {
+		 if (!snapshot.exists) {
+			 reject(new Error("User doesn't exists"))
+		 }
+		 let followings = snapshot.data().followings
+		 followings[uid] = username
+		 usersRef.update({followings:followings});
+		 resolve(true)
+		 return
+	 })
+	 .catch( err => {
+			 console.log("addFollowing error is "+err)
+		 reject(err)
+	 });
+	});
+}
+
+function removeFollowing(from,uid) {
+	return new Promise((resolve,reject) => {
+		const usersRef = db.collection('followers').doc(from)
+		usersRef.get()
+		.then((snapshot) => {
+		 if (!snapshot.exists) {
+			 reject(new Error("User doesn't exists"))
+		 }
+		 let followings = snapshot.data().followings
+		 delete followings[uid]
+		 usersRef.update({followings:followings});
+		 resolve(true)
+		 return
+	 })
+	 .catch( err => {
+			 console.log("removeFollowing error is "+err)
+		 reject(err)
+	 });
+	});
+}
+
+function addFollowerIsPrivate(to,uid,username) {
+	return new Promise((resolve,reject) => {
+		const usersRef = db.collection('followers').doc(to)
+		usersRef.get()
+		.then((snapshot) => {
+		 if (!snapshot.exists) {
+			 reject(new Error("User doesn't exists"))
+		 }
+		 let isPrivate = snapshot.data().isPrivate
+			if (isPrivate) {
+			 let pendings = snapshot.data().pendings
+			 pendings[uid] = username
+	 		 usersRef.update({pendings:pendings});
+			} else {
+			  let followers = snapshot.data().followers
+				followers[uid] = username
+				usersRef.update({followers:followers});
+		}
+		resolve(isPrivate)
+		 return
+	 })
+	 .catch( err => {
+			 console.log("addFollowerIsPrivate error is "+err)
+		 reject(err)
+	 });
+	});
+}
+
+function addFollower(to,uid) {
+	return new Promise((resolve,reject) => {
+		const usersRef = db.collection('followers').doc(to)
+		usersRef.get()
+		.then((snapshot) => {
+		 if (!snapshot.exists) {
+			 reject(new Error("User doesn't exists"))
+		 }
+		 let followers = snapshot.data().followers
+		 followers[uid] = username
+		 usersRef.update({followers:followers});
+		 resolve(true)
+		 return
+	 })
+	 .catch( err => {
+			 console.log("addFollower error is "+err)
+		 reject(err)
+	 });
+	});
+}
+
+function removeFollowingBlock(from,uid) {
+	return new Promise((resolve,reject) => {
+		const usersRef = db.collection('followers').doc(from)
+		usersRef.get()
+		.then((snapshot) => {
+		 if (!snapshot.exists) {
+			 reject(new Error("User doesn't exists"))
+		 }
+		 	  let followings = snapshot.data().followings
+				let followers = snapshot.data().followers
+				delete followings[uid]
+				delete followers[uid]
+				usersRef.update({followings:followings,followers:followers});
+				resolve(true)
+		 return
+	 })
+	 .catch( err => {
+			 console.log("removeFollowingBlock error is "+err)
+		  reject(err)
+	 });
+	});
+}
+
+function removeFollower(from,uid) {
+	return new Promise((resolve,reject) => {
+		const usersRef = db.collection('followers').doc(from)
+		usersRef.get()
+		.then((snapshot) => {
+		 if (!snapshot.exists) {
+			 reject(new Error("User doesn't exists"))
+		 }
+		 let followers = snapshot.data().followers
+		 delete followers[uid]
+		 usersRef.update({followers:followers});
+		 resolve(true)
+		 return
+	 })
+	 .catch( err => {
+			 console.log("removeFollower error is "+err)
+		 reject(err)
+	 });
+	});
+}
+
+function addPendings(to,uid) {
+	return new Promise((resolve,reject) => {
+		const usersRef = db.collection('followers').doc(to)
+		usersRef.get()
+		.then((snapshot) => {
+		 if (!snapshot.exists) {
+			 reject(new Error("User doesn't exists"))
+		 }
+		 let pendings = snapshot.data().pendings
+		 pendings[uid] = username
+		 usersRef.update({pendings:updatedPendings});
+		 resolve(true)
+		 return
+	 })
+	 .catch( err => {
+			 console.log("addFollower error is "+err)
+		 reject(err)
+	 });
+	});
+}
+
+function removePendings(from,uid) {
+	return new Promise((resolve,reject) => {
+		const usersRef = db.collection('followers').doc(from)
+		usersRef.get()
+		.then((snapshot) => {
+		 if (!snapshot.exists) {
+			 reject(new Error("User doesn't exists"))
+		 }
+		 let pendings = snapshot.data().pendings
+		 delete pendings[uid]
+		 usersRef.update({pendings:pendings});
+		 resolve(true)
+		 return
+	 })
+	 .catch( err => {
+			 console.log("removePendings error is "+err)
+		 reject(err)
+	 });
+	});
+}
+
+function removePendingsAcceptRequest(from,uid,username) {
+	return new Promise((resolve,reject) => {
+		const usersRef = db.collection('followers').doc(from)
+		usersRef.get()
+		.then((snapshot) => {
+		 if (!snapshot.exists) {
+			 reject(new Error("User doesn't exists"))
+		 }
+		 	  let pendings = snapshot.data().pendings
+				let followers = snapshot.data().followers
+				delete pendings[uid]
+				followers[uid] = username
+				usersRef.update({pendings:pendings,followers:followers});
+				resolve(true)
+		 return
+	 })
+	 .catch( err => {
+			 console.log("removePendingsAcceptRequest error is "+err)
+		  reject(err)
+	 });
+	});
+}
+
+function addingToBlock(to,uid,username) {
+	return new Promise((resolve,reject) => {
+		const usersRef = db.collection('followers').doc(to)
+		usersRef.get()
+		.then((snapshot) => {
+		 if (!snapshot.exists) {
+			 reject(new Error("User doesn't exists"))
+		 }
+		 		let blocked = snapshot.data().blocked
+		 	  let followings = snapshot.data().followings
+				let followers = snapshot.data().followers
+				delete followings[uid]
+				delete followers[uid]
+				blocked[uid] = username
+				usersRef.update({blocked: blocked,followings:followings,followers:followers});
+				resolve(true)
+		 return
+	 })
+	 .catch( err => {
+			 console.log("removeFollowingBlock error is "+err)
+		  reject(err)
+	 });
+	});
+}
+
+
+
+function addBlock(to,uid) {
+	return new Promise((resolve,reject) => {
+		const usersRef = db.collection('followers').doc(to)
+		usersRef.get()
+		.then((snapshot) => {
+		 if (!snapshot.exists) {
+			 reject(new Error("User doesn't exists"))
+		 }
+		 let blocked = snapshot.data().blocked
+		 blocked[uid] = username
+		 usersRef.update({blocked:updatedBlocked});
+		 resolve(true)
+		 return
+	 })
+	 .catch( err => {
+			 console.log("addBlock error is "+err)
+		 reject(err)
+	 });
+	});
+}
+
+function removeBlock(from,uid) {
+	return new Promise((resolve,reject) => {
+		const usersRef = db.collection('followers').doc(from)
+		usersRef.get()
+		.then((snapshot) => {
+		 if (!snapshot.exists) {
+			 reject(new Error("User doesn't exists"))
+		 }
+		 let blocked = snapshot.data().blocked
+		 delete blocked[uid]
+		 usersRef.update({blocked:blocked});
+		 resolve(true)
+		 return
+	 })
+	 .catch( err => {
+			 console.log("removePendings error is "+err)
+		 reject(err)
+	 });
+	});
+}
+
+exports.updateCounts = functions.firestore
+    .document('followers/{user}')
+    .onUpdate((change, context) => {
+      const uid = context.params.user;
+      const newValue = change.after.data();
+			let followers = newValue.followers
+ 		 	let followings = newValue.followings
+ 		 	let followersCount = 0
+ 		 	let followingsCount = 0
+
+ 		 	for (user in followers) {
+ 			 	followersCount = followersCount+1
+ 		 	}
+
+ 		  for (user in followings) {
+ 			 	followingsCount = followingsCount+1
+ 		 	}
+    	return db.collection('user').doc(uid).update({followersCount : followersCount,followingsCount : followingsCount})
+
+      // perform desired operations ...
+});
+
+
+function updateCount(myuid,useruid) {
+return new Promise((resolve,reject) => {
+		getCounts(myuid)
+		.then( myCount => {
+			  let myFollowersCount = myCount.followers
+				let myFollowingsCount = myCount.followings
+				usersRef.update({followersCount: myFollowersCount,followingsCount:myFollowingsCount});
+
+				getCounts(useruid)
+				.then( theirCount => {
+					let theirFollowersCount = theirCount.followers
+					let theirFollowingsCount = theirCount.followings
+					usersRef.update({followersCount: theirFollowersCount,followingsCount:theirFollowingsCount});
+					return
+				})
+				.catch(err => {
+					console.log("updateCount error is "+err)
+				})
+				return
+		})
+		.catch(err => {
+			console.log("updateCount error is "+err)
+		})
+});
+
+}
+
+function getCounts(uid) {
+	return new Promise((resolve,reject) => {
+		const usersRef = db.collection('followers').doc(uid)
+		usersRef.get()
+		.then((snapshot) => {
+		 if (!snapshot.exists) {
+			 reject(new Error("User doesn't exists"))
+		 }
+		 let followers = snapshot.data().followers
+		 let followings = snapshot.data().followings
+		 let followersCount = 0
+		 let followingCount = 0
+
+		 for (user in followers) {
+			 followersCount = followersCount+1
+		 }
+
+		 for (user in followings) {
+			 followingCount = followingCount+1
+		 }
+
+		 let count = {
+			 followers : followersCount,
+			 followings : followingCount
+		 }
+		 console.log("data is "+ JSON.stringify(count))
+		 resolve(count)
+		 return
+	 })
+	 .catch( err => {
+			 console.log("getCounts error is "+err)
+		 reject(err)
+	 });
+	});
+}
 
 
 function newUserOnBoard(number,authToken) {

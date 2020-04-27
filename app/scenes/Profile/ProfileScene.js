@@ -27,59 +27,57 @@ export default function ProfileScene(props) {
   const { navigate } = useNavigation();
   let uid = useNavigationParam('uid');
   const[username, setUsername] = useState("");
-  const[followerCount, setFollowerCount] = useState("Followers _");
-  const[followingCount, setFollowingCount] = useState("Followings _");
+  const[followerCount, setFollowerCount] = useState(0);
+  const[followingCount, setFollowingCount] = useState(0);
   const[sex, setSex] = useState("");
   const[profileURL, setProfileURL] = useState();
+  const[useruid, setUseruid] = useState(useruid);
 
   const[status, setStatus] = useState(null);
   const[isPrivate, setIsPrivate] = useState(true);
-  const[useruid, setUseruid] = useState(useruid);
+  const[buttonStyleCode, setButtonStyleCode] = useState(1);
 
   useEffect(() => {
     getUserProfileData()
-    }, []);
+  }, []);
 
 async function getUserProfileData () {
   try {
 
     setUseruid(uid)
     let response = await api.getUserProfileOverView(uid)
+
     if(response.youareblocked) {
       setIsLoading(false)
       navigatePop()
     }
-    if(response.isFollowing) {
+    else if(response.isFollowing) {
       setStatus("Following")
-      setIsPrivate(false)
+      setButtonStyleCode(2)
     }
     else if(response.isRequested) {
       setStatus("Requested")
-      setIsPrivate(true)
+      setButtonStyleCode(3)
     }
     else if(response.isPrivate) {
       setStatus("Follow")
-      setIsPrivate(true)
+      setButtonStyleCode(1)
     }else {
       setStatus("Follow")
-      setIsPrivate(false)
+      setButtonStyleCode(1)
     }
-
-    let username = response.username
-    let sex = response.sex
     let followerCount = response.followersCount
     let followingCount = response.followingsCount
-    setUsername(username)
-    setSex(sex)
+    setUsername(response.username)
+    setSex(response.sex)
+    setIsPrivate(response.isPrivate)
+
     if (followerCount) {
-      setFollowerCount("Followers "+followerCount)
-    }else {
-      setFollowerCount("Followers _")
+      setFollowerCount(followerCount)
     }
+
     if(followingCount) {
-      setFollowingCount("Followings "+followingCount)
-    }else {
-        setFollowingCount("Followings _")
+      setFollowingCount(followingCount)
     }
     let profileURl = await api.getMaxProfileUrl(uid)
     setProfileURL(profileURl)
@@ -90,6 +88,39 @@ async function getUserProfileData () {
     console.log("here error is "+err)
   }
 
+}
+
+async function actionPerform() {
+  if(status == "Following") {
+    let status = await api.unfollow(useruid)
+    if(status) {
+      setFollowerCount(followerCount-1)
+      setStatus("Follow")
+      setButtonStyleCode(1)
+    }
+  }
+  else if(status == "Requested") {
+    let status = await api.cancelRequest(useruid)
+    if(status) {
+      setStatus("Follow")
+      setButtonStyleCode(1)
+    }
+  }
+  else if(status == "Follow" && isPrivate) {
+    let status = await api.follow(useruid,username)
+    if(status) {
+      setStatus("Requested")
+      setButtonStyleCode(3)
+    }
+  }
+  else {
+    let status = await api.follow(useruid,username)
+    if(status) {
+      setFollowerCount(followerCount+1)
+      setStatus("Following")
+      setButtonStyleCode(2)
+    }
+  }
 }
 
 function modalCloseCallBack () {
@@ -124,7 +155,35 @@ function navigateToFollowingCount() {
   setShowUserList(true)
 }
 
-  return (
+function buttonStyle() {
+  if(buttonStyleCode == 1) {
+    return {  color : "#149cea",
+          fontSize: 17,
+          fontFamily: "Thonburi",
+          fontWeight : "100",
+    }
+  }
+  else if(buttonStyleCode == 2) {
+    return {  color : "grey",
+          fontSize: 17,
+          fontFamily: "Thonburi",
+          fontWeight : "100",
+    }
+  }
+  else  {
+    return {
+          fontSize: 17,
+          fontFamily: "Thonburi",
+          fontWeight : "100",
+    }
+  }
+
+
+}
+
+
+
+return (
 
     <View style = {styles.main}>
     {
@@ -163,31 +222,31 @@ function navigateToFollowingCount() {
        <View style = {styles.userinfoView}>
           <TouchableOpacity
           onPress={() => navigateToFollowerCount()}
+          disabled={followerCount < 1 }
           underlayColor='#fff'
           >
-          <Text style = {styles.followerText}> {followerCount} </Text>
+          <Text style = {styles.followerText}> {followerCount > 0 ? "Followers " +followerCount : "Followers" } </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
           onPress={() => navigateToFollowingCount()}
+          disabled={followingCount < 1 }
           underlayColor='#fff'
           >
-            <Text style = {styles.followerText}> {followingCount} </Text>
+            <Text style = {styles.followerText}> {followingCount > 0 ? "Followings " +followingCount : "Followings" } </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-          onPress={() => navigateToFollowingCount()}
+          onPress={() => actionPerform()}
           underlayColor='#fff'
           >
-            <Text style = {status == "Follow"? styles.statusTextFollow : styles.statusTextFollowing}> {status} </Text>
+            <Text style={buttonStyle()}> {status} </Text>
           </TouchableOpacity>
        </View>
        </View>
        <View>
         <Text style = {styles.userNameText}> {username}</Text>
        </View>
-
-
 
       </View>
 
@@ -289,17 +348,6 @@ const styles = StyleSheet.create({
     width : '100%',
     // borderColor  : "purple",
     // borderWidth : 1,
-  },
-  statusTextFollowing : {
-    fontSize: 17,
-    fontFamily: "Thonburi",
-    fontWeight : "100",
-  },
-  statusTextFollow : {
-    color : "#149cea",
-    fontSize: 17,
-    fontFamily: "Thonburi",
-    fontWeight : "100",
   },
 
 });
