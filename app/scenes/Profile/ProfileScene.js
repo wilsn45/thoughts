@@ -6,7 +6,8 @@ import { View,
         TextInput,
         TouchableOpacity,
         SafeAreaView,
-        FlatList } from 'react-native';
+        FlatList,
+      TouchableWithoutFeedback } from 'react-native';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Modal from 'react-native-modal';
@@ -23,6 +24,7 @@ import { firebase } from '@react-native-firebase/storage';
 export default function ProfileScene(props) {
   const[isLoading, setIsLoading] = useState(true);
   const[showUserList, setShowUserList] = useState(false);
+  const[showOptions, setShowOptions] = useState(false);
   const[showFollowing, setShowFollowing] = useState(true);
   const { navigate } = useNavigation();
   let uid = useNavigationParam('uid');
@@ -36,6 +38,8 @@ export default function ProfileScene(props) {
   const[status, setStatus] = useState(null);
   const[isPrivate, setIsPrivate] = useState(true);
   const[buttonStyleCode, setButtonStyleCode] = useState(1);
+
+  const[blockText, setBlockText] = useState("Block");
 
   useEffect(() => {
     getUserProfileData()
@@ -59,12 +63,12 @@ async function getUserProfileData () {
       setStatus("Requested")
       setButtonStyleCode(3)
     }
-    else if(response.isPrivate) {
+    else {
       setStatus("Follow")
       setButtonStyleCode(1)
-    }else {
-      setStatus("Follow")
-      setButtonStyleCode(1)
+    }
+    if(response.youblocked) {
+      setBlockText("Unblock")
     }
     let followerCount = response.followersCount
     let followingCount = response.followingsCount
@@ -123,6 +127,24 @@ async function actionPerform() {
   }
 }
 
+async function blockUnblock() {
+  if (blockText == "Block") {
+    let status = await api.block(useruid,username)
+    if(status) {
+      setFollowerCount(followerCount-1)
+      setStatus("Follow")
+      setButtonStyleCode(1)
+      setBlockText("Unblock")
+    }
+  }else {
+    let status = await api.unblock(useruid)
+    if(status) {
+      setBlockText("Block")
+    }
+  }
+  setShowOptions(false)
+}
+
 function modalCloseCallBack () {
     setShowUserList(false)
 }
@@ -155,6 +177,10 @@ function navigateToFollowingCount() {
   setShowUserList(true)
 }
 
+function openOptions() {
+    setShowOptions(true)
+}
+
 function buttonStyle() {
   if(buttonStyleCode == 1) {
     return {  color : "#149cea",
@@ -184,13 +210,13 @@ function buttonStyle() {
 
 
 return (
-
-    <View style = {styles.main}>
+  <View style = {styles.main}>
     {
       isLoading &&
       <Spinner  isVisible={true} size={50} type="Arc" color="#189afd"/>
     }
     { !isLoading &&
+      <TouchableWithoutFeedback onPress={() => {setShowOptions(false)}} accessible={false}>
     <View style = {styles.superView}>
       <View style = {styles.headerView}>
 
@@ -205,10 +231,10 @@ return (
 
       <TouchableOpacity
         style = {styles.superViewHeader}
-        onPress={() => navigateToAMessages()}
+        onPress={() => openOptions()}
         underlayColor='#fff'
        >
-       <Icon name={'settings'}  style = {styles.messageView} size={30} />
+       <Icon name={'menu'}  style = {styles.messageView} size={30} />
       </TouchableOpacity>
 
 
@@ -254,11 +280,33 @@ return (
       </View>
 
     </View>
+    </TouchableWithoutFeedback>
    }
    <Modal isVisible={showUserList} swipeArea={50} style = {{alignSelf : "flex-end",width : '65%'}} >
       <UserListModal  closeCallBack = {modalCloseCallBack} navigateCallBack = {modalNavigateCallBack} uid = {useruid} showFollowing = {showFollowing}/>
    </Modal>
+   {showOptions &&
+     <View style = {styles.optionView}>
+              <TouchableOpacity
+              onPress={() => hideView()}
+              underlayColor='#fff'
+              style = {styles.optionButtonView}
+              >
+                <Text style={styles.optionButtonText}> Hide Posts </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+              onPress={() => blockUnblock()}
+              underlayColor='#fff'
+              style = {styles.optionButtonView}
+              >
+                <Text style={styles.optionButtonText}> {blockText} </Text>
+              </TouchableOpacity>
+
+        </View>
+      }
     </View>
+
     );
 }
 
@@ -349,6 +397,33 @@ const styles = StyleSheet.create({
     // borderColor  : "purple",
     // borderWidth : 1,
   },
+  optionView : {
+    width : 120,
+    height : 130,
+    marginTop : 40,
+    marginRight : 10,
+    backgroundColor : "#fff",
+    borderColor : "black",
+    borderWidth : 1,
+    borderRadius : 7,
+    position: 'absolute',
+    right : -1,
+    top : 0,
+    justifyContent : 'center'
+  },
+  optionButtonView : {
+    flex : 0.5,
+    borderColor : "grey",
+    borderBottomWidth : 1,
+    alignItems : "center",
+    justifyContent : "center"
+  },
+  optionButtonText : {
+    fontSize: 20,
+    fontFamily: "Thonburi",
+    fontWeight : "100",
+  },
+
 
 });
 
@@ -357,3 +432,6 @@ ProfileScene.navigationOptions = ({}) => {
     title: ``
   }
 };
+
+
+// <Modal isVisible={showOptions} swipeArea={50} style = {{alignSelf : "flex-end",width : '25%', height : '10%'}} onBackdropPress={() => setShowOptions(false)} >

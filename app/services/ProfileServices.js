@@ -116,7 +116,6 @@ export async function unfollow(useruid){
       console.log("api unfollow is "+e)
       throw new Error(e);
   }
-
 }
 
 export async function cancelRequest(useruid){
@@ -134,6 +133,44 @@ export async function cancelRequest(useruid){
       return false
   }catch (e) {
       console.log("api cancelRequest is "+e)
+      throw new Error(e);
+  }
+}
+
+export async function block(useruid,blockingusername){
+  try{
+      let myuid = await userStorage.getUserToken()
+      let url = API_URL+"block?blockingusername="+blockingusername
+      const headers = {
+        myuid: myuid,
+        useruid :useruid
+      }
+      let res = await axios.get(url, {headers});
+      if(res.status==200) {
+        return true
+      }else
+        return false
+  }catch (e) {
+      console.log("api unfollow is "+e)
+      throw new Error(e);
+  }
+}
+
+export async function unblock(useruid){
+  try{
+      let myuid = await userStorage.getUserToken()
+      let url = API_URL+"unblock"
+      const headers = {
+        myuid: myuid,
+        useruid :useruid
+      }
+      let res = await axios.get(url, {headers});
+      if(res.status==200) {
+        return true
+      }else
+        return false
+  }catch (e) {
+      console.log("api unfollow is "+e)
       throw new Error(e);
   }
 }
