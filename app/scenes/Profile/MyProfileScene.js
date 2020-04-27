@@ -28,8 +28,8 @@ export default function MyProfileScene(props) {
   const uid = useNavigationParam('uid');
 
   const[username, setUsername] = useState("");
-  const[followerCount, setFollowerCount] = useState("Followers _");
-  const[followingCount, setFollowingCount] = useState("Followings _");
+  const[followerCount, setFollowerCount] = useState(0);
+  const[followingCount, setFollowingCount] = useState(0);
   const[sex, setSex] = useState("");
   const[profileURL, setProfileURL] = useState();
   const[token, setToken] = useState("");
@@ -55,10 +55,10 @@ async function getUserProfileData () {
     let followerCount = snapshot.get('followersCount')
     let followingCount = snapshot.get('followingsCount')
     if (followerCount) {
-      setFollowerCount("Followers "+followerCount)
+      setFollowerCount(followerCount)
     }
     if(followingCount) {
-      setFollowingCount("Followings "+followingCount)
+      setFollowingCount(followingCount)
     }
 
   }
@@ -130,16 +130,18 @@ function navigateToFollowingCount() {
        <View style = {styles.userinfoView}>
           <TouchableOpacity
           onPress={() => navigateToFollowerCount()}
+          disabled={followerCount < 1 }
           underlayColor='#fff'
           >
-          <Text style = {styles.followerText}> {followerCount} </Text>
+            <Text style = {styles.followerText}> {followerCount > 0 ? "Followers " +followerCount : "Followers" } </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
           onPress={() => navigateToFollowingCount()}
+          disabled={followingCount < 1 }
           underlayColor='#fff'
           >
-            <Text style = {styles.followerText}> {followingCount} </Text>
+            <Text style = {styles.followerText}> {followingCount > 0 ? "Followings " +followingCount : "Followings" } </Text>
             </TouchableOpacity>
        </View>
        </View>
