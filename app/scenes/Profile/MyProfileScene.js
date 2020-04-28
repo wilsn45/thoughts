@@ -15,7 +15,7 @@ import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import * as realm from "thoughts/app/storage/Realm/Realm";
 import * as api from "thoughts/app/services/ProfileServices";
-import UserListModal from "./UserListModal";
+import MyUserListModal from "./MyUserListModal";
 var Spinner = require('react-native-spinkit');
 
 import { firebase } from '@react-native-firebase/storage';
@@ -38,9 +38,15 @@ export default function MyProfileScene(props) {
 
   useEffect(() => {
     loadProfile()
-    getUserProfileInfo()
+    //getUserProfileInfo()
     getUserFoProfileData()
-    }, []);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      console.log("cleaned up");
+    };
+  }, []);
 
 async function loadProfile() {
   let followers = await realm.getFollowers()
@@ -55,29 +61,28 @@ async function loadProfile() {
   setSex(sex)
 }
 
-async function getUserProfileInfo () {
-  try {
-
-    let picData = await api.getMaxProfileUrl(uid)
-    setPicData(picData)
-
-    let getProfilePromise = api.getProfileOverView(uid)
-    let snapshot = await getProfilePromise;
-
-    let followerCount = snapshot.get('followersCount')
-    let followingCount = snapshot.get('followingsCount')
-    if (followerCount) {
-      setFollowerCount(followerCount)
-    }
-    if(followingCount) {
-      setFollowingCount(followingCount)
-    }
-  }
-  catch (err) {
-    console.log("here error is "+err)
-  }
-  setIsLoading(false)
-}
+// async function getUserProfileInfo () {
+//   try {
+//
+//     let picData = await api.getMaxProfileUrl(uid)
+//     setPicData(picData)
+//
+//     let getProfilePromise = api.getProfileOverView(uid)
+//     let snapshot = await getProfilePromise;
+//
+//     let followerCount = snapshot.get('followersCount')
+//     let followingCount = snapshot.get('followingsCount')
+//     if (followerCount) {
+//       setFollowerCount(followerCount)
+//     }
+//     if(followingCount) {
+//       setFollowingCount(followingCount)
+//     }
+//   }
+//   catch (err) {
+//     console.log("here error is "+err)
+//   }
+// }
 
 async function getUserFoProfileData () {
   try {
@@ -107,7 +112,7 @@ function navigateToSettings() {
 
 
 function navigateToHome() {
-    navigate.pop()
+    navigate('Home')
 }
 
 async function modalNavigateCallBack (uid) {
@@ -193,7 +198,7 @@ function navigateToFollowingCount() {
     </View>
    }
    <Modal isVisible={showUserList} swipeArea={50} style = {{alignSelf : "flex-end",width : '65%'}} >
-      <UserListModal  closeCallBack = {modalCloseCallBack} navigateCallBack = {modalNavigateCallBack} uid = {uid} showFollowing = {showFollowing}/>
+      <MyUserListModal  closeCallBack = {modalCloseCallBack} navigateCallBack = {modalNavigateCallBack} uid = {uid} showFollowing = {showFollowing}/>
    </Modal>
     </View>
     );

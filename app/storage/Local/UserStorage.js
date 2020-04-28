@@ -9,7 +9,8 @@ const UserSexKey = "@UserSex"
 const UserTagsKey = "@UserTags"
 const UserProfileBaseDataKey = "@UserProfileBaseData"
 const UserCountryKey = "@UserCountry"
-const ViewingUserKey = "@ViewingUserKey"
+const SelectedShowThoughtOptionKey = "@SelectedShowThoughtOption"
+
 
 
 
@@ -153,6 +154,23 @@ export async function getUserProfileMinBase64(){
   try {
     let base64Promise = AsyncStorage.getItem(UserProfileBaseDataKey)
     return await base64Promise
+  } catch (err) {
+    throw new Error(err.message)
+  }
+}
+export async function setSelectShowOption (option){
+  try {
+    let selectedPromise = AsyncStorage.setItem(SelectedShowThoughtOptionKey,option)
+    await selectedPromise
+   } catch (err) {
+    throw new Error(err.message)
+  }
+}
+
+export async function getSelectShowOption () {
+  try {
+    let selectedPromise = AsyncStorage.getItem(SelectedShowThoughtOptionKey)
+    return await selectedPromise
   } catch (err) {
     throw new Error(err.message)
   }

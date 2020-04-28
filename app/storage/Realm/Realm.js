@@ -15,7 +15,33 @@ const FollowingSchema = {
     username: 'string'
   }
 };
-const Schema = [FollowerSchema, FollowingSchema];
+
+const ShowOnlySchema = {
+  name: 'ShowOnly',
+  properties: {
+    uid:  'string',
+    username: 'string'
+  }
+};
+
+const ShowExceptSchema = {
+  name: 'ShowExcept',
+  properties: {
+    uid:  'string',
+    username: 'string'
+  }
+};
+
+const ShowSchema = {
+  name: 'Show',
+  properties: {
+    uid:  'string',
+    username: 'string'
+  }
+};
+
+const Schema = [FollowerSchema, FollowingSchema,ShowOnlySchema,ShowExceptSchema,ShowSchema];
+
 export function updateFollowers(followers) {
 return new Promise((resolve,reject) => {
   Realm.open({schema: Schema})
@@ -26,7 +52,7 @@ return new Promise((resolve,reject) => {
         for (var user in followers) {
           realm.create('Follower', {
               uid: user,
-              username: followings[user]
+              username: followers[user]
           });
         }
       });
@@ -34,7 +60,7 @@ return new Promise((resolve,reject) => {
       resolve(true)
   })
   .catch(error => {
-      console.log(error);
+      console.log("updateFollowers error "+error);
       reject(error)
     });
 });
@@ -59,7 +85,7 @@ return new Promise((resolve,reject) => {
 
   })
   .catch(error => {
-      console.log(error);
+      console.log("updateFollowings error "+error);
       reject(error)
     });
 });
@@ -74,7 +100,7 @@ return new Promise((resolve,reject) => {
       resolve(followings)
   })
   .catch(error => {
-    console.log(error);
+    console.log("getFollowings error "+error);
   });
 });
 }
@@ -88,22 +114,84 @@ return new Promise((resolve,reject) => {
       //realm.close()
   })
   .catch(error => {
-    console.log(error);
+    console.log("getFollowers error "+error);
   });
 });
 }
-//
-// export function getFollowings() {
-// return new Promise((resolve,reject) => {
-//   Realm.open({schema: Schema})
-//     .then(realm => {
-//       const followings = realm.objects('Following');
-//         realm.close();
-//       resolve(followings)
-//   })
-//   .catch(error => {
-//       console.log(error);
-//       reject(error)
-//     });
-// });
-// }
+
+export function updateShowOnly(users) {
+return new Promise((resolve,reject) => {
+  Realm.open({schema: Schema})
+    .then(realm => {
+      realm.write(() => {
+        let usersList = realm.objects('ShowOnly');
+        realm.delete(usersList);
+        for (var user in users) {
+          realm.create('ShowOnly', {
+              uid: user.uid,
+              username: user.username
+          });
+        }
+      });
+      //realm.close();
+      resolve(true)
+
+  })
+  .catch(error => {
+      console.log("updateShowOnly error "+error);
+      reject(error)
+    });
+});
+}
+
+
+export function getShowOnly() {
+return new Promise((resolve,reject) => {
+  Realm.open({schema: Schema})
+  .then(realm => {
+      const user = realm.objects('ShowOnly');
+      resolve(user)
+  })
+  .catch(error => {
+  console.log("getShowOnly error "+error);
+  });
+});
+}
+
+export function updateShowExcept(users) {
+return new Promise((resolve,reject) => {
+  Realm.open({schema: Schema})
+    .then(realm => {
+      realm.write(() => {
+        let usersList = realm.objects('ShowExcept');
+        realm.delete(usersList);
+        for (var user in users) {
+          realm.create('ShowExcept', {
+              uid: user.uid,
+              username: user.username
+          });
+        }
+      });
+      //realm.close();
+      resolve(true)
+  })
+  .catch(error => {
+        console.log("updateShowExcept error "+error);
+      reject(error)
+    });
+});
+}
+
+
+export function getShowExcept() {
+return new Promise((resolve,reject) => {
+  Realm.open({schema: Schema})
+  .then(realm => {
+      const user = realm.objects('ShowExcept');
+      resolve(user)
+  })
+  .catch(error => {
+    console.log("getShowExcept error "+error);
+  });
+});
+}

@@ -28,7 +28,7 @@ export async function getProfileOverView(uid){
        return
      })
     .catch(err => {
-      console.log("error is "+err)
+      console.log("getProfileOverView error is "+err)
           reject(err)
       })
    });
@@ -50,6 +50,7 @@ export async function getUserList(uid,showFollowing){
       return
      })
     .catch(err => {
+        console.log("getUserList is "+err)
         reject(err)
      });
    });
