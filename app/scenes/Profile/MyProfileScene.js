@@ -13,6 +13,7 @@ import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
+import * as realm from "thoughts/app/storage/Realm/Realm";
 import * as api from "thoughts/app/services/ProfileServices";
 import UserListModal from "./UserListModal";
 var Spinner = require('react-native-spinkit');
@@ -31,23 +32,34 @@ export default function MyProfileScene(props) {
   const[followerCount, setFollowerCount] = useState(0);
   const[followingCount, setFollowingCount] = useState(0);
   const[sex, setSex] = useState("");
-  const[profileURL, setProfileURL] = useState();
+  const [picData, setPicData] = useState();
   const[token, setToken] = useState("");
 
 
   useEffect(() => {
-    getUserProfileData()
+    loadProfile()
+    getUserProfileInfo()
+    getUserFoProfileData()
     }, []);
 
-async function getUserProfileData () {
+async function loadProfile() {
+  let followers = await realm.getFollowers()
+  let followings = await realm.getFollowings()
+  setFollowerCount(followers.length)
+  setFollowingCount(followings.length)
+  let picData = await userStorage.getUserProfileMinBase64()
+  setPicData(picData)
+  let username = await userStorage.getUserName()
+  let sex = await userStorage.getUserSex()
+  setUsername(username)
+  setSex(sex)
+}
+
+async function getUserProfileInfo () {
   try {
 
-    let username = await userStorage.getUserName()
-    let sex = await userStorage.getUserSex()
-    setUsername(username)
-    setSex(sex)
-    let profileURl = await api.getMaxProfileUrl(uid)
-    setProfileURL(profileURl)
+    let picData = await api.getMaxProfileUrl(uid)
+    setPicData(picData)
 
     let getProfilePromise = api.getProfileOverView(uid)
     let snapshot = await getProfilePromise;
@@ -60,13 +72,30 @@ async function getUserProfileData () {
     if(followingCount) {
       setFollowingCount(followingCount)
     }
-
   }
   catch (err) {
     console.log("here error is "+err)
   }
   setIsLoading(false)
 }
+
+async function getUserFoProfileData () {
+  try {
+    let followingPromise =  api.getUserList(uid,true)
+    let flgList = await followingPromise
+    realm.updateFollowings(flgList)
+
+    let followerPromise =  api.getUserList(uid,false)
+    let flwrList = await followerPromise
+    realm.updateFollowers(flwrList)
+  }
+  catch (err) {
+    console.log("here error is "+err)
+  }
+  setIsLoading(false)
+}
+
+
 
 function modalCloseCallBack () {
     setShowUserList(false)
@@ -130,7 +159,7 @@ function navigateToFollowingCount() {
       <View style = {styles.centerView}>
       <View style= {styles.upperView}>
        <View style = {styles.userView}>
-        <Image style={sex == "Female" ? styles.imageViewFemale : styles.imageViewMale} source={{uri: profileURL}}/>
+        <Image style={sex == "Female" ? styles.imageViewFemale : styles.imageViewMale} source={{uri: picData}}/>
       </View>
        <View style = {styles.userinfoView}>
           <TouchableOpacity
