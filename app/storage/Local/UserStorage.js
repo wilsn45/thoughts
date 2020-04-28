@@ -10,6 +10,8 @@ const UserTagsKey = "@UserTags"
 const UserProfileBaseDataKey = "@UserProfileBaseData"
 const UserCountryKey = "@UserCountry"
 const SelectedShowThoughtOptionKey = "@SelectedShowThoughtOption"
+const ShowOnlyKey = "@ShowOnly"
+const ShowExceptKey = "@ShowExcept"
 
 
 
@@ -171,6 +173,63 @@ export async function getSelectShowOption () {
   try {
     let selectedPromise = AsyncStorage.getItem(SelectedShowThoughtOptionKey)
     return await selectedPromise
+  } catch (err) {
+    throw new Error(err.message)
+  }
+}
+
+export async function setShowOnly(users) {
+  try {
+    let showOnlyPromise = AsyncStorage.setItem(ShowOnlyKey,JSON.stringify(users))
+    await showOnlyPromise
+   } catch (err) {
+    throw new Error(err.message)
+  }
+}
+
+export async function getShowOnly () {
+  try {
+    let showOnlyPromise = AsyncStorage.getItem(ShowOnlyKey)
+    let users = await showOnlyPromise
+    return JSON.parse(users)
+  } catch (err) {
+    throw new Error(err.message)
+  }
+}
+
+export async function setShowExcept(users) {
+  try {
+    let showExceptPromise = AsyncStorage.setItem(ShowExceptKey,JSON.stringify(users))
+    await showExceptPromise
+   } catch (err) {
+    throw new Error(err.message)
+  }
+}
+
+export async function getShowExcept () {
+  try {
+    let showExceptPromise = AsyncStorage.getItem(ShowExceptKey)
+    let users = await showExceptPromise
+    return JSON.parse(users)
+  } catch (err) {
+    throw new Error(err.message)
+  }
+}
+
+export async function setHidden(users) {
+  try {
+    let hiddenPromise = AsyncStorage.setItem(HiddenKey,JSON.stringify(users))
+    await hiddenPromise
+   } catch (err) {
+    throw new Error(err.message)
+  }
+}
+
+export async function getHiden () {
+  try {
+    let hiddenPromise = AsyncStorage.getItem(HiddenKey)
+    let tags = await hiddenPromise
+    return JSON.parse(tags)
   } catch (err) {
     throw new Error(err.message)
   }

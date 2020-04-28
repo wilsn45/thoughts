@@ -16,31 +16,8 @@ const FollowingSchema = {
   }
 };
 
-const ShowOnlySchema = {
-  name: 'ShowOnly',
-  properties: {
-    uid:  'string',
-    username: 'string'
-  }
-};
 
-const ShowExceptSchema = {
-  name: 'ShowExcept',
-  properties: {
-    uid:  'string',
-    username: 'string'
-  }
-};
-
-const ShowSchema = {
-  name: 'Show',
-  properties: {
-    uid:  'string',
-    username: 'string'
-  }
-};
-
-const Schema = [FollowerSchema, FollowingSchema,ShowOnlySchema,ShowExceptSchema,ShowSchema];
+const Schema = [FollowerSchema, FollowingSchema];
 
 export function updateFollowers(followers) {
 return new Promise((resolve,reject) => {
@@ -115,83 +92,6 @@ return new Promise((resolve,reject) => {
   })
   .catch(error => {
     console.log("getFollowers error "+error);
-  });
-});
-}
-
-export function updateShowOnly(users) {
-return new Promise((resolve,reject) => {
-  Realm.open({schema: Schema})
-    .then(realm => {
-      realm.write(() => {
-        let usersList = realm.objects('ShowOnly');
-        realm.delete(usersList);
-        for (var user in users) {
-          realm.create('ShowOnly', {
-              uid: user.uid,
-              username: user.username
-          });
-        }
-      });
-      //realm.close();
-      resolve(true)
-
-  })
-  .catch(error => {
-      console.log("updateShowOnly error "+error);
-      reject(error)
-    });
-});
-}
-
-
-export function getShowOnly() {
-return new Promise((resolve,reject) => {
-  Realm.open({schema: Schema})
-  .then(realm => {
-      const user = realm.objects('ShowOnly');
-      resolve(user)
-  })
-  .catch(error => {
-  console.log("getShowOnly error "+error);
-  });
-});
-}
-
-export function updateShowExcept(users) {
-return new Promise((resolve,reject) => {
-  Realm.open({schema: Schema})
-    .then(realm => {
-      realm.write(() => {
-        let usersList = realm.objects('ShowExcept');
-        realm.delete(usersList);
-        for (var user in users) {
-          realm.create('ShowExcept', {
-              uid: user.uid,
-              username: user.username
-          });
-        }
-      });
-      //realm.close();
-      resolve(true)
-  })
-  .catch(error => {
-        console.log("updateShowExcept error "+error);
-      reject(error)
-    });
-});
-}
-
-
-export function getShowExcept() {
-return new Promise((resolve,reject) => {
-  Realm.open({schema: Schema})
-  .then(realm => {
-      const user = realm.objects('ShowExcept');
-      resolve(user)
-  })
-  .catch(error => {
-    console.log("getShowExcept error "+error);
   });
 });
 }

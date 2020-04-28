@@ -9,14 +9,11 @@ import { View,
         FlatList,
       TouchableWithoutFeedback } from 'react-native';
 
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/Feather';
+import Modal from 'react-native-modal';
 import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
-import * as api from "thoughts/app/services/ProfileServices";
-import UserListModal from "./UserListModal";
-var Spinner = require('react-native-spinkit');
+import SelectViewerModal from "./SelectViewerModal";
 import * as realm from "thoughts/app/storage/Realm/Realm";
 
 import { firebase } from '@react-native-firebase/storage';
@@ -59,6 +56,24 @@ export default function SettingsScene(props) {
     setSelectionOption("Except")
   }
 
+  function modalCloseCallBack() {
+      setShowSelectModal(false)
+  }
+
+  async function modalDoneCallBack(list) {
+      setShowSelectModal(false)
+      if(selectionOption == "Only") {
+        console.log("selection option was only")
+        await userStorage.setShowOnly(list)
+      }
+      else if(selectionOption == "Except") {
+        console.log("selection option was except")
+        await userStorage.setShowExcept(list)
+      }else {
+        console.log("selection option was hide")
+        await userStorage.setHidden(list)
+      }
+  }
 
 
 
@@ -119,9 +134,19 @@ return (
 
       </View>
     }
+    <TouchableOpacity
+      style = {styles.privacyOptionView}
+      onPress={() => hideFrom()}
+      underlayColor='#fff'
+      >
+        <Text style = {styles.optionText}> Hide </Text>
+          <Icon name={showThought ? 'chevron-up':'chevron-down'}  style = {styles.messageView} size={40} />
+    </TouchableOpacity>
 
   </View>
-
+   <Modal isVisible={showSelectModal} swipeArea={50} style = {{alignSelf : "center",width : '85%'}} >
+     <SelectViewerModal  closeCallBack = {modalCloseCallBack} modalDoneCallBack = {modalDoneCallBack}  selectionOption = {selectionOption}/>
+  </Modal>
   </View>
 
     );
@@ -153,8 +178,8 @@ const styles = StyleSheet.create({
   optionsViews : {
     flex : 0.93,
     width : '100%',
-    // borderColor : "#149cea",
-    // borderWidth : 2,
+    borderColor : "#149cea",
+    borderWidth : 2,
     alignItems : "center"
   },
   privacyOptionView : {
@@ -167,7 +192,7 @@ const styles = StyleSheet.create({
     paddingLeft : 10,
     paddingRight : 10,
     paddingTop: 10,
-    marginBottom : 10,
+    marginBottom : 5,
     flexDirection : 'row'
   },
   optionText : {
@@ -176,7 +201,7 @@ const styles = StyleSheet.create({
     fontWeight : "100",
   },
   thoughtsOptionSuperView : {
-    width : '100%',
+    width : '95%',
     height : 800,
     alignItems : "center"
   },
