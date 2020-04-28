@@ -155,7 +155,7 @@ function navigateToHome() {
 
  function modalNavigateCallBack (newuid) {
   try {
-     updateFlags(newuid)
+    updateFlags(newuid)
   }catch(err) {
     console.log("err is "+err)
   }

@@ -72,6 +72,11 @@ function modalCloseCallBack () {
     setShowUserList(false)
 }
 
+function navigateToSettings() {
+   navigate('Settings')
+}
+
+
 function navigateToHome() {
     navigate.pop()
 }
@@ -113,7 +118,7 @@ function navigateToFollowingCount() {
 
       <TouchableOpacity
         style = {styles.superViewHeader}
-        onPress={() => navigateToAMessages()}
+        onPress={() => navigateToSettings()}
         underlayColor='#fff'
        >
        <Icon name={'settings'}  style = {styles.messageView} size={30} />
