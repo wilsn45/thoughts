@@ -47,6 +47,7 @@ export default function SettingsScene(props) {
   }
 
   async function selectShowAll() {
+     setSelectedOption("1")
      await userStorage.setSelectShowOption("1")
   }
 
@@ -77,9 +78,13 @@ export default function SettingsScene(props) {
       setShowSelectModal(false)
       if(selectionOption == "Only") {
         await userStorage.setShowOnly(list)
+        await userStorage.setSelectShowOption("3")
+        setSelectedOption("3")
       }
       else if(selectionOption == "Except") {
         await userStorage.setShowExcept(list)
+        await userStorage.setSelectShowOption("2")
+        setSelectedOption("2")
       }else  if(selectionOption == "Hide"){
         await userStorage.setHidden(list)
       }else {
