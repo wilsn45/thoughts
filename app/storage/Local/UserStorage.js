@@ -191,7 +191,7 @@ export async function getShowOnly () {
     let showOnlyPromise = AsyncStorage.getItem(ShowOnlyKey)
     let users = await showOnlyPromise
     if(users) {
-      JSON.parse(users)
+      return JSON.parse(users)
     }
     return []
   } catch (err) {
@@ -213,7 +213,7 @@ export async function getShowExcept () {
     let showExceptPromise = AsyncStorage.getItem(ShowExceptKey)
     let users = await showExceptPromise
     if(users) {
-      JSON.parse(users)
+      return JSON.parse(users)
     }
     return []
   } catch (err) {
@@ -237,7 +237,7 @@ export async function getHidden () {
     let hiddenPromise = AsyncStorage.getItem(HiddenKey)
     let users = await hiddenPromise
     if(users) {
-      JSON.parse(users)
+      return  JSON.parse(users)
     }
     return []
   } catch (err) {

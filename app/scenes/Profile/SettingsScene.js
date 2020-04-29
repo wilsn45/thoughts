@@ -82,8 +82,6 @@ export default function SettingsScene(props) {
         await userStorage.setShowExcept(list)
       }else  if(selectionOption == "Hide"){
         await userStorage.setHidden(list)
-        let user = userStorage.getHidden()
-        console.log("found users are "+JSON.stringify(user))
       }else {
           console.log("IGNORE")
       }
