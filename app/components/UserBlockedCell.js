@@ -22,17 +22,11 @@ async function getURL() {
   setProfileURL(url)
 }
 
- async function cellClick() {
-   let state = !isSelected
-   await setIsSelected(!isSelected)
-   cellCallback(user.uid,state)
- }
 
- function unblockUser() {
-   setIsUnblocking(true)
+ async function unblockUser() {
+   setIsUnblocking(!isunblocking)
    unblockCallback(user.uid)
  }
-
 
   return (
     <View style = {styles.container}>
@@ -53,13 +47,11 @@ async function getURL() {
        style={ isunblocking ? styles.setButtonUnblockingView : styles.setButtonView}
        onPress={() => unblockUser()}
        underlayColor='#fff'>
-       <Text style={styles.buttonText}>Unblock</Text>
+       <Text style={isunblocking ? styles.buttonUnblockText : styles.buttonText}>Unblock</Text>
      </TouchableOpacity>
      </View>
 
     </View>
-
-
 
 	</View>
   );
@@ -135,6 +127,13 @@ const styles = StyleSheet.create ({
   },
   buttonText: {
     color:'#189afd',
+    textAlign:'center',
+    fontSize: 17,
+    fontFamily: "Thonburi",
+    fontWeight : "100",
+  },
+  buttonUnblockText: {
+    color:'#C0C0C0',
     textAlign:'center',
     fontSize: 17,
     fontFamily: "Thonburi",

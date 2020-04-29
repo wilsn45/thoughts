@@ -65,12 +65,16 @@ export default function SettingsScene(props) {
     setSelectionOption("Hide")
   }
 
-  function selectBlock() {
+  function showBlockedUser() {
     setShowBlockedList(true)
   }
 
   function modalCloseCallBack() {
       setShowSelectModal(false)
+  }
+
+  function modalBlockCloseCallBack() {
+    setShowBlockedList(false)
   }
 
   async function modalDoneCallBack(list) {
@@ -171,7 +175,7 @@ return (
     <View style = {styles.blocked}>
     <TouchableOpacity
       style = {styles.privacyOptionView}
-      onPress={() => selectBlock()}
+      onPress={() => showBlockedUser()}
       underlayColor='#fff'
       >
       <Text style = {styles.optionText}> Blocked </Text>
@@ -197,7 +201,7 @@ return (
   </Modal>
 
   <Modal isVisible={showBlockedList} swipeArea={50} style = {{alignSelf : "center",width : '85%'}} >
-    <BlockedListModal  closeCallBack = {modalCloseCallBack} uid ={uid} />
+    <BlockedListModal  closeCallBackBlock = {modalBlockCloseCallBack} uid ={uid} />
  </Modal>
   </View>
 

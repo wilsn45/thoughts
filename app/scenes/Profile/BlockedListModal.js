@@ -12,7 +12,7 @@ import * as realm from "thoughts/app/storage/Realm/Realm";
 import * as api from "thoughts/app/services/ProfileServices";
 var Spinner = require('react-native-spinkit');
 
-export default function BlockedListModal ({closeCallBack,uid}) {
+export default function BlockedListModal ({closeCallBackBlock,uid}) {
   const[isLoading, setIsLoading] = useState(true);
   const[userList, setUserList] = useState(null);
   const[title, setTitle] = useState("");
@@ -45,10 +45,25 @@ function getUserDictArray(userList) {
   return dicArray
 }
 
-function unblockUser(uid) {
-   console.log("unblock this one "+uid)
-   setUserList(userList.filter((e)=>(e !== uid)))
-
+async function unblockUser(uid) {
+  try {
+    console.log("unblock this one "+uid)
+    await api.unblock(uid)
+    let tmpBlock = []
+    let blocked = userList
+    for (index in blocked) {
+      if(blocked[index].uid != uid) {
+        tmpBlock.push(blocked[index])
+      }
+    }
+    if(tmpBlock.length<1) {
+      closeCallBackBlock()
+    }
+    setUserList(tmpBlock)
+  }
+  catch(err) {
+    console.log("unblockUser error is "+err)
+  }
 }
 
 
@@ -65,7 +80,7 @@ return (
       <View style = {styles.headerView}>
       <TouchableOpacity
                style = {{marginLeft : 10,marginTop : 10,flex : 0.5}}
-               onPress={() => closeCallBack()}>
+               onPress={() => closeCallBackBlock()}>
                <Icon name={"x"}  size={28}  color={"gray"}   />
           </TouchableOpacity>
 

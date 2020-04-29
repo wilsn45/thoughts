@@ -56,7 +56,8 @@ export async function getUserList(uid,showFollowing){
    });
 }
 
-export async function getBlockedUser(uid){
+export async function getBlockedUser(){
+  let uid = await userStorage.getUserToken()
   return new Promise((resolve,reject) => {
     const userRef = firestore().collection('followers').doc(uid);
      userRef.get()
@@ -65,6 +66,34 @@ export async function getBlockedUser(uid){
         reject(new Error("Oops, could'not fetch user details"))
        }
        resolve(snapshot.get('blocked'))
+
+       return
+     })
+    .catch(err => {
+      console.log("getBlockedUser error is "+err)
+          reject(err)
+      })
+   });
+}
+
+export async function unblock(useruid){
+  let uid = await userStorage.getUserToken()
+  return new Promise((resolve,reject) => {
+    const userRef = firestore().collection('followers').doc(uid);
+     userRef.get()
+     .then(snapshot => {
+       if(!snapshot.exists) {
+        reject(new Error("Oops, could'not fetch user details"))
+       }
+       let tmpBlock = {}
+       let blocked = snapshot.get('blocked')
+       for (user in blocked) {
+         if(user != useruid) {
+           tmpBlock[user] = blocked[user]
+         }
+      }
+      userRef.update({blocked:tmpBlock});
+       resolve(true)
 
        return
      })
@@ -177,21 +206,21 @@ export async function block(useruid,blockingusername){
   }
 }
 
-export async function unblock(useruid){
-  try{
-      let myuid = await userStorage.getUserToken()
-      let url = API_URL+"unblock"
-      const headers = {
-        myuid: myuid,
-        useruid :useruid
-      }
-      let res = await axios.get(url, {headers});
-      if(res.status==200) {
-        return true
-      }else
-        return false
-  }catch (e) {
-      console.log("api unfollow is "+e)
-      throw new Error(e);
-  }
-}
+// export async function unblock(useruid){
+//   try{
+//       let myuid = await userStorage.getUserToken()
+//       let url = API_URL+"unblock"
+//       const headers = {
+//         myuid: myuid,
+//         useruid :useruid
+//       }
+//       let res = await axios.get(url, {headers});
+//       if(res.status==200) {
+//         return true
+//       }else
+//         return false
+//   }catch (e) {
+//       console.log("api unfollow is "+e)
+//       throw new Error(e);
+//   }
+// }
