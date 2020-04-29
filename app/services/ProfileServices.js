@@ -98,7 +98,47 @@ export async function unblock(useruid){
        return
      })
     .catch(err => {
+      console.log("unblock error is "+err)
+          reject(err)
+      })
+   });
+}
+
+export async function getPendingRequests(){
+  let uid = await userStorage.getUserToken()
+  return new Promise((resolve,reject) => {
+    const userRef = firestore().collection('followers').doc(uid);
+     userRef.get()
+     .then(snapshot => {
+       if(!snapshot.exists) {
+        reject(new Error("Oops, could'not fetch user details"))
+       }
+       resolve(snapshot.get('pendings'))
+
+       return
+     })
+    .catch(err => {
       console.log("getBlockedUser error is "+err)
+          reject(err)
+      })
+   });
+}
+
+export async function setPrivate(state){
+  let uid = await userStorage.getUserToken()
+  return new Promise((resolve,reject) => {
+    const userRef = firestore().collection('user').doc(uid);
+     userRef.get()
+     .then(snapshot => {
+       if(!snapshot.exists) {
+        reject(new Error("Oops, could'not fetch user details"))
+       }
+       userRef.update({isPrivate:state});
+       resolve(true)
+       return
+     })
+    .catch(err => {
+      console.log("setPrivate error is "+err)
           reject(err)
       })
    });
@@ -166,6 +206,55 @@ export async function unfollow(useruid){
       console.log("api unfollow is "+e)
       throw new Error(e);
   }
+}
+
+export async function acceptRequest(useruid,username){
+  try{
+      let myuid = await userStorage.getUserToken()
+      let myusername = await userStorage.getUserName()
+      let url = API_URL+"acceptRequest?followingusername="+username+"&&followerusername="+myusername
+      console.log("url for rejection "+url)
+      const headers = {
+        myuid: myuid,
+        useruid :useruid
+      }
+      let res = await axios.get(url, {headers});
+      if(res.status==200) {
+        return true
+      }
+      return false
+  }catch (e) {
+      console.log("api cancelRequest is "+e)
+      throw new Error(e);
+  }
+}
+
+export async function rejectRequest(useruid){
+  let uid = await userStorage.getUserToken()
+  return new Promise((resolve,reject) => {
+    const userRef = firestore().collection('followers').doc(uid);
+     userRef.get()
+     .then(snapshot => {
+       if(!snapshot.exists) {
+        reject(new Error("Oops, could'not fetch user details"))
+       }
+       let tmpPndg = {}
+       let reqs = snapshot.get('pendings')
+       for (user in reqs) {
+         if(user != useruid) {
+           tmpPndg[user] = reqs[user]
+         }
+      }
+      userRef.update({pendings:tmpPndg});
+       resolve(true)
+
+       return
+     })
+    .catch(err => {
+      console.log("unblock error is "+err)
+          reject(err)
+      })
+   });
 }
 
 export async function cancelRequest(useruid){

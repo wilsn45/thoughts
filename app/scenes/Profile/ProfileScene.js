@@ -203,8 +203,6 @@ function buttonStyle() {
           fontWeight : "100",
     }
   }
-
-
 }
 
 

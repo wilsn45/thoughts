@@ -13,6 +13,7 @@ const SelectedShowThoughtOptionKey = "@SelectedShowThoughtOption"
 const ShowOnlyKey = "@ShowOnly"
 const ShowExceptKey = "@ShowExcept"
 const HiddenKey = "@Hidden"
+const IsPrivateProfileKey = "@IsPrivateProfile"
 
 
 export async function setUserToken (token){
@@ -223,11 +224,9 @@ export async function getShowExcept () {
 
 export async function setHidden(users) {
   try {
-    console.log("users are "+users)
     let hiddenPromise = AsyncStorage.setItem(HiddenKey,JSON.stringify(users))
     await hiddenPromise
    } catch (err) {
-     console.log("exception is "+err)
     throw new Error(err.message)
   }
 }
@@ -240,6 +239,24 @@ export async function getHidden () {
       return  JSON.parse(users)
     }
     return []
+  } catch (err) {
+    throw new Error(err.message)
+  }
+}
+
+export async function setIsPrivate(state) {
+  try {
+    let isPrivatePromise = AsyncStorage.setItem(IsPrivateProfileKey,JSON.stringify(state))
+    await isPrivatePromise
+   } catch (err) {
+    throw new Error(err.message)
+  }
+}
+
+export async function getIsPrivate () {
+  try {
+    let isPrivatePromise = AsyncStorage.getItem(IsPrivateProfileKey)
+    return await isPrivatePromise
   } catch (err) {
     throw new Error(err.message)
   }
@@ -264,6 +281,7 @@ export async function initUser(uid,response,profileBase64) {
     await setUserSex(response.sex)
     await setTags(response.tags)
     await setUserCountry(response.country)
+    await setIsPrivate(response.isPrivate)
     await setUserActive()
     await setUserProfileMinBase64(profileBase64)
   }

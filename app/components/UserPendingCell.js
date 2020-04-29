@@ -5,12 +5,12 @@ import {View,
         StyleSheet,
         TouchableOpacity} from 'react-native';
 import * as api from "thoughts/app/services/ProfileServices";
-import * as userStorage from "thoughts/app/storage/Local/UserStorage";
+import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 
-export default function UserBlockedCell({user,unblockCallback}) {
+export default function UserPendingCell({user,acceptCallBack,rejectCallBack}) {
 const[profileURL, setProfileURL] = useState();
-const[isunblocking, setIsUnblocking] = useState(false);
+const[isAccepting, setIsAccepting] = useState(false);
 
 useEffect(() => {
   getURL()
@@ -22,9 +22,13 @@ async function getURL() {
 }
 
 
- async function unblockUser() {
-   setIsUnblocking(!isunblocking)
-   unblockCallback(user.uid)
+ async function acceptRequest() {
+   setIsAccepting(!isAccepting)
+   acceptCallBack(user.uid,user.username)
+ }
+
+ async function rejectRequest() {
+   rejectCallBack(user.uid)
  }
 
   return (
@@ -41,13 +45,17 @@ async function getURL() {
           <Text style = {styles.usernameText}> {user.username} </Text>
      </View>
 
-     <View style ={styles.unblockView}>
+     <View style ={styles.pendingView}>
      <TouchableOpacity
-       style={ isunblocking ? styles.setButtonUnblockingView : styles.setButtonView}
-       onPress={() => unblockUser()}
+       style={ isAccepting ? styles.setButtonAcceptingView : styles.setButtonView}
+       onPress={() => acceptRequest()}
        underlayColor='#fff'>
-       <Text style={isunblocking ? styles.buttonUnblockText : styles.buttonText}>Unblock</Text>
-     </TouchableOpacity>
+       <Text style={isAccepting ? styles.buttonAcceptingText : styles.buttonText}>Accept</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+             onPress={() => rejectRequest()}>
+             <Icon name={"x"}  size={20}  color={"black"}   />
+        </TouchableOpacity>
      </View>
 
     </View>
@@ -89,16 +97,18 @@ const styles = StyleSheet.create ({
     // borderWidth : 2,
   },
   usernameView : {
-    width : '60%',
+    width : '40%',
     height : '100%',
     justifyContent : 'center',
     alignItems : 'flex-start',
   },
-  unblockView : {
-    width : '40%',
+  pendingView : {
+    width : '60%',
     height : '100%',
-
+    flexDirection : 'row',
     justifyContent : 'center',
+    alignItems : "center",
+    // borderColsmhcdvyhjcfuscfdth : 2,
 
   },
   usernameText : {
@@ -107,22 +117,23 @@ const styles = StyleSheet.create ({
     fontWeight : "100",
   },
   setButtonView: {
-      flex : 0.3,
-      width : '100%',
-      borderColor:'#189afd',
-      borderWidth : 1,
-      borderRadius:10,
-      justifyContent:  "center",
-      alignItems: "center",
+    flex : 0.9,
+    height : '50%',
+    borderColor:'#189afd',
+    borderWidth : 1,
+    borderRadius:10,
+    justifyContent:  "center",
+    alignItems: "center",
+    marginRight : 10
   },
-  setButtonUnblockingView: {
-      flex : 0.3,
-      width : '100%',
-      borderColor:'#C0C0C0',
-      borderWidth : 1,
-      borderRadius:10,
-      justifyContent:  "center",
-      alignItems: "center",
+  setButtonAcceptingView: {
+    flex : 0.3,
+    width : '100%',
+    borderColor:'#C0C0C0',
+    borderWidth : 1,
+    borderRadius:10,
+    justifyContent:  "center",
+    alignItems: "center",
   },
   buttonText: {
     color:'#189afd',
@@ -131,7 +142,7 @@ const styles = StyleSheet.create ({
     fontFamily: "Thonburi",
     fontWeight : "100",
   },
-  buttonUnblockText: {
+  buttonAcceptingText: {
     color:'#C0C0C0',
     textAlign:'center',
     fontSize: 17,

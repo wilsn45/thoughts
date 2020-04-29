@@ -28,7 +28,7 @@ export default function SettingsScene(props) {
   const[selectionOption, setSelectionOption] = useState();
   const[showSelectModal, setShowSelectModal] = useState(false);
   const[showBlockedList, setShowBlockedList] = useState(false);
-  const[isPrivate, setIsPrivate] = useState();
+  const[privateState, setPrivateState] = useState();
 
   useEffect(() => {
       loadValues()
@@ -37,7 +37,9 @@ export default function SettingsScene(props) {
  async function loadValues() {
     let option = await userStorage.getSelectShowOption()
     setSelectedOption(option)
- }
+    let isPrivate = await userStorage.getIsPrivate()
+    setPrivateState(isPrivate)
+}
   function navigateToProfile() {
     navigate('MyProfile')
   }
@@ -100,6 +102,15 @@ export default function SettingsScene(props) {
 
   }
 
+  async function setPrivate() {
+      let stringState = privateState == "0" ? "1" : "0"
+      let boolState = stringState == "1" ? true : false
+      setPrivateState(stringState)
+      console.log("string next state "+stringState)
+      console.log("bool next state "+boolState)
+      await api.setPrivate(boolState)
+
+}
 
 
 return (
@@ -190,7 +201,7 @@ return (
       underlayColor='#fff'
       >
       <Text style = {styles.optionText}> Private </Text>
-      <View style={isPrivate ? styles.selected : styles.unselected}/>
+      <View style={privateState == "1" ? styles.privateSelected : styles.privateUnselected}/>
     </TouchableOpacity>
     </View>
 
@@ -234,8 +245,8 @@ const styles = StyleSheet.create({
   optionsViews : {
     flex : 0.93,
     width : '100%',
-    borderColor : "#149cea",
-    borderWidth : 2,
+    // borderColor : "#149cea",
+    // borderWidth : 2,
     alignItems : "center"
   },
   show : {
@@ -302,6 +313,18 @@ const styles = StyleSheet.create({
     width : 15,
     height : 15,
     borderRadius : 7,
+    backgroundColor : "#149cea"
+  },
+  privateUnselected: {
+    width : 20,
+    height : 20,
+    borderRadius : 10,
+    borderWidth : 1
+  },
+  privateSelected : {
+    width : 20,
+    height : 20,
+    borderRadius : 10,
     backgroundColor : "#149cea"
   }
 

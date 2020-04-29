@@ -17,7 +17,7 @@ import * as realm from "thoughts/app/storage/Realm/Realm";
 import * as api from "thoughts/app/services/ProfileServices";
 import MyUserListModal from "./MyUserListModal";
 var Spinner = require('react-native-spinkit');
-
+import PendingListModal  from "./PendingListModal";
 import { firebase } from '@react-native-firebase/storage';
 
 
@@ -25,6 +25,7 @@ export default function MyProfileScene(props) {
   const[isLoading, setIsLoading] = useState(false);
   const[showUserList, setShowUserList] = useState(false);
   const[showFollowing, setShowFollowing] = useState(true);
+  const[showPendings, setShowPendings] = useState(false);
   const { navigate } = useNavigation();
   const uid = useNavigationParam('uid');
 
@@ -130,6 +131,14 @@ function navigateToFollowingCount() {
   setShowUserList(true)
 }
 
+function showPendingRequets() {
+  setShowPendings(true)
+}
+
+function closePendingRequets() {
+  setShowPendings(false)
+}
+
   return (
 
     <View style = {styles.main}>
@@ -182,6 +191,14 @@ function navigateToFollowingCount() {
           >
             <Text style = {styles.followerText}> {followingCount > 0 ? "Followings " +followingCount : "Followings" } </Text>
             </TouchableOpacity>
+
+            <TouchableOpacity
+            onPress={() => showPendingRequets()}
+            disabled={followingCount < 1 }
+            underlayColor='#fff'
+            >
+              <Text style = {styles.followerText}> Pending Requests </Text>
+              </TouchableOpacity>
        </View>
        </View>
        <View>
@@ -200,6 +217,10 @@ function navigateToFollowingCount() {
    <Modal isVisible={showUserList} swipeArea={50} style = {{alignSelf : "flex-end",width : '65%'}} >
       <MyUserListModal  closeCallBack = {modalCloseCallBack} navigateCallBack = {modalNavigateCallBack} uid = {uid} showFollowing = {showFollowing}/>
    </Modal>
+
+   <Modal isVisible={showPendings} swipeArea={50} style = {{alignSelf : "center",width : '85%'}} >
+     <PendingListModal  closeCallBackBlock = {closePendingRequets} uid ={uid} />
+  </Modal>
     </View>
     );
 }
