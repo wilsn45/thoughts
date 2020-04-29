@@ -15,7 +15,7 @@ import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import SelectViewerModal from "./SelectViewerModal";
 import BlockedListModal  from "./BlockedListModal";
-import * as realm from "thoughts/app/storage/Realm/Realm";
+import * as api from "thoughts/app/services/ProfileServices";
 
 import { firebase } from '@react-native-firebase/storage';
 
@@ -35,10 +35,12 @@ export default function SettingsScene(props) {
   }, []);
 
  async function loadValues() {
+   await userStorage.setIsPrivate(true)
     let option = await userStorage.getSelectShowOption()
     setSelectedOption(option)
     let isPrivate = await userStorage.getIsPrivate()
     setPrivateState(isPrivate)
+    console.log("privateState "+isPrivate)
 }
   function navigateToProfile() {
     navigate('MyProfile')
@@ -103,13 +105,9 @@ export default function SettingsScene(props) {
   }
 
   async function setPrivate() {
-      let stringState = privateState == "0" ? "1" : "0"
-      let boolState = stringState == "1" ? true : false
-      setPrivateState(stringState)
-      console.log("string next state "+stringState)
-      console.log("bool next state "+boolState)
-      await api.setPrivate(boolState)
-
+      let newState = !privateState
+      setPrivateState(newState)
+      await api.setPrivate(newState)
 }
 
 

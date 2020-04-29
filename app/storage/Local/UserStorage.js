@@ -256,7 +256,8 @@ export async function setIsPrivate(state) {
 export async function getIsPrivate () {
   try {
     let isPrivatePromise = AsyncStorage.getItem(IsPrivateProfileKey)
-    return await isPrivatePromise
+    let state = await isPrivatePromise
+    return  JSON.parse(state)
   } catch (err) {
     throw new Error(err.message)
   }
