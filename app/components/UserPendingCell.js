@@ -127,13 +127,14 @@ const styles = StyleSheet.create ({
     marginRight : 10
   },
   setButtonAcceptingView: {
-    flex : 0.3,
-    width : '100%',
+    flex : 0.9,
+    height : '50%',
     borderColor:'#C0C0C0',
     borderWidth : 1,
     borderRadius:10,
     justifyContent:  "center",
     alignItems: "center",
+    marginRight : 10
   },
   buttonText: {
     color:'#189afd',

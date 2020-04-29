@@ -208,12 +208,11 @@ export async function unfollow(useruid){
   }
 }
 
-export async function acceptRequest(useruid,username){
+export async function acceptRequest(useruid,followerusername){
   try{
       let myuid = await userStorage.getUserToken()
-      let myusername = await userStorage.getUserName()
-      let url = API_URL+"acceptRequest?followingusername="+username+"&&followerusername="+myusername
-      console.log("url for rejection "+url)
+      let followingusername = await userStorage.getUserName()
+      let url = API_URL+"acceptRequest?followingusername="+followingusername+"&&followerusername="+followerusername
       const headers = {
         myuid: myuid,
         useruid :useruid
@@ -251,7 +250,7 @@ export async function rejectRequest(useruid){
        return
      })
     .catch(err => {
-      console.log("unblock error is "+err)
+      console.log("rejectRequest error is "+err)
           reject(err)
       })
    });
