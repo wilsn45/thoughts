@@ -14,6 +14,7 @@ import Modal from 'react-native-modal';
 import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import SelectViewerModal from "./SelectViewerModal";
+import BlockedListModal  from "./BlockedListModal";
 import * as realm from "thoughts/app/storage/Realm/Realm";
 
 import { firebase } from '@react-native-firebase/storage';
@@ -26,6 +27,8 @@ export default function SettingsScene(props) {
   const[selectedOption, setSelectedOption] = useState();
   const[selectionOption, setSelectionOption] = useState();
   const[showSelectModal, setShowSelectModal] = useState(false);
+  const[showBlockedList, setShowBlockedList] = useState(false);
+  const[isPrivate, setIsPrivate] = useState();
 
   useEffect(() => {
       loadValues()
@@ -56,23 +59,38 @@ export default function SettingsScene(props) {
     setSelectionOption("Except")
   }
 
+  function selectHidden() {
+    setShowSelectModal(true)
+    setSelectionOption("Hide")
+  }
+
+  function selectBlock() {
+    setShowBlockedList(true)
+  }
+
   function modalCloseCallBack() {
       setShowSelectModal(false)
   }
 
   async function modalDoneCallBack(list) {
+    try {
       setShowSelectModal(false)
       if(selectionOption == "Only") {
-        console.log("selection option was only")
         await userStorage.setShowOnly(list)
       }
       else if(selectionOption == "Except") {
-        console.log("selection option was except")
         await userStorage.setShowExcept(list)
-      }else {
-        console.log("selection option was hide")
+      }else  if(selectionOption == "Hide"){
         await userStorage.setHidden(list)
+        let user = userStorage.getHidden()
+        console.log("found users are "+JSON.stringify(user))
+      }else {
+          console.log("IGNORE")
       }
+    }catch(err) {
+      console.log("modalDoneCallBack error is "+err)
+    }
+
   }
 
 
@@ -93,6 +111,7 @@ return (
   </View>
 
   <View style = {styles.optionsViews}>
+    <View style = {styles.show}>
     <TouchableOpacity
       style = {styles.privacyOptionView}
       onPress={() => showThoughtOptions()}
@@ -134,19 +153,49 @@ return (
 
       </View>
     }
+    </View>
+    <View style = {styles.hide}>
     <TouchableOpacity
       style = {styles.privacyOptionView}
-      onPress={() => hideFrom()}
+      onPress={() => selectHidden()}
       underlayColor='#fff'
       >
-        <Text style = {styles.optionText}> Hide </Text>
-          <Icon name={showThought ? 'chevron-up':'chevron-down'}  style = {styles.messageView} size={40} />
+      <Text style = {styles.optionText}> Hide </Text>
+
     </TouchableOpacity>
+    </View>
+
+    <View style = {styles.blocked}>
+    <TouchableOpacity
+      style = {styles.privacyOptionView}
+      onPress={() => selectBlock()}
+      underlayColor='#fff'
+      >
+      <Text style = {styles.optionText}> Blocked </Text>
+
+    </TouchableOpacity>
+    </View>
+
+    <View style = {styles.isPrivate}>
+    <TouchableOpacity
+      style = {styles.privacyOptionView}
+      onPress={() => setPrivate()}
+      underlayColor='#fff'
+      >
+      <Text style = {styles.optionText}> Private </Text>
+      <View style={isPrivate ? styles.selected : styles.unselected}/>
+    </TouchableOpacity>
+    </View>
+
 
   </View>
    <Modal isVisible={showSelectModal} swipeArea={50} style = {{alignSelf : "center",width : '85%'}} >
      <SelectViewerModal  closeCallBack = {modalCloseCallBack} modalDoneCallBack = {modalDoneCallBack}  selectionOption = {selectionOption}/>
   </Modal>
+
+  <Modal isVisible={showBlockedList} swipeArea={50} style = {{alignSelf : "center",width : '85%'}} >
+    <BlockedListModal  closeCallBack = {modalCloseCallBack} uid ={uid} />
+ </Modal>
   </View>
 
     );
@@ -182,6 +231,26 @@ const styles = StyleSheet.create({
     borderWidth : 2,
     alignItems : "center"
   },
+  show : {
+    width : '100%',
+    alignItems : 'center',
+    marginBottom : 10,
+  },
+  hide : {
+    width : '100%',
+    alignItems : 'center',
+      marginBottom : 10,
+  },
+  blocked : {
+    width : '100%',
+    alignItems : 'center',
+    marginBottom : 10,
+  },
+  isPrivate : {
+    width : '100%',
+    alignItems : 'center',
+      marginBottom : 10,
+  },
   privacyOptionView : {
    height : 60,
     width : '90%',
@@ -189,10 +258,9 @@ const styles = StyleSheet.create({
     borderWidth : 1,
     borderRadius : 10,
     justifyContent : "space-between",
+    alignItems : "center",
     paddingLeft : 10,
     paddingRight : 10,
-    paddingTop: 10,
-    marginBottom : 5,
     flexDirection : 'row'
   },
   optionText : {

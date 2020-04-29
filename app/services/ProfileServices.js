@@ -55,6 +55,26 @@ export async function getUserList(uid,showFollowing){
      });
    });
 }
+
+export async function getBlockedUser(uid){
+  return new Promise((resolve,reject) => {
+    const userRef = firestore().collection('followers').doc(uid);
+     userRef.get()
+     .then(snapshot => {
+       if(!snapshot.exists) {
+        reject(new Error("Oops, could'not fetch user details"))
+       }
+       resolve(snapshot.get('blocked'))
+
+       return
+     })
+    .catch(err => {
+      console.log("getBlockedUser error is "+err)
+          reject(err)
+      })
+   });
+}
+
 export async function getMaxProfileUrl(token){
   let resourceName = '/profile_pic_max/'+token+'.jpg'
   const ref = await storage.ref(resourceName)

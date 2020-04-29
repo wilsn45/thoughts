@@ -13,7 +13,7 @@ import * as realm from "thoughts/app/storage/Realm/Realm";
 export default function SelectViewerModal ({closeCallBack,modalDoneCallBack,uid,selectionOption}) {
   const[userList, setUserList] = useState(null);
   const[title, setTitle] = useState("");
-  let selectedList = []
+  const[list, setList] = useState([]);
 
 
   useEffect(() => {
@@ -33,10 +33,9 @@ export default function SelectViewerModal ({closeCallBack,modalDoneCallBack,uid,
     } else if (selectionOption == "Except") {
       selList = await userStorage.getShowExcept()
     } else {
-      selList = await userStorage.getHiden()
+      selList = await userStorage.getHidden()
     }
-    selectedList.push(selList)
-    console.log("init selectedList "+selectedList)
+    setList(selList)
     let selArray = []
     for (index in allList) {
       let user = {
@@ -51,21 +50,21 @@ export default function SelectViewerModal ({closeCallBack,modalDoneCallBack,uid,
 }
 
  function makeFinalList() {
-   modalDoneCallBack(selectedList)
+   modalDoneCallBack(list)
  }
 
- async function cellCallback(uid,isSelected) {
+function cellCallback(uid,isSelected) {
+
    if(isSelected) {
-      console.log("adding in arrat "+uid)
-      selectedList.push(uid)
-   }
+      let lst  = list
+      lst.push(uid)
+      setList(lst)
+  }
    else {
-    selectedList = selectedList.filter((e)=>(e !== uid))
-   }
-   // console.log("uid is "+uid)
-   // console.log("is selected "+isSelected)
-   // console.log("selected list is "+selectedList)
- }
+     let lst  = list.filter((e)=>(e !== uid))
+     setList(lst)
+  }
+}
 
 return (
 

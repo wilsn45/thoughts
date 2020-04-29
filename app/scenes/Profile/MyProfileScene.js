@@ -61,28 +61,28 @@ async function loadProfile() {
   setSex(sex)
 }
 
-// async function getUserProfileInfo () {
-//   try {
-//
-//     let picData = await api.getMaxProfileUrl(uid)
-//     setPicData(picData)
-//
-//     let getProfilePromise = api.getProfileOverView(uid)
-//     let snapshot = await getProfilePromise;
-//
-//     let followerCount = snapshot.get('followersCount')
-//     let followingCount = snapshot.get('followingsCount')
-//     if (followerCount) {
-//       setFollowerCount(followerCount)
-//     }
-//     if(followingCount) {
-//       setFollowingCount(followingCount)
-//     }
-//   }
-//   catch (err) {
-//     console.log("here error is "+err)
-//   }
-// }
+async function getUserProfileInfo () {
+  try {
+
+    let picData = await api.getMaxProfileUrl(uid)
+    setPicData(picData)
+
+    let getProfilePromise = api.getProfileOverView(uid)
+    let snapshot = await getProfilePromise;
+
+    let followerCount = snapshot.get('followersCount')
+    let followingCount = snapshot.get('followingsCount')
+    if (followerCount) {
+      setFollowerCount(followerCount)
+    }
+    if(followingCount) {
+      setFollowingCount(followingCount)
+    }
+  }
+  catch (err) {
+    console.log("here error is "+err)
+  }
+}
 
 async function getUserFoProfileData () {
   try {
@@ -107,7 +107,7 @@ function modalCloseCallBack () {
 }
 
 function navigateToSettings() {
-   navigate('Settings')
+   navigate('Settings',{uid : uid})
 }
 
 

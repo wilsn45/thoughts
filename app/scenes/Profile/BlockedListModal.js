@@ -5,51 +5,51 @@ import {View,
         TouchableOpacity,
         FlatList,
         Text} from 'react-native';
+import UserBlockedCell  from "thoughts/app/components/UserBlockedCell";
 import Icon from 'react-native-vector-icons/Feather';
-var Spinner = require('react-native-spinkit');
+import * as userStorage from "thoughts/app/storage/Local/UserStorage";
+import * as realm from "thoughts/app/storage/Realm/Realm";
 import * as api from "thoughts/app/services/ProfileServices";
-import UserCell  from "thoughts/app/components/UserCell";
+var Spinner = require('react-native-spinkit');
 
-
-export default function UserList ({closeCallBack,navigateCallBack,uid,showFollowing}) {
+export default function BlockedListModal ({closeCallBack,uid}) {
   const[isLoading, setIsLoading] = useState(true);
   const[userList, setUserList] = useState(null);
   const[title, setTitle] = useState("");
+  let selectedList = []
 
 
   useEffect(() => {
-    if (showFollowing) {
-      setTitle("Followings")
-    }else {
-      setTitle("Followers")
-    }
-    getUserList()
-    }, []);
+    setTitle("Blocked")
+    loadList()
+  }, []);
 
-  async function getUserList() {
-    try {
-      let userListPromise =  api.getUserList(uid,showFollowing)
-      let list = await userListPromise
-      let dicArray = getUserDictArray(list)
-      setUserList(dicArray)
-    }
-    catch(err) {
-      console.log("error is "+err)
-    }
+  async function loadList () {
+
+    let userListPromise =  api.getBlockedUser(uid)
+    let list = await userListPromise
+    let dicArray = getUserDictArray(list)
+    setUserList(dicArray)
     setIsLoading(false)
-  }
+}
 
-  function getUserDictArray(userList) {
-    let dicArray = []
-     for (var user in userList) {
-       let dic = {
-         uid : user,
-         username : userList[user]
-       }
-      dicArray.push(dic)
-    }
-    return dicArray
+function getUserDictArray(userList) {
+  let dicArray = []
+   for (var user in userList) {
+     let dic = {
+       uid : user,
+       username : userList[user]
+     }
+    dicArray.push(dic)
   }
+  return dicArray
+}
+
+function unblockUser(uid) {
+   console.log("unblock this one "+uid)
+   setUserList(userList.filter((e)=>(e !== uid)))
+
+}
 
 
 return (
@@ -59,8 +59,8 @@ return (
     isLoading &&
     <Spinner  isVisible={true} size={50} type="Arc" color="#189afd"/>
   }
-  {
-    !isLoading && userList &&
+  { !isLoading &&
+     userList &&
     <View style = {styles.superView}>
       <View style = {styles.headerView}>
       <TouchableOpacity
@@ -75,11 +75,11 @@ return (
         <View style={styles.tableView}>
           <FlatList
             data={userList}
-            renderItem={({ item }) => <UserCell cellNavigateCallBack = {navigateCallBack} user={item} />}
+            renderItem={({ item }) => <UserBlockedCell user={item} unblockCallback={unblockUser} />}
             keyExtractor={user => user.username}
           />
         </View>
-    </View>
+      </View>
   }
 
 
@@ -123,7 +123,26 @@ const styles = StyleSheet.create({
         fontFamily: "Thonburi",
         fontWeight : "100",
         marginTop : 15
-    }
+    },
+    setButtonView: {
+        marginTop : 10,
+        width : '60%',
+        flex : 0.078,
+        backgroundColor:'#189afd',
+        borderRadius:25,
+        justifyContent:  "center",
+        alignSelf: "center",
+        marginBottom : 20
+    },
+    buttonText: {
+      color:'#fff',
+      textAlign:'center',
+      fontSize: 23,
+      fontFamily: "Thonburi",
+      fontWeight : "100",
+    },
+
+
 
 });
 

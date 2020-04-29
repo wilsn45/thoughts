@@ -12,8 +12,7 @@ const UserCountryKey = "@UserCountry"
 const SelectedShowThoughtOptionKey = "@SelectedShowThoughtOption"
 const ShowOnlyKey = "@ShowOnly"
 const ShowExceptKey = "@ShowExcept"
-
-
+const HiddenKey = "@Hidden"
 
 
 export async function setUserToken (token){
@@ -191,7 +190,10 @@ export async function getShowOnly () {
   try {
     let showOnlyPromise = AsyncStorage.getItem(ShowOnlyKey)
     let users = await showOnlyPromise
-    return JSON.parse(users)
+    if(users) {
+      JSON.parse(users)
+    }
+    return []
   } catch (err) {
     throw new Error(err.message)
   }
@@ -210,7 +212,10 @@ export async function getShowExcept () {
   try {
     let showExceptPromise = AsyncStorage.getItem(ShowExceptKey)
     let users = await showExceptPromise
-    return JSON.parse(users)
+    if(users) {
+      JSON.parse(users)
+    }
+    return []
   } catch (err) {
     throw new Error(err.message)
   }
@@ -218,18 +223,23 @@ export async function getShowExcept () {
 
 export async function setHidden(users) {
   try {
+    console.log("users are "+users)
     let hiddenPromise = AsyncStorage.setItem(HiddenKey,JSON.stringify(users))
     await hiddenPromise
    } catch (err) {
+     console.log("exception is "+err)
     throw new Error(err.message)
   }
 }
 
-export async function getHiden () {
+export async function getHidden () {
   try {
     let hiddenPromise = AsyncStorage.getItem(HiddenKey)
-    let tags = await hiddenPromise
-    return JSON.parse(tags)
+    let users = await hiddenPromise
+    if(users) {
+      JSON.parse(users)
+    }
+    return []
   } catch (err) {
     throw new Error(err.message)
   }

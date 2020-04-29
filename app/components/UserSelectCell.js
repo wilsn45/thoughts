@@ -9,7 +9,7 @@ import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 import * as realm from "thoughts/app/storage/Realm/Realm";
 
-export default function UserCell({cellCallback,user,selectionOption}) {
+export default function UserSelectCell({cellCallback,user,selectionOption}) {
 const[profileURL, setProfileURL] = useState();
 const[isSelected, setIsSelected] = useState(user.isSelected);
 
@@ -55,25 +55,23 @@ async function getURL() {
 
 const styles = StyleSheet.create ({
  container : {
-		flex : 1,
-	   width : '90%',
-     alignSelf : "center",
-    flexDirection : 'row',
-    borderColor : "grey",
-    borderBottomWidth : 0.5,
-    marginBottom : 10,
-    marginRight : 10
+   flex : 1,
+    width : '100%',
+    alignSelf : "center",
+   flexDirection : 'row',
+   borderColor : "grey",
+   borderBottomWidth : 0.5,
 	},
   imageView : {
     width : 60,
     height : 60,
     borderRadius : 30,
     borderWidth : 0.5,
-    marginBottom : 20,
   },
   leftView : {
     width : '30%',
-    alignItems : 'flex-start',
+    height : 90,
+    alignItems : 'center',
     justifyContent : 'center',
 
    //  borderColor : "#149cea",
