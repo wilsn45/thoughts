@@ -35,15 +35,15 @@ export default function SettingsScene(props) {
   }, []);
 
  async function loadValues() {
-   await userStorage.setIsPrivate(true)
     let option = await userStorage.getSelectShowOption()
     setSelectedOption(option)
     let isPrivate = await userStorage.getIsPrivate()
     setPrivateState(isPrivate)
-    console.log("privateState "+isPrivate)
 }
-  function navigateToProfile() {
-    navigate('MyProfile')
+  async function navigateToProfile() {
+    api.setPrivate(privateState)
+     await userStorage.setIsPrivate(privateState)
+     navigate('MyProfile')
   }
 
   function showThoughtOptions() {
@@ -107,7 +107,6 @@ export default function SettingsScene(props) {
   async function setPrivate() {
       let newState = !privateState
       setPrivateState(newState)
-      await api.setPrivate(newState)
 }
 
 
