@@ -14,13 +14,13 @@ import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import NewThought from "./NewThoughtModal";
 import Modal from 'react-native-modal';
+import  * as User  from "thoughts/app/User";
 
 
 export default function HomeScene(props) {
   const [locationViewWidth, setLocationViewWidth] = useState(100);
   const [newThought, showNewThought] = useState(false);
   const [picData, setPicData] = useState(null);
-  const [uid, setUID] = useState(null);
   const { navigate } = useNavigation();
 
     toggleDrawer = () => {
@@ -32,7 +32,6 @@ export default function HomeScene(props) {
     }
 
   useEffect(() => {
-    getUID()
     userStorage.getUserProfileMinBase64()
     .then(data => {
       setPicData(data)
@@ -42,13 +41,9 @@ export default function HomeScene(props) {
     })
   },[]);
 
-  async function getUID() {
-    let uid = await userStorage.getUserToken()
-    setUID(uid)
-  }
 
   async function navigateToProfile() {
-    navigate('MyProfile', {uid : uid})
+    navigate('MyProfile')
   }
 
   return (

@@ -7,10 +7,9 @@ import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import * as contactListHelper from "thoughts/app/helper/ContactListtHelper";
 import * as imageHelper from "thoughts/app/helper/ImageHelper";
 import { firebase } from '@react-native-firebase/storage';
+import * as  User  from "thoughts/app/User";
 //Google Map API Key : AIzaSyCr65NbaaL4JvLuuvr5-n9QYH_1YxCRT1Q
-const BoyProfileMaxURL = "https://firebasestorage.googleapis.com/v0/b/thoughts-fe76a.appspot.com/o/profile_pic_max%2FBoyPlaceholderMax.jpg?alt=media&token=15231ea9-7a5c-4206-a3ba-a40c7711d13f"
 const BoyProfileMinURL = "https://firebasestorage.googleapis.com/v0/b/thoughts-fe76a.appspot.com/o/profile_pic_min%2FBoyPlaceholderMin.jpg?alt=media&token=bc2cbc39-23b7-4c6e-995c-a93bc33a270e"
-const GirlProfileMaxURL = "https://firebasestorage.googleapis.com/v0/b/thoughts-fe76a.appspot.com/o/profile_pic_max%2FGirlPlaceholderMax.jpg?alt=media&token=1f122094-c8cb-4d85-9196-2ab5564895ef"
 const GirlProfileMinURL = "https://firebasestorage.googleapis.com/v0/b/thoughts-fe76a.appspot.com/o/profile_pic_min%2FGirlPlaceholderMin.jpg?alt=media&token=281c8637-cb10-4e0c-83ae-8980c7d723da"
 const API_URL = "https://us-central1-thoughts-fe76a.cloudfunctions.net/"
 
@@ -109,18 +108,18 @@ export async function addNewUser(){
     let country = await userStorage.getUserCountry()
     let sex = await userStorage.getUserSex()
     let tags = await userStorage.getTags()
-    let profileMaxUrl = ""
-    let profileMinUrl = ""
-    if (sex == "Male") {
-      profileMaxUrl = BoyProfileMaxURL
-      profileMinUrl = BoyProfileMinURL
-    }else {
-      profileMaxUrl = GirlProfileMaxURL
-      profileMinUrl = GirlProfileMinURL
-    }
-    console.log("profile min "+ profileMinUrl)
-    console.log("profile max "+ profileMaxUrl)
+    User.uid = token
+    User.username = username
+    User.sex = sex
+    User.isPrivate = false
+
     let imageHelperPromise = imageHelper.saveProfileBase64(profileMinUrl)
+    if (sex == "Male") {
+      imageHelperPromise = imageHelper.saveProfileBase64(BoyProfileMinURL)
+    }else {
+      imageHelperPromise = imageHelper.saveProfileBase64(GirlProfileMinURL)
+    }
+
     let profileBase64 = await imageHelperPromise
     userStorage.setUserProfileMinBase64(profileBase64)
     return new Promise((resolve,reject) => {
@@ -131,8 +130,7 @@ export async function addNewUser(){
      tags : tags,
      sex : sex,
      country : country,
-     profileMinUrl : profileMinUrl,
-     profileMaxUrl : profileMaxUrl
+     isPrivate : false
    }
    firestore().collection('user').doc(token).set(newUserDocument).
     then(resp => {

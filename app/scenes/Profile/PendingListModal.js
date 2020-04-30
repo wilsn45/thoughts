@@ -7,12 +7,11 @@ import {View,
         Text} from 'react-native';
 import UserPendingCell  from "thoughts/app/components/UserPendingCell";
 import Icon from 'react-native-vector-icons/Feather';
-import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import * as realm from "thoughts/app/storage/Realm/Realm";
 import * as api from "thoughts/app/services/ProfileServices";
 var Spinner = require('react-native-spinkit');
 
-export default function PendingListModal ({closeCallBackBlock,uid}) {
+export default function PendingListModal ({closeCallBackPending}) {
   const[isLoading, setIsLoading] = useState(true);
   const[userList, setUserList] = useState(null);
   const[title, setTitle] = useState("");
@@ -26,7 +25,7 @@ export default function PendingListModal ({closeCallBackBlock,uid}) {
 
   async function loadList () {
 
-    let userListPromise =  api.getPendingRequests(uid)
+    let userListPromise =  api.getPendingRequests()
     let list = await userListPromise
     let dicArray = getUserDictArray(list)
     setUserList(dicArray)
@@ -45,10 +44,9 @@ function getUserDictArray(userList) {
   return dicArray
 }
 
-async function rejectRequest(uid) {
+function rejectRequest(uid) {
   try {
-    console.log("reject this one "+uid)
-    await api.rejectRequest(uid)
+    api.rejectRequest(uid)
     let tmpPnd = []
     let pendings = userList
     for (index in pendings) {
@@ -57,7 +55,7 @@ async function rejectRequest(uid) {
       }
     }
     if(tmpPnd.length<1) {
-      closeCallBackBlock()
+      closeCallBackPending()
     }
     setUserList(tmpPnd)
   }
@@ -66,10 +64,10 @@ async function rejectRequest(uid) {
   }
 }
 
-async function acceptRequest(uid,username) {
+function acceptRequest(uid,username) {
   try {
     console.log("accept this one "+uid)
-    await api.acceptRequest(uid,username)
+    api.acceptRequest(uid,username)
     let tmpPnd = []
     let pendings = userList
     for (index in pendings) {
@@ -78,7 +76,7 @@ async function acceptRequest(uid,username) {
       }
     }
     if(tmpPnd.length<1) {
-      closeCallBackBlock()
+      closeCallBackPending()
     }
     setUserList(tmpPnd)
   }
@@ -101,7 +99,7 @@ return (
       <View style = {styles.headerView}>
       <TouchableOpacity
                style = {{marginLeft : 10,marginTop : 10,flex : 0.5}}
-               onPress={() => closeCallBackBlock()}>
+               onPress={() => closeCallBackPending()}>
                <Icon name={"x"}  size={28}  color={"gray"}   />
           </TouchableOpacity>
 

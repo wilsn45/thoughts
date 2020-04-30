@@ -16,8 +16,7 @@ import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import SelectViewerModal from "./SelectViewerModal";
 import BlockedListModal  from "./BlockedListModal";
 import * as api from "thoughts/app/services/ProfileServices";
-
-import { firebase } from '@react-native-firebase/storage';
+import  * as User  from "thoughts/app/User";
 
 
 export default function SettingsScene(props) {
@@ -37,11 +36,14 @@ export default function SettingsScene(props) {
  async function loadValues() {
     let option = await userStorage.getSelectShowOption()
     setSelectedOption(option)
-    let isPrivate = await userStorage.getIsPrivate()
+    let isPrivate = User.isPrivate
+    console.log("current private state "+isPrivate)
     setPrivateState(isPrivate)
 }
   async function navigateToProfile() {
-    api.setPrivate(privateState)
+     User.isPrivate = privateState
+     api.setPrivate(privateState)
+     console.log("saving private state "+privateState)
      await userStorage.setIsPrivate(privateState)
      navigate('MyProfile')
   }
@@ -209,7 +211,7 @@ return (
   </Modal>
 
   <Modal isVisible={showBlockedList} swipeArea={50} style = {{alignSelf : "center",width : '85%'}} >
-    <BlockedListModal  closeCallBackBlock = {modalBlockCloseCallBack} uid ={uid} />
+    <BlockedListModal  closeCallBackBlock = {modalBlockCloseCallBack} />
  </Modal>
   </View>
 

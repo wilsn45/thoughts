@@ -1,5 +1,5 @@
-
 import AsyncStorage from '@react-native-community/async-storage'
+import * as  User  from "thoughts/app/User";
 
 const UserTokenKey = "@UserToken"
 const UserActiveKey = "@UserActive"
@@ -285,6 +285,11 @@ export async function initUser(uid,response,profileBase64) {
     await setIsPrivate(response.isPrivate)
     await setUserActive()
     await setUserProfileMinBase64(profileBase64)
+
+    User.uid = uid
+    User.username = response.username
+    User.sex = response.sex
+    User.isPrivate = response.isPrivate
   }
    catch (err) {
      throw Error(err);

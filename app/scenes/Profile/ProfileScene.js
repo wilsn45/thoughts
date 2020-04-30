@@ -13,12 +13,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
-import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import * as api from "thoughts/app/services/ProfileServices";
 import UserListModal from "./UserListModal";
 var Spinner = require('react-native-spinkit');
 
-import { firebase } from '@react-native-firebase/storage';
 
 
 export default function ProfileScene(props) {

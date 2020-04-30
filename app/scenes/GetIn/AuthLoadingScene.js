@@ -17,8 +17,7 @@ export default function AuthLoading(props) {
     async function initialize() {
         try {
              let status = await getAuthState();
-             // navigate('Auth')
-
+            
              if (status == AuthStatus.ACTIVATED) {
                 navigate('App');
              }

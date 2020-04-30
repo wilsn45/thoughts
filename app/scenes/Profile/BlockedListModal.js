@@ -7,12 +7,11 @@ import {View,
         Text} from 'react-native';
 import UserBlockedCell  from "thoughts/app/components/UserBlockedCell";
 import Icon from 'react-native-vector-icons/Feather';
-import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import * as realm from "thoughts/app/storage/Realm/Realm";
 import * as api from "thoughts/app/services/ProfileServices";
 var Spinner = require('react-native-spinkit');
 
-export default function BlockedListModal ({closeCallBackBlock,uid}) {
+export default function BlockedListModal ({closeCallBackBlock}) {
   const[isLoading, setIsLoading] = useState(true);
   const[userList, setUserList] = useState(null);
   const[title, setTitle] = useState("");
@@ -26,7 +25,7 @@ export default function BlockedListModal ({closeCallBackBlock,uid}) {
 
   async function loadList () {
 
-    let userListPromise =  api.getBlockedUser(uid)
+    let userListPromise =  api.getBlockedUser()
     let list = await userListPromise
     let dicArray = getUserDictArray(list)
     setUserList(dicArray)

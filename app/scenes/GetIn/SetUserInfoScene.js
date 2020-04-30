@@ -35,10 +35,6 @@ useEffect(() => {
 
 });
 
-async function updateActiveToken() {
-    await userStorage.setUserActive()
-}
-
 function userNameCallBack(value) {
   setError(null)
   setUserNameFound(false)
@@ -67,8 +63,7 @@ function isUsernameAvailable(value) {
   .catch(err => {
      setIsFinding(false)
       console.log("console error "+err)
-
-  })
+    })
 }
 
 async function setUserInfo() {

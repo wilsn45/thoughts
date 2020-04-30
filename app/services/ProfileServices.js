@@ -4,36 +4,57 @@ import firestore from '@react-native-firebase/firestore';
 import { firebase } from '@react-native-firebase/storage';
 import * as c from "../storage/Constants";
 import React, { useState } from 'react';
-import * as userStorage from "thoughts/app/storage/Local/UserStorage";
-import * as contactListHelper from "thoughts/app/helper/ContactListtHelper";
 import * as imageHelper from "thoughts/app/helper/ImageHelper";
 const API_URL = "https://us-central1-thoughts-fe76a.cloudfunctions.net/"
+import * as  User  from "thoughts/app/User";
 //Google Map API Key : AIzaSyCr65NbaaL4JvLuuvr5-n9QYH_1YxCRT1Q
 
 const usersCollection = firestore().collection('Users');
 const storage = firebase.storage()
 let confirmation  = null
 
+//
+// export async function getProfileOverView(){
+//   return new Promise((resolve,reject) => {
+//     const userRef = firestore().collection('user').doc(User.uid);
+//      userRef.get()
+//      .then(snapshot => {
+//        if(!snapshot.exists) {
+//         reject(new Error("Oops, could'not fetch user details"))
+//        }
+//        resolve(snapshot)
+//
+//        return
+//      })
+//     .catch(err => {
+//       console.log("getProfileOverView error is "+err)
+//           reject(err)
+//       })
+//    });
+// }
 
-export async function getProfileOverView(uid){
+
+export async function getMyUserList(showFollowing){
   return new Promise((resolve,reject) => {
-    const userRef = firestore().collection('user').doc(uid);
+    const userRef = firestore().collection('followers').doc(User.uid);
      userRef.get()
      .then(snapshot => {
        if(!snapshot.exists) {
-        reject(new Error("Oops, could'not fetch user details"))
+        reject(new Error("Oops, could'not fetch user list"))
        }
-       resolve(snapshot)
-
-       return
+       let data = {
+         followers : snapshot.get('followers'),
+         followings : snapshot.get('followings')
+       }
+       resolve(data)
+      return
      })
     .catch(err => {
-      console.log("getProfileOverView error is "+err)
-          reject(err)
-      })
+        console.log("getUserList is "+err)
+        reject(err)
+     });
    });
 }
-
 export async function getUserList(uid,showFollowing){
   return new Promise((resolve,reject) => {
     const userRef = firestore().collection('followers').doc(uid);
@@ -57,9 +78,8 @@ export async function getUserList(uid,showFollowing){
 }
 
 export async function getBlockedUser(){
-  let uid = await userStorage.getUserToken()
   return new Promise((resolve,reject) => {
-    const userRef = firestore().collection('followers').doc(uid);
+    const userRef = firestore().collection('followers').doc(User.uid);
      userRef.get()
      .then(snapshot => {
        if(!snapshot.exists) {
@@ -77,9 +97,8 @@ export async function getBlockedUser(){
 }
 
 export async function unblock(useruid){
-  let uid = await userStorage.getUserToken()
   return new Promise((resolve,reject) => {
-    const userRef = firestore().collection('followers').doc(uid);
+    const userRef = firestore().collection('followers').doc(User.uid);
      userRef.get()
      .then(snapshot => {
        if(!snapshot.exists) {
@@ -105,9 +124,8 @@ export async function unblock(useruid){
 }
 
 export async function getPendingRequests(){
-  let uid = await userStorage.getUserToken()
   return new Promise((resolve,reject) => {
-    const userRef = firestore().collection('followers').doc(uid);
+    const userRef = firestore().collection('followers').doc(User.uid);
      userRef.get()
      .then(snapshot => {
        if(!snapshot.exists) {
@@ -125,9 +143,8 @@ export async function getPendingRequests(){
 }
 
 export async function setPrivate(state){
-  let uid = await userStorage.getUserToken()
   return new Promise((resolve,reject) => {
-    const userRef = firestore().collection('user').doc(uid);
+    const userRef = firestore().collection('user').doc(User.uid);
      userRef.get()
      .then(snapshot => {
        if(!snapshot.exists) {
@@ -145,12 +162,18 @@ export async function setPrivate(state){
 }
 
 export async function getMaxProfileUrl(token){
+  if(!token) {
+    token = User.uid
+  }
   let resourceName = '/profile_pic_max/'+token+'.jpg'
   const ref = await storage.ref(resourceName)
   return await ref.getDownloadURL();
 }
 
 export async function getMinProfileUrl(token){
+  if(!token) {
+    token = User.uid
+  }
   let resourceName = '/profile_pic_min/'+token+'.jpg'
   const ref = await storage.ref(resourceName)
   return await ref.getDownloadURL();
@@ -158,8 +181,7 @@ export async function getMinProfileUrl(token){
 
 export async function getUserProfileOverView(useruid){
     try{
-        let myuid = await userStorage.getUserToken()
-        let url = API_URL+"getUserProfileOverView?useruid="+useruid+"&&myuid="+myuid
+        let url = API_URL+"getUserProfileOverView?useruid="+useruid+"&&myuid="+User.uid
         let res = await axios.get(url);
         console.log("response is "+JSON.stringify(res.data))
         return res.data;
@@ -170,12 +192,11 @@ export async function getUserProfileOverView(useruid){
 
 export async function follow(useruid,followingname){
   try{
-      let myuid = await userStorage.getUserToken()
-      let followername = await userStorage.getUserName()
+      let followername = User.username
       let url = API_URL+"follow?followingusername="+followingname+"&&followerusername="+followername
       console.log("url is "+url)
       const headers = {
-        myuid: myuid,
+        myuid: User.uid,
         useruid :useruid
       }
       let res = await axios.get(url, {headers});
@@ -191,10 +212,9 @@ export async function follow(useruid,followingname){
 
 export async function unfollow(useruid){
   try{
-      let myuid = await userStorage.getUserToken()
       let url = API_URL+"unfollow"
       const headers = {
-        myuid: myuid,
+        myuid: User.uid,
         useruid :useruid
       }
       let res = await axios.get(url, {headers});
@@ -210,11 +230,10 @@ export async function unfollow(useruid){
 
 export async function acceptRequest(useruid,followerusername){
   try{
-      let myuid = await userStorage.getUserToken()
-      let followingusername = await userStorage.getUserName()
+      let followingusername = User.username
       let url = API_URL+"acceptRequest?followingusername="+followingusername+"&&followerusername="+followerusername
       const headers = {
-        myuid: myuid,
+        myuid: User.uid,
         useruid :useruid
       }
       let res = await axios.get(url, {headers});
@@ -229,9 +248,8 @@ export async function acceptRequest(useruid,followerusername){
 }
 
 export async function rejectRequest(useruid){
-  let uid = await userStorage.getUserToken()
   return new Promise((resolve,reject) => {
-    const userRef = firestore().collection('followers').doc(uid);
+    const userRef = firestore().collection('followers').doc(User.uid);
      userRef.get()
      .then(snapshot => {
        if(!snapshot.exists) {
@@ -258,10 +276,9 @@ export async function rejectRequest(useruid){
 
 export async function cancelRequest(useruid){
   try{
-      let myuid = await userStorage.getUserToken()
       let url = API_URL+"cancelRequest"
       const headers = {
-        myuid: myuid,
+        myuid: User.uid,
         useruid :useruid
       }
       let res = await axios.get(url, {headers});
@@ -277,10 +294,9 @@ export async function cancelRequest(useruid){
 
 export async function block(useruid,blockingusername){
   try{
-      let myuid = await userStorage.getUserToken()
       let url = API_URL+"block?blockingusername="+blockingusername
       const headers = {
-        myuid: myuid,
+        myuid: User.uid,
         useruid :useruid
       }
       let res = await axios.get(url, {headers});

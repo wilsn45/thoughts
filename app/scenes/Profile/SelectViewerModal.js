@@ -10,7 +10,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import * as realm from "thoughts/app/storage/Realm/Realm";
 
-export default function SelectViewerModal ({closeCallBack,modalDoneCallBack,uid,selectionOption}) {
+export default function SelectViewerModal ({closeCallBack,modalDoneCallBack,selectionOption}) {
   const[userList, setUserList] = useState(null);
   const[title, setTitle] = useState("");
   const[list, setList] = useState([]);

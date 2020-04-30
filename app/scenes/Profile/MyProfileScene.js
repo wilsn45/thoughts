@@ -18,8 +18,7 @@ import * as api from "thoughts/app/services/ProfileServices";
 import MyUserListModal from "./MyUserListModal";
 var Spinner = require('react-native-spinkit');
 import PendingListModal  from "./PendingListModal";
-import { firebase } from '@react-native-firebase/storage';
-
+import  * as User  from "thoughts/app/User";
 
 export default function MyProfileScene(props) {
   const[isLoading, setIsLoading] = useState(false);
@@ -27,19 +26,14 @@ export default function MyProfileScene(props) {
   const[showFollowing, setShowFollowing] = useState(true);
   const[showPendings, setShowPendings] = useState(false);
   const { navigate } = useNavigation();
-  const uid = useNavigationParam('uid');
 
-  const[username, setUsername] = useState("");
   const[followerCount, setFollowerCount] = useState(0);
   const[followingCount, setFollowingCount] = useState(0);
-  const[sex, setSex] = useState("");
   const [picData, setPicData] = useState();
-  const[token, setToken] = useState("");
 
 
   useEffect(() => {
     loadProfile()
-    //getUserProfileInfo()
     getUserFoProfileData()
   }, []);
 
@@ -54,45 +48,26 @@ async function loadProfile() {
   let followings = await realm.getFollowings()
   setFollowerCount(followers.length)
   setFollowingCount(followings.length)
-  let picData = await userStorage.getUserProfileMinBase64()
-  setPicData(picData)
-  let username = await userStorage.getUserName()
-  let sex = await userStorage.getUserSex()
-  setUsername(username)
-  setSex(sex)
-}
-
-async function getUserProfileInfo () {
-  try {
-
-    let picData = await api.getMaxProfileUrl(uid)
-    setPicData(picData)
-
-    let getProfilePromise = api.getProfileOverView(uid)
-    let snapshot = await getProfilePromise;
-
-    let followerCount = snapshot.get('followersCount')
-    let followingCount = snapshot.get('followingsCount')
-    if (followerCount) {
-      setFollowerCount(followerCount)
-    }
-    if(followingCount) {
-      setFollowingCount(followingCount)
-    }
-  }
-  catch (err) {
-    console.log("here error is "+err)
-  }
+  let picDataMin = await userStorage.getUserProfileMinBase64()
+  setPicData(picDataMin)
+  let picDataMax = await api.getMaxProfileUrl()
+  setPicData(picDataMax)
 }
 
 async function getUserFoProfileData () {
   try {
-    let followingPromise =  api.getUserList(uid,true)
-    let flgList = await followingPromise
-    realm.updateFollowings(flgList)
+    let userListPrimise =  api.getMyUserList()
+    let usrLst = await userListPrimise
 
-    let followerPromise =  api.getUserList(uid,false)
-    let flwrList = await followerPromise
+    let flgList = usrLst.followings
+    let flwrList = usrLst.followers
+    if (flwrList) {
+      setFollowerCount(Object.keys(flwrList).length)
+    }
+    if(flgList) {
+      setFollowingCount(Object.keys(flgList).length)
+    }
+    realm.updateFollowings(flgList)
     realm.updateFollowers(flwrList)
   }
   catch (err) {
@@ -108,7 +83,7 @@ function modalCloseCallBack () {
 }
 
 function navigateToSettings() {
-   navigate('Settings',{uid : uid})
+   navigate('Settings')
 }
 
 
@@ -136,7 +111,9 @@ function showPendingRequets() {
 }
 
 function closePendingRequets() {
+
   setShowPendings(false)
+  getUserFoProfileData()
 }
 
   return (
@@ -173,7 +150,7 @@ function closePendingRequets() {
       <View style = {styles.centerView}>
       <View style= {styles.upperView}>
        <View style = {styles.userView}>
-        <Image style={sex == "Female" ? styles.imageViewFemale : styles.imageViewMale} source={{uri: picData}}/>
+        <Image style={User.sex == "Female" ? styles.imageViewFemale : styles.imageViewMale} source={{uri: picData}}/>
       </View>
        <View style = {styles.userinfoView}>
           <TouchableOpacity
@@ -202,7 +179,7 @@ function closePendingRequets() {
        </View>
        </View>
        <View>
-        <Text style = {styles.userNameText}> {username}</Text>
+        <Text style = {styles.userNameText}> {User.username}</Text>
        </View>
 
 
@@ -215,11 +192,12 @@ function closePendingRequets() {
     </View>
    }
    <Modal isVisible={showUserList} swipeArea={50} style = {{alignSelf : "flex-end",width : '65%'}} >
-      <MyUserListModal  closeCallBack = {modalCloseCallBack} navigateCallBack = {modalNavigateCallBack} uid = {uid} showFollowing = {showFollowing}/>
+      <MyUserListModal  closeCallBack = {modalCloseCallBack} navigateCallBack = {modalNavigateCallBack}
+      showFollowing = {showFollowing}/>
    </Modal>
 
    <Modal isVisible={showPendings} swipeArea={50} style = {{alignSelf : "center",width : '85%'}} >
-     <PendingListModal  closeCallBackBlock = {closePendingRequets} uid ={uid} />
+     <PendingListModal  closeCallBackPending = {closePendingRequets} />
   </Modal>
     </View>
     );

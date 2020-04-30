@@ -9,9 +9,10 @@ import Icon from 'react-native-vector-icons/Feather';
 var Spinner = require('react-native-spinkit');
 import * as api from "thoughts/app/services/ProfileServices";
 import UserCell  from "thoughts/app/components/UserCell";
+import  * as User  from "thoughts/app/User";
 
 
-export default function MyUserList ({closeCallBack,navigateCallBack,uid,showFollowing}) {
+export default function MyUserList ({closeCallBack,navigateCallBack,showFollowing}) {
   const[isLoading, setIsLoading] = useState(true);
   const[userList, setUserList] = useState(null);
   const[title, setTitle] = useState("");
@@ -27,7 +28,7 @@ export default function MyUserList ({closeCallBack,navigateCallBack,uid,showFoll
 
   async function getUserList() {
     try {
-      let userListPromise =  api.getUserList(uid,showFollowing)
+      let userListPromise =  api.getUserList(User.uid,showFollowing)
       let list = await userListPromise
       let dicArray = getUserDictArray(list)
       setUserList(dicArray)
