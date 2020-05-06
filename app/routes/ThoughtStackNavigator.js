@@ -7,7 +7,8 @@ import ChatListScreen  from "thoughts/app/scenes/Thoughts/ChatListScene";
 import TalkScreen from "thoughts/app/scenes/Thoughts/TalkScene";
 import MyProfileScene from "thoughts/app/scenes/Profile/MyProfileScene";
 import ProfileScene from "thoughts/app/scenes/Profile/ProfileScene";
-import SettingsScene from "thoughts/app/scenes/Profile/SettingsScene";
+import SettingsScene from "thoughts/app/scenes/Profile/SettingsScene"; ChatScene
+import ChatScene from "thoughts/app/scenes/Messages/ChatScene";
 
 const ThoughtsStack = createStackNavigator(
     {
@@ -16,7 +17,8 @@ const ThoughtsStack = createStackNavigator(
         Talk: TalkScreen,
         MyProfile : MyProfileScene,
         Profile : ProfileScene,
-        Settings : SettingsScene
+        Settings : SettingsScene,
+        Chat : ChatScene
     },
     { headerMode: 'none' },
     {

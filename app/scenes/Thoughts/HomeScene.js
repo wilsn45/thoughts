@@ -15,14 +15,16 @@ import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import NewThought from "./NewThoughtModal";
 import Modal from 'react-native-modal';
 import  * as User  from "thoughts/app/User";
-
+import firestore from '@react-native-firebase/firestore';
+import * as messagesAPI from "thoughts/app/services/MessageServices";
 
 export default function HomeScene(props) {
+  const [subscriber,setSubscriber] = useState(null)
   const [locationViewWidth, setLocationViewWidth] = useState(100);
   const [newThought, showNewThought] = useState(false);
   const [picData, setPicData] = useState(null);
   const { navigate } = useNavigation();
-
+  let messageSubscriber
     toggleDrawer = () => {
         navigation.toggleDrawer()
     }
@@ -39,11 +41,29 @@ export default function HomeScene(props) {
     .catch(err => {
       console.log("error is " +err)
     })
-  },[]);
+},[]);
 
+
+const unsubscribe = props.navigation.addListener('didFocus', () => {
+     messagesAPI.subscribeMessage()
+});
+
+const didBlurEvent = props.navigation.addListener('didBlur', () => {
+    console.log('lost focused');
+    unsubscribe.remove()
+});
 
   async function navigateToProfile() {
+    messagesAPI.unsubscribeMessage()
     navigate('MyProfile')
+  }
+
+  function navigateToAMessages() {
+    navigate('Chat')
+  }
+
+  function sendMessage(uid) {
+    console.log("Sending message to "+uid)
   }
 
   return (
@@ -71,6 +91,63 @@ export default function HomeScene(props) {
       </View>
 
       <View style = {styles.centerView}>
+
+          <View style = {styles.thoughtView}>
+            <Text style = {styles.text}>AD9jnDWbPKYPOFD4C355b1ja7bF2</Text>
+            <Text style = {styles.text}>Gautam Budh</Text>
+            <View style = {styles.sendView}>
+            <TextInput style = {{flex : 0.8, height : 50, marginLeft : 20}}
+              placeholder = "Send"/>
+              <TouchableOpacity style = {{flex : 0.2, height : 50}}
+              onPress={() => sendMessage("AD9jnDWbPKYPOFD4C355b1ja7bF2")}
+              >
+               <Icon name={'send'}  style = {{alignSelf : "center"}} size={30} />
+              </TouchableOpacity>
+            </View>
+
+          </View>
+
+          <View style = {styles.thoughtView}>
+            <Text style = {styles.text}>BD9jnDWbPKYPOFD4C355b1ja7bF2</Text>
+            <Text style = {styles.text}>Isha</Text>
+            <View style = {styles.sendView}>
+            <TextInput style = {{flex : 0.8, height : 50, marginLeft : 20}}
+              placeholder = "Send"/>
+              <TouchableOpacity style = {{flex : 0.2, height : 50}}
+              onPress={() => sendMessage("BD9jnDWbPKYPOFD4C355b1ja7bF2")}
+              >
+               <Icon name={'send'}  style = {{alignSelf : "center"}} size={30} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style = {styles.thoughtView}>
+            <Text style = {styles.text}>CD9jnDWbPKYPOFD4C355b1ja7bF2</Text>
+            <Text style = {styles.text}>Daniya</Text>
+            <View style = {styles.sendView}>
+            <TextInput style = {{flex : 0.8, height : 50, marginLeft : 20}}
+              placeholder = "Send"/>
+              <TouchableOpacity style = {{flex : 0.2, height : 50}}
+              onPress={() => sendMessage("CD9jnDWbPKYPOFD4C355b1ja7bF2")}
+              >
+               <Icon name={'send'}  style = {{alignSelf : "center"}} size={30} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style = {styles.thoughtView}>
+            <Text style = {styles.text}>ED9jnDWbPKYPOFD4C355b1ja7bF2</Text>
+            <Text style = {styles.text}>Wilson</Text>
+            <View style = {styles.sendView}>
+            <TextInput style = {{flex : 0.8, height : 50, marginLeft : 20}}
+              placeholder = "Send"/>
+              <TouchableOpacity style = {{flex : 0.2, height : 50}}
+              onPress={() => sendMessage("ED9jnDWbPKYPOFD4C355b1ja7bF2")}
+              >
+               <Icon name={'send'}  style = {{alignSelf : "center"}} size={30} />
+              </TouchableOpacity>
+            </View>
+          </View>
 
       </View>
 
@@ -117,17 +194,44 @@ const styles = StyleSheet.create({
       backgroundColor : "#fff",
   },
   headerView : {
-    flex : 0.15,
+    flex : 0.1,
     width : '100%',
     marginTop : 40,
     justifyContent : "space-between",
     flexDirection : "row"
   },
   centerView : {
-    flex : 0.8,
+    flex : 0.9,
     width : '100%',
+    alignItems : "center",
+    justifyContent : "center",
     // borderColor  : "purple",
     // borderWidth : 1,
+  },
+
+  thoughtView : {
+    flex : 0.3,
+    width : '70%',
+    borderColor  : "#149cea",
+    borderWidth : 1,
+    margin : 10,
+    justifyContent : 'space-between'
+  },
+  sendView : {
+    alignSelf : "flex-end",
+    alignItems : "center",
+    justifyContent : "center",
+    width : '100%',
+    height : '30%',
+    flexDirection : 'row',
+    borderColor  : "#149cea",
+    borderWidth : 1,
+  },
+  text : {
+    fontSize: 15,
+    fontFamily: "Thonburi",
+    fontWeight : "200",
+    margin : 5
   },
   bottomView : {
     flex : 0.1,
