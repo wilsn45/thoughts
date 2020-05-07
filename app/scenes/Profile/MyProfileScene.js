@@ -13,7 +13,7 @@ import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
-import * as realm from "thoughts/app/storage/Realm/Realm";
+import * as realm from "thoughts/app/storage/Realm/ProfileRealm";
 import * as api from "thoughts/app/services/ProfileServices";
 import MyUserListModal from "./MyUserListModal";
 var Spinner = require('react-native-spinkit');

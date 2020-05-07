@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState,useEffect,useRef } from 'react';
 import { View,
         StyleSheet,
         Text,
@@ -19,7 +19,8 @@ import firestore from '@react-native-firebase/firestore';
 import * as messagesAPI from "thoughts/app/services/MessageServices";
 
 export default function HomeScene(props) {
-  const [subscriber,setSubscriber] = useState(null)
+  // let unsubscribe
+  const refContainer = useRef(null);
   const [locationViewWidth, setLocationViewWidth] = useState(100);
   const [newThought, showNewThought] = useState(false);
   const [picData, setPicData] = useState(null);
@@ -44,14 +45,23 @@ export default function HomeScene(props) {
 },[]);
 
 
-const unsubscribe = props.navigation.addListener('didFocus', () => {
+
+// const unsubscribe = firestore().collection('messages').where("touid", '==', User.uid).onSnapshot(function (querySnapshot) {
+//    querySnapshot.forEach(documentSnapshot => {
+//     console.log("message is "+documentSnapshot.data().message)
+//     console.log("************************")
+//   });
+// });
+
+const didFocusEvent = props.navigation.addListener('didFocus', () => {
+    // console.log('focused');
      messagesAPI.subscribeMessage()
 });
-
-const didBlurEvent = props.navigation.addListener('didBlur', () => {
-    console.log('lost focused');
-    unsubscribe.remove()
-});
+//
+// const didBlurEvent = props.navigation.addListener('didBlur', () => {
+//     console.log('lost focused');
+//     refContainer.current = null
+// });
 
   async function navigateToProfile() {
     messagesAPI.unsubscribeMessage()

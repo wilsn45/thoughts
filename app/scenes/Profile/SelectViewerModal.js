@@ -8,7 +8,7 @@ import {View,
 import UserSelectCell  from "thoughts/app/components/UserSelectCell";
 import Icon from 'react-native-vector-icons/Feather';
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
-import * as realm from "thoughts/app/storage/Realm/Realm";
+import * as realm from "thoughts/app/storage/Realm/ProfileRealm";
 
 export default function SelectViewerModal ({closeCallBack,modalDoneCallBack,selectionOption}) {
   const[userList, setUserList] = useState(null);

@@ -7,7 +7,7 @@ import {View,
         Text} from 'react-native';
 import UserPendingCell  from "thoughts/app/components/UserPendingCell";
 import Icon from 'react-native-vector-icons/Feather';
-import * as realm from "thoughts/app/storage/Realm/Realm";
+import * as realm from "thoughts/app/storage/Realm/ProfileRealm";
 import * as api from "thoughts/app/services/ProfileServices";
 var Spinner = require('react-native-spinkit');
 

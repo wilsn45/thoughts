@@ -7,7 +7,7 @@ import {View,
 import * as api from "thoughts/app/services/ProfileServices";
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
-import * as realm from "thoughts/app/storage/Realm/Realm";
+import * as realm from "thoughts/app/storage/Realm/ProfileRealm";
 
 export default function UserSelectCell({cellCallback,user,selectionOption}) {
 const[profileURL, setProfileURL] = useState();
