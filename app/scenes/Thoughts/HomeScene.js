@@ -18,6 +18,7 @@ import  * as User  from "thoughts/app/User";
 import firestore from '@react-native-firebase/firestore';
 import * as messagesAPI from "thoughts/app/services/MessageServices";
 
+
 export default function HomeScene(props) {
   // let unsubscribe
   const refContainer = useRef(null);
@@ -42,31 +43,29 @@ export default function HomeScene(props) {
     .catch(err => {
       console.log("error is " +err)
     })
+
+   messagesAPI.subscribeMessage()
 },[]);
 
+async function navigateToProfile() {
 
+    let unixtime = new Date().valueOf()
+    let timestampe = Math.floor(unixtime/1000)
 
-// const unsubscribe = firestore().collection('messages').where("touid", '==', User.uid).onSnapshot(function (querySnapshot) {
-//    querySnapshot.forEach(documentSnapshot => {
-//     console.log("message is "+documentSnapshot.data().message)
-//     console.log("************************")
-//   });
-// });
-
-const didFocusEvent = props.navigation.addListener('didFocus', () => {
-    // console.log('focused');
-     messagesAPI.subscribeMessage()
-});
-//
-// const didBlurEvent = props.navigation.addListener('didBlur', () => {
-//     console.log('lost focused');
-//     refContainer.current = null
-// });
-
-  async function navigateToProfile() {
-    messagesAPI.unsubscribeMessage()
-    navigate('MyProfile')
-  }
+    let messageRef = firestore().collection('messages');
+     messageRef.add({
+        fromusername : "User A",
+        fromuid : "ED9jnDWbPKYPOFD4C355b1ja7bF2",
+        tousername : "Kabir",
+        touid : "DD9jnDWbPKYPOFD4C355b1ja7bF2",
+        message : "Message A 2",
+        picRef : null,
+        audioRef : null,
+        thoughtsTitle : null,
+        thoughtsRef : 451,
+        at : timestampe
+      })
+}
 
   function navigateToAMessages() {
     navigate('Chat')
@@ -289,3 +288,25 @@ HomeScene.navigationOptions = ({}) => {
     title: ``
   }
 };
+
+
+
+
+
+// const unsubscribe = firestore().collection('messages').where("touid", '==', User.uid).onSnapshot(function (querySnapshot) {
+//    querySnapshot.forEach(documentSnapshot => {
+//     console.log("message is "+documentSnapshot.data().message)
+//     console.log("************************")
+//   });
+// });
+
+// const didFocusEvent = props.navigation.addListener('didFocus', () => {
+//     // console.log('focused');
+//
+// });
+
+//
+// const didBlurEvent = props.navigation.addListener('didBlur', () => {
+//     console.log('lost focused');
+//     refContainer.current = null
+// });

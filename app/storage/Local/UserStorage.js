@@ -14,6 +14,8 @@ const ShowOnlyKey = "@ShowOnly"
 const ShowExceptKey = "@ShowExcept"
 const HiddenKey = "@Hidden"
 const IsPrivateProfileKey = "@IsPrivateProfile"
+const MessageLastKey = "@MessageLastKey"
+const ThoughtsLastKey = "@ThoughtsLastKey"
 
 
 export async function setUserToken (token){
@@ -268,10 +270,48 @@ export async function setUserData(token,number,country)  {
     await setUserToken(token)
     await setUserNumber(number)
     await setUserCountry(country)
+    await setMessageLast(0)
+    await setThoughtsLast(0)
   }
   catch (err) {
     throw handler(err);
   }
+}
+
+export async function getMessageLast () {
+  try {
+    let timestampePromise = AsyncStorage.getItem(MessageLastKey)
+    let time = await timestampePromise
+    return time
+  } catch (err) {
+    throw new Error(err.message)
+  }
+}
+
+export async function setMessageLast(time)  {
+  let timestampePromise = AsyncStorage.setItem(MessageLastKey,JSON.stringify(time))
+  await timestampePromise
+  return new Promise((resolve,reject) => {
+    resolve(true)
+  });
+}
+
+export async function getThoughtsLast () {
+  try {
+    let timestampePromise = AsyncStorage.getItem(ThoughtsLastKey)
+    let time = await timestampePromise
+    return time
+  } catch (err) {
+    throw new Error(err.message)
+  }
+}
+
+export async function setThoughtsLast(time)  {
+  let timestampePromise = AsyncStorage.setItem(ThoughtsLastKey,JSON.stringify(time))
+  await timestampePromise
+  return new Promise((resolve,reject) => {
+    resolve(true)
+  });
 }
 
 export async function initUser(uid,response,profileBase64) {
@@ -285,11 +325,15 @@ export async function initUser(uid,response,profileBase64) {
     await setIsPrivate(response.isPrivate)
     await setUserActive()
     await setUserProfileMinBase64(profileBase64)
+    await setMessageLast(0)
+    await setThoughtsLast(0)
 
     User.uid = uid
     User.username = response.username
     User.sex = response.sex
     User.isPrivate = response.isPrivate
+    User.messageLast = 0
+    User.thoughtsLast = 0
   }
    catch (err) {
      throw Error(err);
