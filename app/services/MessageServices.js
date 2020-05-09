@@ -8,27 +8,22 @@ import * as imageHelper from "thoughts/app/helper/ImageHelper";
 const API_URL = "https://us-central1-thoughts-fe76a.cloudfunctions.net/"
 import * as  User  from "thoughts/app/User";
 import * as messageRealm from "thoughts/app/storage/Realm/MessageRealm";
-import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 
 export function subscribeMessage(){
 
-  // console.log("lasttimestamp is "+lasttimestamp)
-//.where("at", ">", 1588872000)
-  console.log("last message time "+User.messageLast)
   const subscriber = firestore()
   .collection('messages')
   .where("touid", '==', User.uid)
+  .where("delivered", '==', false)
   .onSnapshot(querySnapshot => {
     if(querySnapshot) {
-      console.log("message received")
       querySnapshot.forEach(documentSnapshot => {
 
         let message =  {
            msgid:  documentSnapshot.id,
-           fromusername: documentSnapshot.data().fromusername,
-           fromuid : documentSnapshot.data().fromuid,
-           tousername : documentSnapshot.data().tousername,
-           touid : documentSnapshot.data().touid,
+           username: documentSnapshot.data().fromusername,
+           useruid : documentSnapshot.data().fromuid,
+           isReceived : true,
            message : documentSnapshot.data().message,
            thoughtTitle : documentSnapshot.data().thoughtTitle,
            picRef : documentSnapshot.data().picRef,
@@ -36,9 +31,12 @@ export function subscribeMessage(){
            at : documentSnapshot.data().at
          }
 
-         console.log("evaluated message "+JSON.stringify(message))
-         console.log("************************")
-         messageRealm.addNewChat(message)
+         firestore().collection('messages').doc(documentSnapshot.id).update({delivered : true})
+          // documentSnapshot.update({read : true})
+         // console.log("evaluated message "+JSON.stringify(message))
+         // console.log("************************")
+         messageRealm.addNewMessage(message)
+         // messageRealm.clearMSg()
         });
       }
 

@@ -3,7 +3,4 @@ module.exports = {
    username : "DaniyaKissWilson",
    sex : "Female",
    isPrivate : false,
-
-   messageLast : 0,
-   thoughtsLast : 0
 };

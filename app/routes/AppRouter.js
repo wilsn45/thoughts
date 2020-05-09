@@ -8,7 +8,7 @@ import GetInNavigator from "./GetInNavigator";
 
 import SetUserInfoScene  from "thoughts/app/scenes/GetIn/SetUserInfoScene";
 import SelectTagScene  from "thoughts/app/scenes/GetIn/SelectTagScene";
-import AuthLoading from "thoughts/app/scenes/GetIn/AuthLoadingScene"; SelectTagScene
+import AuthLoading from "thoughts/app/scenes/GetIn/AuthLoadingScene"; 
 import AuthProvider from "thoughts/app/provider";
 
 //APP ROUTES STACK

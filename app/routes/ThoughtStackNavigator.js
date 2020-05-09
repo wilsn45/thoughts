@@ -3,22 +3,22 @@ import {createStackNavigator} from 'react-navigation-stack';
 
 //IMPORT SCENES
 import HomeScreen from "thoughts/app/scenes/Thoughts/HomeScene";
-import ChatListScreen  from "thoughts/app/scenes/Thoughts/ChatListScene";
-import TalkScreen from "thoughts/app/scenes/Thoughts/TalkScene";
 import MyProfileScene from "thoughts/app/scenes/Profile/MyProfileScene";
 import ProfileScene from "thoughts/app/scenes/Profile/ProfileScene";
-import SettingsScene from "thoughts/app/scenes/Profile/SettingsScene"; ChatScene
-import ChatScene from "thoughts/app/scenes/Messages/ChatScene";
+import SettingsScene from "thoughts/app/scenes/Profile/SettingsScene";
+import ConversationScene from "thoughts/app/scenes/Messages/ConversationScene";
+import ConversationListScene from "thoughts/app/scenes/Messages/ConversationListScene";
+
 
 const ThoughtsStack = createStackNavigator(
     {
         Home: HomeScreen,
-        ChatList: ChatListScreen,
-        Talk: TalkScreen,
         MyProfile : MyProfileScene,
         Profile : ProfileScene,
         Settings : SettingsScene,
-        Chat : ChatScene
+        conversationList : ConversationListScene,
+        conversation : ConversationScene,
+
     },
     { headerMode: 'none' },
     {

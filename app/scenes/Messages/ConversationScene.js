@@ -84,7 +84,7 @@ export default function ChatScene(props) {
   }, []);
 
   function navigateToProfile() {
-  navigate('Home')
+  navigate('conversationList')
   }
 
   function addNewMessage() {

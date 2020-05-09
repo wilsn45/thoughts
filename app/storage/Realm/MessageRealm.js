@@ -1,116 +1,50 @@
 const Realm = require('realm');
-import * as  User  from "thoughts/app/User";
-import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 
-const Chat3Schema = {
-  name: 'Chat3',
+const Message100Schema = {
+  name: 'Message100',
   properties: {
-    useruid:  'string',
-    username: 'string',
-    lastmessage : 'string',
-    lastmessageat : 'int',
-    message : 'Message3[]'
-  }
-};
-
-const Message3Schema = {
-  name: 'Message3',
-  properties: {
-    msdid:  'string',
-    fromusername: 'string',
-    fromuid : 'string',
-    tousername : 'string',
-    touid : 'string',
+    msgid:  'string',
+    useruid: 'string',
+    username : 'string',
     message : 'string',
+    isReceived : 'bool',
     thoughtTitle : 'string?',
     picRef : 'string?',
     audioRef : 'string?',
-    at : 'int'
+    at : 'int',
+    read : 'bool',
+    isMsgArchived : 'bool?'
   }
 };
 
 
-const Schema = [Chat3Schema, Message3Schema];
-
-export function addNewChat(newMessage) {
-return new Promise((resolve,reject) => {
-  Realm.open({schema: Schema})
+export function addNewMessage(newMessage) {
+  Realm.open({schema: [Message100Schema]})
     .then(realm => {
-      const chat = realm.objects('Chat3').filtered('useruid == $0',newMessage.fromuid);
 
-      // realm.write(() => {
-      //   realm.delete(chat);
-      if(chat.length>0) {
-          addNewMessage(newMessage)
-        }else {
-         realm.write(() => {
-          let newFrom = realm.create('Chat3', {
-                lastmessage  : newMessage.message,
-                lastmessageat : newMessage.at,
-                useruid: newMessage.fromuid,
-                username: newMessage.fromusername,
-                message: []
-            });
-            addNewMessage(newMessage)
-          });
-        }
-      // });
-      console.log("chats is "+JSON.stringify(chat))
+      const msg = realm.objects('Message100').filtered('msgid == $0',newMessage.msgid);
 
-      //realm.close();
-      resolve(true)
-  })
-  .catch(error => {
-      console.log("addNewChat error "+error);
-      reject(error)
-    });
-});
-}
-
-export async function addNewMessage(newMessage) {
-  Realm.open({schema: Schema})
-    .then(realm => {
-      console.log("here i am 1 "+newMessage.message)
-      const chat = realm.objects('Chat3').filtered('useruid == $0',newMessage.fromuid);
-
-      const messages = chat[0].message
-
-      let exists = messages.some(el => el.msdid === newMessage.msgid);
-      if(exists) {
-        console.log("message already added")
+      if(msg.length > 0) {
         return
       }
-     console.log("here i am 2 "+newMessage.message)
-     if(newMessage.at > User.messageLast) {
-         User.messageLast = newMessage.at
-         userStorage.setMessageLast(newMessage.at)
-         console.log("updated time is "+User.messageLast)
-     }
 
-      // realm.delete(chat);
       realm.write(() => {
-         console.log("here i am  3"+newMessage.message)
-         chat[0].lastmessage  = newMessage.message
-         chat[0].lastmessageat =  newMessage.at
+         realm.create('Message100', {
+              msgid:  newMessage.msgid,
+              useruid: newMessage.useruid,
+              username : newMessage.username,
+              message : newMessage.message,
+              isReceived : newMessage.isReceived,
+              thoughtTitle : newMessage.thoughtTitle,
+              picRef : newMessage.picRef,
+              audioRef : newMessage.audioRef,
+              at : newMessage.at,
+              isMsgArchived : false,
+              read : false
+            });
 
-            chat[0].message.push({
-                msdid:  newMessage.msgid,
-                fromusername: newMessage.fromusername,
-                fromuid : newMessage.fromuid,
-                tousername : newMessage.tousername,
-                touid : newMessage.touid,
-                message : newMessage.message,
-                thoughtTitle : newMessage.thoughtTitle,
-                picRef : newMessage.picRef,
-                audioRef : newMessage.audioRef,
-                at : newMessage.at
-              })
         });
-        console.log("chats is "+JSON.stringify(chat[0]))
-        // console.log("messages is "+JSON.stringify(messages))
-        // console.log("chats is "+JSON.stringify(chat))
-        // console.log("new message added")
-
+        console.log("messagelist is "+JSON.stringify(realm.objects('Message100')))
 
       //realm.close();
 
@@ -118,4 +52,64 @@ export async function addNewMessage(newMessage) {
   .catch(error => {
       console.log("addNewMessage error "+error);
   });
+}
+
+export function deleteMsg(msgid) {
+  Realm.open({schema: [Message100Schema]})
+    .then(realm => {
+
+      const msgFilter = realm.objects('Message100').filtered('msgid == $0',msgid);
+      realm.write(() => {
+         realm.delete(msgFilter);
+       });
+        console.log("messagelist is "+JSON.stringify(realm.objects('Message100')))
+  })
+  .catch(error => {
+      console.log("addNewMessage error "+error);
+  });
+}
+
+export function clearMSg(msgid) {
+  Realm.open({schema: [Message100Schema]})
+    .then(realm => {
+
+      const allMSg = realm.objects('Message100')
+      realm.write(() => {
+         realm.delete(allMSg);
+       });
+
+  })
+  .catch(error => {
+      console.log("addNewMessage error "+error);
+  });
+}
+
+export function getConversationList() {
+return new Promise((resolve,reject) => {
+  Realm.open({schema: [Message100Schema]})
+    .then(realm => {
+
+      let allMsg = realm.objects('Message100').filtered('TRUEPREDICATE SORT(at DESC) DISTINCT(useruid)')
+      resolve(allMsg)
+  })
+  .catch(error => {
+      console.log("addNewMessage error "+error);
+      reject(error)
+  });
+});
+}
+
+export function getConversation(useruid) {
+return new Promise((resolve,reject) => {
+  Realm.open({schema: [Message100Schema]})
+    .then(realm => {
+
+      let allMsg = realm.objects('Message100').filtered('TRUEPREDICATE useruid = $0 SORT(at DESC)'.useruid)
+      resolve(allMsg)
+  })
+  .catch(error => {
+      console.log("addNewMessage error "+error);
+      reject(error)
+  });
+});
 }

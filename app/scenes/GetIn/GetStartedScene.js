@@ -93,16 +93,16 @@ function showOtc() {
 async function sendOtc () {
     setIsLoading(true)
     try {
-        const number = dial_code+phoneNumber;
-        if (!validE164(number)) {
-            showError("Incorrect phone number")
-            return;
-
-        }
-        Keyboard.dismiss()
-        let phoneNumberPromise = api.numberSignIn(number)
-        let confirmation = await phoneNumberPromise
-        setConfirmation(confirmation)
+        // const number = dial_code+phoneNumber;
+        // if (!validE164(number)) {
+        //     showError("Incorrect phone number")
+        //     return;
+        //
+        // }
+        // Keyboard.dismiss()
+        // let phoneNumberPromise = api.numberSignIn(number)
+        // let confirmation = await phoneNumberPromise
+        // setConfirmation(confirmation)
         showOtc()
 
     } catch (err) {
@@ -120,24 +120,24 @@ async function verifyOtc () {
      let code = otc.replace(/ /g, "")
     setIsLoading(true)
     try {
-        if (otc.length < 6) {
-           showError("Thats not the code")
-           return;
-
-       }
+       //  if (otc.length < 6) {
+       //     showError("Thats not the code")
+       //     return;
+       //
+       // }
        Keyboard.dismiss()
-       let numberVerifyPromise = api.numberVerify(code,confirmation)
-       let user = await numberVerifyPromise;
+       // let numberVerifyPromise = api.numberVerify(code,confirmation)
+       // let user = await numberVerifyPromise;
+       //
+       //  if (!user) {
+       //   showError()
+       //   return
+       //  }
 
-        if (!user) {
-         showError()
-         return
-        }
-
-        // let uid =    "DD9jnDWbPKYPOFD4C355b1ja7bF2"
-        // let number =  "+919958565727"
-        let uid =    user.uid
-        let number =  user.phoneNumber
+        let uid =    "DD9jnDWbPKYPOFD4C355b1ja7bF2"
+        let number =  "+919958565727"
+        // let uid =    user.uid
+        // let number =  user.phoneNumber
 
         console.log("id is " +uid)
         console.log("number is " +number)

@@ -55,20 +55,21 @@ async function navigateToProfile() {
     let messageRef = firestore().collection('messages');
      messageRef.add({
         fromusername : "User A",
-        fromuid : "ED9jnDWbPKYPOFD4C355b1ja7bF2",
+        fromuid : "AD9jnDWbPKYPOFD4C355b1ja7bF2",
         tousername : "Kabir",
         touid : "DD9jnDWbPKYPOFD4C355b1ja7bF2",
-        message : "Message A 2",
+        message : "Message A 5",
         picRef : null,
         audioRef : null,
         thoughtsTitle : null,
         thoughtsRef : 451,
-        at : timestampe
+        at : timestampe,
+        delivered : false
       })
 }
 
   function navigateToAMessages() {
-    navigate('Chat')
+    navigate('conversationList')
   }
 
   function sendMessage(uid) {
