@@ -8,6 +8,7 @@ import * as imageHelper from "thoughts/app/helper/ImageHelper";
 const API_URL = "https://us-central1-thoughts-fe76a.cloudfunctions.net/"
 import * as  User  from "thoughts/app/User";
 import * as messageRealm from "thoughts/app/storage/Realm/MessageRealm";
+const storage = firebase.storage()
 
 export function subscribeMessage(){
 
@@ -27,7 +28,6 @@ export function subscribeMessage(){
            message : documentSnapshot.data().message,
            thoughtTitle : documentSnapshot.data().thoughtTitle,
            picRef : documentSnapshot.data().picRef,
-           audioRef : documentSnapshot.data().audioRef,
            at : documentSnapshot.data().at
          }
 
@@ -43,6 +43,37 @@ export function subscribeMessage(){
 });
   return subscriber
 
+}
+
+export async function sendMessage(message){
+  return new Promise((resolve,reject) => {
+    try {
+      let messageRef = firestore().collection('messages');
+       messageRef.add({
+          fromusername : User.username,
+          fromuid : User.uid,
+          tousername : message.username,
+          touid : message.useruid,
+          message : message.message,
+          at : message.at,
+          delivered : false
+        })
+        messageRealm.addNewMessage(message)
+        resolve(true)
+    }catch(err) {
+        reject(err)
+        console.log("error is "+err)
+    }
+  });
+}
+
+export async function getMinProfileUrl(token){
+  if(!token) {
+    token = User.uid
+  }
+  let resourceName = '/profile_pic_min/'+token+'.jpg'
+  const ref = await storage.ref(resourceName)
+  return await ref.getDownloadURL();
 }
 
 async function handleMessage(documentSnapshot) {

@@ -10,9 +10,17 @@ import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 
 export default function ConversationListCell({message,navigateToConversation}) {
 const[profileURL, setProfileURL] = useState();
+const[msg, setMsg] = useState();
 const { navigate } = useNavigation();
 
 useEffect(() => {
+  if(message.message.length > 20) {
+    let trimedMsg = message.message.substring(1, 19) + "..";
+    setMsg(trimedMsg)
+  } else {
+    setMsg(message.message)
+  }
+  console.log("cell msg "+JSON.stringify(message))
   getURL()
 }, []);
 
@@ -22,7 +30,7 @@ async function getURL() {
 }
 
 return (
-    <TouchableOpacity onPress={() => navigateToConversation(message.useruid)}>
+    <TouchableOpacity onPress={() => navigateToConversation(message.useruid,message.username)}>
     <View style = {styles.container}>
     <View style = {styles.leftView}>
 
@@ -32,7 +40,7 @@ return (
 
     <View style = {styles.rightView}>
     <Text style = {styles.usernameText}> {message.username} </Text>
-    <Text style = {message.read ? styles.messageText : styles.messageTextUnread}> {message.message} </Text>
+    <Text style = {message.read ? styles.messageText : styles.messageTextUnread}> {msg} </Text>
     </View>
 
     </View>

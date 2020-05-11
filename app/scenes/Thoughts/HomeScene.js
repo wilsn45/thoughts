@@ -15,9 +15,8 @@ import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import NewThought from "./NewThoughtModal";
 import Modal from 'react-native-modal';
 import  * as User  from "thoughts/app/User";
-import firestore from '@react-native-firebase/firestore';
 import * as messagesAPI from "thoughts/app/services/MessageServices";
-
+import firestore from '@react-native-firebase/firestore';
 
 export default function HomeScene(props) {
   // let unsubscribe
@@ -48,24 +47,24 @@ export default function HomeScene(props) {
 },[]);
 
 async function navigateToProfile() {
+  // navigate('MyProfile')
+  let unixtime = new Date().valueOf()
+  let timestamp = Math.floor(unixtime/1000)
 
-    let unixtime = new Date().valueOf()
-    let timestampe = Math.floor(unixtime/1000)
-
-    let messageRef = firestore().collection('messages');
-     messageRef.add({
-        fromusername : "User A",
-        fromuid : "AD9jnDWbPKYPOFD4C355b1ja7bF2",
-        tousername : "Kabir",
-        touid : "DD9jnDWbPKYPOFD4C355b1ja7bF2",
-        message : "Message A 5",
-        picRef : null,
-        audioRef : null,
-        thoughtsTitle : null,
-        thoughtsRef : 451,
-        at : timestampe,
-        delivered : false
-      })
+  let messageRef = firestore().collection('messages');
+   messageRef.add({
+      fromusername : "User A",
+      fromuid : "AD9jnDWbPKYPOFD4C355b1ja7bF2",
+      tousername : "Kabir",
+      touid : "DD9jnDWbPKYPOFD4C355b1ja7bF2",
+      message : "Message 2 A",
+      picRef : null,
+      thoughtsTitle : null,
+      thoughtsRef : 451,
+      at : timestamp,
+      delivered : false
+    })
+    console.log("timestampe "+timestamp)
 }
 
   function navigateToAMessages() {

@@ -14,100 +14,93 @@ import Icon from 'react-native-vector-icons/Feather';
 import Modal from 'react-native-modal';
 import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
-import * as api from "thoughts/app/services/ProfileServices";
 import  * as User  from "thoughts/app/User";
-
-
-
-let DATA = [
-{
-  id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-  title: 'First Item',
-},
-{
-  id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-  title: 'Second Item',
-},
-{
-  id: '58694a0f-3da1-471f-bd96-145571e29d72',
-  title: 'Third Item',
-},
-{
-  id: '5839440f-3da1-471f-bd96-145571e29d72',
-  title: 'Forth Item',
-},
-{
-  id: '58394a0f-3da1-471f-bd96-145571e29d72',
-  title: 'Fifth Item',
-},
-{
-  id: '5842594a0f-3da1-471f-bd96-145571e29d72',
-  title: 'Sixth Item',
-},
-{
-  id: '7842594a0f-3da1-471f-bd96-145571e29d72',
-  title: 'Seventh Item',
-},
-{
-  id: '8842594a0f-3da1-471f-bd96-145571e29d72',
-  title: 'Eight Item',
-},
-{
-  id: '9842594a0f-3da1-471f-bd96-145571e29d72',
-  title: 'Ninth Item',
-},
-{
-  id: '1042594a0f-3da1-471f-bd96-145571e29d72',
-  title: 'Tenth Item',
-},
-
-];
-
-function Item({ title }) {
-return (
-  <View style={styles.item}>
-    <Text style={styles.title}>{title}</Text>
-  </View>
-);
-}
-
+import ConversationCell  from "./ConversationCell";
+import * as messageRealm from "thoughts/app/storage/Realm/MessageRealm";
+import * as api from "thoughts/app/services/MessageServices";
+import * as imageHelper from "thoughts/app/helper/ImageHelper";
+import firestore from '@react-native-firebase/firestore';
 
 export default function ChatScene(props) {
   let id =0
   let flatList
+  let textInput
   const { navigate } = useNavigation();
-  const[messages, addMessage] = useState([])
+  const[messages, setMessage] = useState([])
+  const[newMessage, setNewMesage] = useState("")
   let uid = useNavigationParam('uid');
+  let username = useNavigationParam('username');
+  const[userProfileImg, setUserProfileImg] = useState();
+  const[myProfileImg, setMyProfileImg] = useState();
 
   useEffect(() => {
-    addNewMessage()
+    getMessages()
+    getUserPic()
+    getMyPic()
+    messageRealm.attachListner(getMessages)
+    return () => {
+
+    };
   }, []);
 
-  function navigateToProfile() {
-  navigate('conversationList')
+  function getMessages() {
+    console.log("just called")
+    messageRealm.getConversation(uid)
+    .then(msgList => {
+      setMessage(msgList)
+      console.log("conversation is "+JSON.stringify(msgList))
+    })
   }
 
-  function addNewMessage() {
-    id = id+1
-    let me = {
-      id : id,
-      Text : "Me"
-    }
-    id = id+1
-    let you = {
-      id : id,
-      Text : "You"
-    }
-    addMessage(
-      [... messages, me]
-    )
-    addMessage(
-      [... messages, you]
-    )
-
+  function navigateBack() {
+    navigate('conversationList')
   }
 
+  async function getUserPic() {
+    let url = await api.getMinProfileUrl(uid)
+    let imageHelperPromise = imageHelper.saveProfileBase64(url)
+    let profileBase64 = await imageHelperPromise
+    setUserProfileImg(profileBase64)
+  }
 
+  async function getMyPic() {
+    let data = await userStorage.getUserProfileMinBase64()
+    setMyProfileImg(data)
+  }
+
+  function senTextdMessage() {
+    let unixtime = new Date().valueOf()
+    let timestamp = Math.floor(unixtime/1000)
+
+    let newMsg = {
+      msgid:  newMessage.msgid,
+      useruid: uid,
+      username : username,
+      message : "Me 10",
+      isReceived : false,
+      at : timestamp,
+      isMsgArchived : false,
+      read : true
+    }
+    api.sendMessage(newMsg)
+    textInput.clear()
+
+
+    // let messageRef = firestore().collection('messages');
+    //  messageRef.add({
+    //     fromusername : "User A",
+    //     fromuid : "AD9jnDWbPKYPOFD4C355b1ja7bF2",
+    //     tousername : "Kabir",
+    //     touid : "DD9jnDWbPKYPOFD4C355b1ja7bF2",
+    //     message : "Message 10 A",
+    //     picRef : null,
+    //     thoughtsTitle : null,
+    //     thoughtsRef : 451,
+    //     at : timestamp,
+    //     delivered : false
+    //   })
+
+  }
 
 return (
   <KeyboardAvoidingView
@@ -118,7 +111,7 @@ return (
 
   <TouchableOpacity
     style = {styles.backButtonView}
-    onPress={() => navigateToProfile()}
+    onPress={() => navigateBack()}
     underlayColor='#fff'
    >
 
@@ -129,9 +122,10 @@ return (
 
   <View style = {styles.chatView}>
     <FlatList
+      style =  {{width : '100%'}}
       data={messages}
-      renderItem={({ item }) => <Item title={item.Text} />}
-      keyExtractor={item => item.id}
+      renderItem={({ item }) => <ConversationCell message={item}  profilePic={item.isReceived ? userProfileImg: myProfileImg} />}
+      keyExtractor={item => item.at}
       ref={ref => flatList = ref}
       onContentSizeChange={() => flatList.scrollToEnd({animated: true})}
       onLayout={() => flatList.scrollToEnd({animated: true})}
@@ -140,9 +134,11 @@ return (
 
   <View style = {styles.sendView}>
     <TextInput style = {{flex : 0.8, height : 50, marginLeft : 20}}
-      placeholder = "Send"/>
+      placeholder = "Send"
+      ref={ref => textInput = ref}
+      onChangeText={(value) => setNewMesage(value) }/>
       <TouchableOpacity style = {{flex : 0.2, height : 50}}
-      onPress={() => addNewMessage()}
+      onPress={() => senTextdMessage()}
       >
        <Icon name={'send'}  style = {styles.messageView} size={40} />
       </TouchableOpacity>
@@ -176,8 +172,6 @@ const styles = StyleSheet.create({
   chatView : {
     flex : 0.86,
     width : '100%',
-    // borderColor : "#149cea",
-    // borderWidth : 2,
     alignItems : "center"
   },
   sendView : {

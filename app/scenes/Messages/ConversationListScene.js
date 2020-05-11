@@ -27,10 +27,10 @@ export default function ConversationListScene(props) {
   let uid = useNavigationParam('uid');
 
   useEffect(() => {
+    // messageRealm.clearMSg()
       messageRealm.getConversationList()
       .then(msgList => {
         setMessageList(msgList)
-        console.log("messagelist is "+JSON.stringify(msgList))
       })
 
       // console.log("i am being called")
@@ -44,10 +44,9 @@ export default function ConversationListScene(props) {
   navigate('Home')
 }
 
- function navigateToConversation(fromuid) {
-   console.log("navigate to conversation "+fromuid)
-   navigate('conversation')
- }
+ function navigateToConversation(uid,username) {
+   navigate('conversation',{uid : uid,username:username} )
+}
 
 
 return (
