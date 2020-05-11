@@ -45,7 +45,7 @@ export function subscribeMessage(){
 
 }
 
-export async function sendMessage(message){
+export async function sendTextMessage(message){
   return new Promise((resolve,reject) => {
     try {
       let messageRef = firestore().collection('messages');
@@ -59,6 +59,29 @@ export async function sendMessage(message){
           delivered : false
         })
         messageRealm.addNewMessage(message)
+        resolve(true)
+    }catch(err) {
+        reject(err)
+        console.log("error is "+err)
+    }
+  });
+}
+
+export async function sendImageMessage(message){
+  return new Promise((resolve,reject) => {
+    try {
+      let messageRef = firestore().collection('messages');
+       messageRealm.addNewMessage(message)
+       // messageRef.add({
+       //    fromusername : User.username,
+       //    fromuid : User.uid,
+       //    tousername : message.username,
+       //    touid : message.useruid,
+       //    message : message.message,
+       //    at : message.at,
+       //    delivered : false
+       //  })
+
         resolve(true)
     }catch(err) {
         reject(err)

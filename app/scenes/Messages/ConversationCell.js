@@ -24,7 +24,8 @@ return (
        {message.isReceived &&   <Image style={styles.imageView} source={{uri: profilePic}}/> }
         </View>
         <View style =  {message.isReceived ? styles.rightViewReceived : styles.rightView}>
-        <Text style = {styles.messageText} > {message.message} </Text>
+        { !message.picRef && <Text style = {styles.messageText} > {message.message} </Text> }
+        { message.picRef &&  <ImageView source = {imageOne} />  }
         </View>
       </View>
     </View>

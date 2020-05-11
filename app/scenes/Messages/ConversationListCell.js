@@ -20,7 +20,6 @@ useEffect(() => {
   } else {
     setMsg(message.message)
   }
-  console.log("cell msg "+JSON.stringify(message))
   getURL()
 }, []);
 

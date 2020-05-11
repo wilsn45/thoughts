@@ -57,7 +57,7 @@ async function navigateToProfile() {
       fromuid : "AD9jnDWbPKYPOFD4C355b1ja7bF2",
       tousername : "Kabir",
       touid : "DD9jnDWbPKYPOFD4C355b1ja7bF2",
-      message : "Message 2 A",
+      message : "Message A 1",
       picRef : null,
       thoughtsTitle : null,
       thoughtsRef : 451,

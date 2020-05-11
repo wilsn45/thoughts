@@ -20,6 +20,15 @@ import * as messageRealm from "thoughts/app/storage/Realm/MessageRealm";
 import * as api from "thoughts/app/services/MessageServices";
 import * as imageHelper from "thoughts/app/helper/ImageHelper";
 import firestore from '@react-native-firebase/firestore';
+import ImagePicker from 'react-native-image-picker';
+
+const options = {
+  title: 'Select Image',
+   storageOptions: {
+    skipBackup: true,
+    path: 'images',
+  },
+};
 
 export default function ChatScene(props) {
   let id =0
@@ -32,6 +41,7 @@ export default function ChatScene(props) {
   let username = useNavigationParam('username');
   const[userProfileImg, setUserProfileImg] = useState();
   const[myProfileImg, setMyProfileImg] = useState();
+  const [imagePath, setImagePath] = useState()
 
   useEffect(() => {
     getMessages()
@@ -48,7 +58,7 @@ export default function ChatScene(props) {
     messageRealm.getConversation(uid)
     .then(msgList => {
       setMessage(msgList)
-      console.log("conversation is "+JSON.stringify(msgList))
+      //console.log("conversation is "+JSON.stringify(msgList))
     })
   }
 
@@ -68,21 +78,21 @@ export default function ChatScene(props) {
     setMyProfileImg(data)
   }
 
-  function senTextdMessage() {
+  function sendTextMessage() {
     let unixtime = new Date().valueOf()
     let timestamp = Math.floor(unixtime/1000)
 
     let newMsg = {
-      msgid:  newMessage.msgid,
+      msgid:  timestamp.toString(),
       useruid: uid,
       username : username,
-      message : "Me 10",
+      message : newMessage,
       isReceived : false,
       at : timestamp,
       isMsgArchived : false,
       read : true
     }
-    api.sendMessage(newMsg)
+    api.sendTextMessage(newMsg)
     textInput.clear()
 
 
@@ -92,13 +102,47 @@ export default function ChatScene(props) {
     //     fromuid : "AD9jnDWbPKYPOFD4C355b1ja7bF2",
     //     tousername : "Kabir",
     //     touid : "DD9jnDWbPKYPOFD4C355b1ja7bF2",
-    //     message : "Message 10 A",
+    //     message : "Message A 4",
     //     picRef : null,
     //     thoughtsTitle : null,
     //     thoughtsRef : 451,
     //     at : timestamp,
     //     delivered : false
     //   })
+
+  }
+
+  function sendImageMessage() {
+    ImagePicker.showImagePicker(options, (response) => {
+             console.log('Response = ', response);
+        if (response.didCancel) {
+
+    } else if (response.error) {
+
+    } else if (response.customButton) {
+
+    } else {
+         const source = { uri: response.uri };
+         setImagePath(source)
+         let unixtime = new Date().valueOf()
+         let timestamp = Math.floor(unixtime/1000)
+
+         let newMsg = {
+           msgid:  timestamp,
+           useruid: uid,
+           username : username,
+           message : "nothing",
+           picRef : source,
+           remoteurl : "remote url",
+           isReceived : false,
+           at : timestamp,
+           isMsgArchived : false,
+           read : true
+         }
+         api.sendImageMessage(newMsg)
+        }
+     });
+
 
   }
 
@@ -125,7 +169,7 @@ return (
       style =  {{width : '100%'}}
       data={messages}
       renderItem={({ item }) => <ConversationCell message={item}  profilePic={item.isReceived ? userProfileImg: myProfileImg} />}
-      keyExtractor={item => item.at}
+      keyExtractor={item => item.msgid}
       ref={ref => flatList = ref}
       onContentSizeChange={() => flatList.scrollToEnd({animated: true})}
       onLayout={() => flatList.scrollToEnd({animated: true})}
@@ -138,7 +182,7 @@ return (
       ref={ref => textInput = ref}
       onChangeText={(value) => setNewMesage(value) }/>
       <TouchableOpacity style = {{flex : 0.2, height : 50}}
-      onPress={() => senTextdMessage()}
+      onPress={() => sendTextMessage()}
       >
        <Icon name={'send'}  style = {styles.messageView} size={40} />
       </TouchableOpacity>
