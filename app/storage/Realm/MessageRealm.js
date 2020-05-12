@@ -4,8 +4,8 @@ const Realm = require('realm');
 //message optional
 //rename picRef
 //remove archive
-const Message97Schema = {
-  name: 'Message97',
+const Message96Schema = {
+  name: 'Message96',
   properties: {
     msgid:  'string?',
     useruid: 'string',
@@ -13,7 +13,7 @@ const Message97Schema = {
     message : 'string?',
     isReceived : 'bool',
     thoughtTitle : 'string?',
-    image : 'data?',
+    image : 'string?',
     at : 'int',
     read : 'bool',
     isMsgArchived : 'bool?'
@@ -22,32 +22,32 @@ const Message97Schema = {
 
 
 export function addNewMessage(newMessage) {
-  Realm.open({schema: [Message97Schema]})
+  Realm.open({schema: [Message96Schema]})
     .then(realm => {
 
-      const msg = realm.objects('Message97').filtered('msgid == $0',newMessage.msgid);
-      console.log("adding msg "+ msg)
+      const msg = realm.objects('Message96').filtered('msgid == $0',newMessage.msgid);
+      console.log("adding msg "+ newMessage)
       if(msg.isReceived && msg.length > 0) {
         console.log("ignoring msg "+msg)
         return
       }
 
       realm.write(() => {
-         realm.create('Message97', {
+         realm.create('Message96', {
               msgid:  newMessage.msgid,
               useruid: newMessage.useruid,
               username : newMessage.username,
               message : newMessage.message,
               isReceived : newMessage.isReceived,
               thoughtTitle : newMessage.thoughtTitle,
-              picRef : newMessage.picRef,
+              image : newMessage.image,
               at : newMessage.at,
               isMsgArchived : false,
               read : !newMessage.isReceived
             });
 
         });
-      //  console.log("messagelist is "+JSON.stringify(realm.objects('Message97')))
+      //  console.log("messagelist is "+JSON.stringify(realm.objects('Message96')))
 
       //realm.close();
 
@@ -58,14 +58,14 @@ export function addNewMessage(newMessage) {
 }
 
 export function deleteMsg(msgid) {
-  Realm.open({schema: [Message97Schema]})
+  Realm.open({schema: [Message96Schema]})
     .then(realm => {
 
-      const msgFilter = realm.objects('Message97').filtered('msgid == $0',msgid);
+      const msgFilter = realm.objects('Message96').filtered('msgid == $0',msgid);
       realm.write(() => {
          realm.delete(msgFilter);
        });
-        console.log("messagelist is "+JSON.stringify(realm.objects('Message97')))
+        console.log("messagelist is "+JSON.stringify(realm.objects('Message96')))
   })
   .catch(error => {
       console.log("addNewMessage error "+error);
@@ -73,10 +73,10 @@ export function deleteMsg(msgid) {
 }
 
 export function clearMSg(msgid) {
-  Realm.open({schema: [Message97Schema]})
+  Realm.open({schema: [Message96Schema]})
     .then(realm => {
 
-      const allMSg = realm.objects('Message97')
+      const allMSg = realm.objects('Message96')
       realm.write(() => {
          realm.delete(allMSg);
        });
@@ -89,10 +89,10 @@ export function clearMSg(msgid) {
 
 export function getConversationList() {
 return new Promise((resolve,reject) => {
-  Realm.open({schema: [Message97Schema]})
+  Realm.open({schema: [Message96Schema]})
     .then(realm => {
 
-      let allMsg = realm.objects('Message97').filtered('TRUEPREDICATE SORT(at DESC) DISTINCT(useruid)')
+      let allMsg = realm.objects('Message96').filtered('TRUEPREDICATE SORT(at DESC) DISTINCT(useruid)')
       resolve(allMsg)
   })
   .catch(error => {
@@ -104,10 +104,10 @@ return new Promise((resolve,reject) => {
 
 export function getConversation(useruid) {
 return new Promise((resolve,reject) => {
-  Realm.open({schema: [Message97Schema]})
+  Realm.open({schema: [Message96Schema]})
     .then(realm => {
 
-      let allMsg = realm.objects('Message97').filtered('useruid == $0',useruid)
+      let allMsg = realm.objects('Message96').filtered('useruid == $0',useruid)
       resolve(allMsg)
   })
   .catch(error => {
@@ -118,7 +118,7 @@ return new Promise((resolve,reject) => {
 }
 
 export function attachListner(updateMessage) {
-  Realm.open({schema: [Message97Schema]})
+  Realm.open({schema: [Message96Schema]})
     .then(realm => {
       realm.addListener('change', updateMessage);
   })

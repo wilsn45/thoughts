@@ -57,6 +57,13 @@ export default function ChatScene(props) {
     console.log("just called")
     messageRealm.getConversation(uid)
     .then(msgList => {
+       console.log("realm msg is "+JSON.stringify(msgList))
+      // let getMsg = []
+      // for (msg in msgList) {
+      //   if(!getMsg.filter(e => e.msgid === msgList[msg].msgid).length > 0)
+      //   getMsg.push(msgList[msg])
+      //   console.log("unique msg is "+JSON.stringify(msgList[msg]))
+      // }
       setMessage(msgList)
       //console.log("conversation is "+JSON.stringify(msgList))
     })
@@ -114,7 +121,6 @@ export default function ChatScene(props) {
 
   function sendImageMessage() {
     ImagePicker.showImagePicker(options, (response) => {
-             console.log('Response = ', response);
         if (response.didCancel) {
 
     } else if (response.error) {
@@ -128,11 +134,11 @@ export default function ChatScene(props) {
          let timestamp = Math.floor(unixtime/1000)
 
          let newMsg = {
-           msgid:  timestamp,
+           msgid:  timestamp.toString(),
            useruid: uid,
            username : username,
            message : "nothing",
-           picRef : source,
+           image : response.uri,
            remoteurl : "remote url",
            isReceived : false,
            at : timestamp,
@@ -182,7 +188,7 @@ return (
       ref={ref => textInput = ref}
       onChangeText={(value) => setNewMesage(value) }/>
       <TouchableOpacity style = {{flex : 0.2, height : 50}}
-      onPress={() => sendTextMessage()}
+      onPress={() => sendImageMessage()}
       >
        <Icon name={'send'}  style = {styles.messageView} size={40} />
       </TouchableOpacity>

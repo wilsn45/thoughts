@@ -8,10 +8,12 @@ import * as api from "thoughts/app/services/ProfileServices";
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 
-export default function ConversationCell({message,profilePic,navigateToUser,}) {
+export default function ConversationCell({message,profilePic,navigateToUser}) {
 const { navigate } = useNavigation();
-
+const[image, setImage] = useState(null)
+let source
 useEffect(() => {
+  setImage(message.image)
 }, []);
 
 return (
@@ -21,11 +23,11 @@ return (
 
    <View style = {message.isReceived ? styles.receivedMsg : styles.sendMsg}>
       <View style = {message.isReceived ? styles.leftViewReceived : styles.leftView}>
-       {message.isReceived &&   <Image style={styles.imageView} source={{uri: profilePic}}/> }
+       {message.isReceived &&   <Image style={styles.profileView} source={{uri: profilePic}}/> }
         </View>
         <View style =  {message.isReceived ? styles.rightViewReceived : styles.rightView}>
-        { !message.picRef && <Text style = {styles.messageText} > {message.message} </Text> }
-        { message.picRef &&  <ImageView source = {imageOne} />  }
+        { !image && <Text style = {styles.messageText} > {message.message} </Text> }
+        { image &&  <Image style = {styles.imageView} source = {{uri :image}} />  }
         </View>
       </View>
     </View>
@@ -56,7 +58,7 @@ const styles = StyleSheet.create ({
     paddingLeft : 10,
     paddingTop : 10
   },
-  imageView : {
+  profileView : {
     width : 30,
     height : 30,
     borderRadius : 15,
@@ -106,5 +108,11 @@ const styles = StyleSheet.create ({
     fontWeight : "bold",
     marginBottom : 20,
   },
+  imageView : {
+    width : 100,
+    height : 100
+  }
 
 });
+// { !image && <Text style = {styles.messageText} > {message.message} </Text> }
+// { image &&  <Image style = {styles.imageView} source = {{uri :image}} />  }

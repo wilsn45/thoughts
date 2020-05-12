@@ -72,6 +72,7 @@ export async function sendImageMessage(message){
     try {
       let messageRef = firestore().collection('messages');
        messageRealm.addNewMessage(message)
+       console.log("image msg in "+JSON.stringify(message))
        // messageRef.add({
        //    fromusername : User.username,
        //    fromuid : User.uid,
@@ -105,3 +106,6 @@ async function handleMessage(documentSnapshot) {
 export function unsubscribeMessage() {
   subscriber = null
 }
+
+
+//picRef":{"uri":"file:///Users/wilsonshakya/Library/Developer/CoreSimulator/Devices/FD9BC9A8-9D4D-46A7-A1DB-FE136551835D/data/Containers/Data/Application/7EB226D4-FE89-4194-A08B-B1C55F4E5E4E/Documents/images/0F6DEF3D-16FF-4F7D-A6D6-DB6DFF8A2392.jpg"}

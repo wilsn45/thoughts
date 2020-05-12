@@ -14,14 +14,54 @@ const[msg, setMsg] = useState();
 const { navigate } = useNavigation();
 
 useEffect(() => {
+  getURL()
+  if(message.image) {
+    setMsg("image")
+    return
+  }
   if(message.message.length > 20) {
     let trimedMsg = message.message.substring(1, 19) + "..";
     setMsg(trimedMsg)
   } else {
     setMsg(message.message)
   }
-  getURL()
 }, []);
+
+function textStyle() {
+
+  return {  fontSize: 18,
+  fontFamily: "Thonburi",
+  fontWeight : "bold",
+  marginBottom : 20,
+  fontStyle: 'italic'
+  }
+  // if(message.image) {
+  //   console.log("is image")
+  //   return {  fontSize: 18,
+  //   fontFamily: "Thonburi",
+  //   fontWeight : "bold",
+  //   marginBottom : 20,
+  //   fontStyle: 'italic'
+  //   }
+  // } else {
+  //   if(message.read) {
+  //    return {  fontSize: 18,
+  //    fontFamily: "Thonburi",
+  //    fontWeight : "100",
+  //    marginBottom : 20,
+  //    }
+  //  }
+  //  else  {
+  //    return {
+  //      fontSize: 18,
+  //      fontFamily: "Thonburi",
+  //      fontWeight : "bold",
+  //      marginBottom : 20,
+  //    }
+  //  }
+  // }
+
+}
 
 async function getURL() {
   let url = await api.getMinProfileUrl(message.useruid)
@@ -39,7 +79,7 @@ return (
 
     <View style = {styles.rightView}>
     <Text style = {styles.usernameText}> {message.username} </Text>
-    <Text style = {message.read ? styles.messageText : styles.messageTextUnread}> {msg} </Text>
+    <Text style = {textStyle()}> {msg} </Text>
     </View>
 
     </View>
@@ -85,18 +125,6 @@ const styles = StyleSheet.create ({
     fontFamily: "Thonburi",
     fontWeight : "100",
     marginBottom : 15,
-  },
-  messageText : {
-    fontSize: 18,
-    fontFamily: "Thonburi",
-    fontWeight : "100",
-    marginBottom : 20,
-  },
-  messageTextUnread : {
-    fontSize: 18,
-    fontFamily: "Thonburi",
-    fontWeight : "bold",
-    marginBottom : 20,
   },
 
 });
