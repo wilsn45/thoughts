@@ -57,15 +57,8 @@ export default function ChatScene(props) {
     console.log("just called")
     messageRealm.getConversation(uid)
     .then(msgList => {
-       console.log("realm msg is "+JSON.stringify(msgList))
-      // let getMsg = []
-      // for (msg in msgList) {
-      //   if(!getMsg.filter(e => e.msgid === msgList[msg].msgid).length > 0)
-      //   getMsg.push(msgList[msg])
-      //   console.log("unique msg is "+JSON.stringify(msgList[msg]))
-      // }
+       // console.log("realm msg is "+JSON.stringify(msgList))
       setMessage(msgList)
-      //console.log("conversation is "+JSON.stringify(msgList))
     })
   }
 
@@ -88,7 +81,7 @@ export default function ChatScene(props) {
   function sendTextMessage() {
     let unixtime = new Date().valueOf()
     let timestamp = Math.floor(unixtime/1000)
-
+    //
     let newMsg = {
       msgid:  timestamp.toString(),
       useruid: uid,
@@ -128,25 +121,11 @@ export default function ChatScene(props) {
     } else if (response.customButton) {
 
     } else {
-         const source = { uri: response.uri };
-         setImagePath(source)
-         let unixtime = new Date().valueOf()
-         let timestamp = Math.floor(unixtime/1000)
 
-         let newMsg = {
-           msgid:  timestamp.toString(),
-           useruid: uid,
-           username : username,
-           message : "nothing",
-           image : response.uri,
-           remoteurl : "remote url",
-           isReceived : false,
-           at : timestamp,
-           isMsgArchived : false,
-           read : true
-         }
-         api.sendImageMessage(newMsg)
-        }
+         // api.sendImageMessage(username,uid,response.uri)
+
+         api.sendReceivedImage(response.uri)
+       }
      });
 
 

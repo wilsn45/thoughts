@@ -15,6 +15,7 @@ const { navigate } = useNavigation();
 
 useEffect(() => {
   getURL()
+  //console.log("message is " +JSON.stringify(message))
   if(message.image) {
     setMsg("image")
     return

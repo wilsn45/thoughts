@@ -4,7 +4,7 @@ import {View,
         Image,
         StyleSheet,
         TouchableOpacity} from 'react-native';
-import * as api from "thoughts/app/services/ProfileServices";
+import * as api from "thoughts/app/services/MessageServices";
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 
@@ -13,8 +13,22 @@ const { navigate } = useNavigation();
 const[image, setImage] = useState(null)
 let source
 useEffect(() => {
-  setImage(message.image)
+  if(message.image) {
+    getImageURL()
+  }
+  console.log("message is "+message)
 }, []);
+
+async function getImageURL() {
+  if(!message.isMsgArchived) {
+    console.log("url is image "+message.image)
+    setImage(message.image)
+    return
+  }
+  let downloadUrl = await api.getChatImage(message.image)
+  console.log("download url is "+JSON.stringify(downloadUrl))
+  setImage(downloadUrl)
+}
 
 return (
     <TouchableOpacity onPress={() => navigateToConversation(message.useruid)}>

@@ -31,6 +31,7 @@ export default function ConversationListScene(props) {
       messageRealm.getConversationList()
       .then(msgList => {
         setMessageList(msgList)
+        console.log("messages are "+JSON.stringify(msgList))
       })
 
       // console.log("i am being called")

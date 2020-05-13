@@ -27,13 +27,13 @@ export function subscribeMessage(){
            isReceived : true,
            message : documentSnapshot.data().message,
            thoughtTitle : documentSnapshot.data().thoughtTitle,
-           picRef : documentSnapshot.data().picRef,
+           image : documentSnapshot.data().image,
            at : documentSnapshot.data().at
          }
 
          firestore().collection('messages').doc(documentSnapshot.id).update({delivered : true})
           // documentSnapshot.update({read : true})
-         // console.log("evaluated message "+JSON.stringify(message))
+         console.log("evaluated message "+JSON.stringify(message))
          // console.log("************************")
          messageRealm.addNewMessage(message)
          // messageRealm.clearMSg()
@@ -67,28 +67,49 @@ export async function sendTextMessage(message){
   });
 }
 
-export async function sendImageMessage(message){
-  return new Promise((resolve,reject) => {
-    try {
-      let messageRef = firestore().collection('messages');
-       messageRealm.addNewMessage(message)
-       console.log("image msg in "+JSON.stringify(message))
-       // messageRef.add({
-       //    fromusername : User.username,
-       //    fromuid : User.uid,
-       //    tousername : message.username,
-       //    touid : message.useruid,
-       //    message : message.message,
-       //    at : message.at,
-       //    delivered : false
-       //  })
+export async function sendImageMessage(username,useruid,imageurll){
+  try {
 
-        resolve(true)
+      let unixtime = new Date().valueOf()
+      let timestamp = Math.floor(unixtime/1000)
+      let messageRef = firestore().collection('messages');
+
+      let ext = imageurll.split('.').pop();
+      let imagePath =  User.uid +'_'+timestamp+'.'+ext
+      const reference = firebase.storage().ref('chat/'+imagePath);
+
+       await reference.putFile(imageurll);
+
+       let downloadUrl = await getImageURL('chat/'+imagePath)
+       console.log("download url is "+downloadUrl)
+
+
+       let realmMessage = {
+         msgid:  timestamp.toString(),
+         useruid: useruid,
+         username : username,
+         image : downloadUrl,
+         isReceived : false,
+         at : timestamp,
+         isMsgArchived : false,
+         read : true
+       }
+       messageRealm.addNewMessage(realmMessage)
+
+       messageRef.add({
+          fromusername : User.username,
+          fromuid : User.uid,
+          tousername : username,
+          touid : useruid,
+          image : downloadUrl,
+          at : timestamp,
+          delivered : false
+        })
+
+       console.log("file uploaded ")
     }catch(err) {
-        reject(err)
         console.log("error is "+err)
     }
-  });
 }
 
 export async function getMinProfileUrl(token){
@@ -98,6 +119,41 @@ export async function getMinProfileUrl(token){
   let resourceName = '/profile_pic_min/'+token+'.jpg'
   const ref = await storage.ref(resourceName)
   return await ref.getDownloadURL();
+}
+
+export async function getImageURL(resourceName){
+  const ref = await storage.ref(resourceName)
+  return await ref.getDownloadURL();
+}
+
+export async function sendReceivedImage(image) {
+  let unixtime = new Date().valueOf()
+  let timestamp = Math.floor(unixtime/1000)
+
+  let senderuid = "AD9jnDWbPKYPOFD4C355b1ja7bF2"
+
+  let ext = image.split('.').pop();
+  let imagePath = senderuid +'_'+timestamp+'.'+ext
+
+  console.log("image path "+imagePath)
+
+  const reference = firebase.storage().ref('chat/'+imagePath);
+  await reference.putFile(image);
+
+  let downloadUrl = await getImageURL('chat/'+imagePath)
+  console.log("download url is "+downloadUrl)
+
+
+  let messageRef = firestore().collection('messages');
+   messageRef.add({
+      fromusername : "User A",
+      fromuid : senderuid,
+      tousername : "Kabir",
+      touid : "DD9jnDWbPKYPOFD4C355b1ja7bF2",
+      image : downloadUrl,
+      at : timestamp,
+      delivered : false
+    })
 }
 
 async function handleMessage(documentSnapshot) {
