@@ -54,7 +54,6 @@ export default function ChatScene(props) {
   }, []);
 
   function getMessages() {
-    console.log("just called")
     messageRealm.getConversation(uid)
     .then(msgList => {
        // console.log("realm msg is "+JSON.stringify(msgList))
@@ -122,9 +121,9 @@ export default function ChatScene(props) {
 
     } else {
 
-         // api.sendImageMessage(username,uid,response.uri)
+         api.sendImageMessage(username,uid,response.uri)
 
-         api.sendReceivedImage(response.uri)
+         // api.sendReceivedImage(response.uri)
        }
      });
 

@@ -16,17 +16,15 @@ useEffect(() => {
   if(message.image) {
     getImageURL()
   }
-  console.log("message is "+message)
+  console.log("message is "+JSON.stringify(message))
 }, []);
 
 async function getImageURL() {
   if(!message.isMsgArchived) {
-    console.log("url is image "+message.image)
     setImage(message.image)
     return
   }
   let downloadUrl = await api.getChatImage(message.image)
-  console.log("download url is "+JSON.stringify(downloadUrl))
   setImage(downloadUrl)
 }
 

@@ -27,7 +27,7 @@ export function addNewMessage(newMessage) {
     .then(realm => {
 
       const msg = realm.objects('Message95').filtered('msgid == $0',newMessage.msgid);
-      console.log("adding msg "+ JSON.stringify(newMessage))
+      // console.log("adding msg "+ JSON.stringify(newMessage))
       if(msg.isReceived && msg.length > 0) {
         console.log("ignoring msg "+msg)
         return
@@ -48,7 +48,7 @@ export function addNewMessage(newMessage) {
             });
 
         });
-       console.log("messagelist is "+JSON.stringify(realm.objects('Message95')))
+       // console.log("messagelist is "+JSON.stringify(realm.objects('Message95')))
 
       //realm.close();
 
@@ -116,6 +116,25 @@ return new Promise((resolve,reject) => {
       reject(error)
   });
 });
+}
+
+export function updateImageUrl(msgid,downloadUrl) {
+  return new Promise((resolve,reject) => {
+    Realm.open({schema: [Message95Schema]})
+      .then(realm => {
+        const msgFilter = realm.objects('Message95').filtered('msgid == $0',msgid);
+        console.log("updating objects "+JSON.stringify(msgFilter))
+        realm.write(() => {
+           msgFilter[0].image = downloadUrl
+         });
+         console.log("after update "+JSON.stringify(msgFilter))
+         resolve(true)
+    })
+    .catch(error => {
+        console.log("addNewMessage error "+error);
+        reject(error)
+    });
+  });
 }
 
 export function attachListner(updateMessage) {

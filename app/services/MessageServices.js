@@ -74,27 +74,29 @@ export async function sendImageMessage(username,useruid,imageurll){
       let timestamp = Math.floor(unixtime/1000)
       let messageRef = firestore().collection('messages');
 
+      let realmMessage = {
+        msgid:  timestamp.toString(),
+        useruid: useruid,
+        username : username,
+        image : imageurll,
+        isReceived : false,
+        at : timestamp,
+        isMsgArchived : false,
+        read : true
+      }
+      messageRealm.addNewMessage(realmMessage)
+
       let ext = imageurll.split('.').pop();
       let imagePath =  User.uid +'_'+timestamp+'.'+ext
       const reference = firebase.storage().ref('chat/'+imagePath);
 
-       await reference.putFile(imageurll);
+      await reference.putFile(imageurll);
 
-       let downloadUrl = await getImageURL('chat/'+imagePath)
-       console.log("download url is "+downloadUrl)
+      let downloadUrl = await getImageURL('chat/'+imagePath)
+       // console.log("download url is "+downloadUrl)
 
 
-       let realmMessage = {
-         msgid:  timestamp.toString(),
-         useruid: useruid,
-         username : username,
-         image : downloadUrl,
-         isReceived : false,
-         at : timestamp,
-         isMsgArchived : false,
-         read : true
-       }
-       messageRealm.addNewMessage(realmMessage)
+       messageRealm.updateImageUrl(timestamp.toString(),downloadUrl)
 
        messageRef.add({
           fromusername : User.username,
