@@ -305,7 +305,7 @@ export async function block(useruid,blockingusername){
       }else
         return false
   }catch (e) {
-      console.log("api unfollow is "+e)
+      console.log("api block is "+e)
       throw new Error(e);
   }
 }

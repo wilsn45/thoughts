@@ -2,7 +2,7 @@ const Realm = require('realm');
 
 
 
-//add thought ref
+//remove isMsgArchived
 const Message95Schema = {
   name: 'Message95',
   properties: {
@@ -28,7 +28,7 @@ export function addNewMessage(newMessage) {
 
       const msg = realm.objects('Message95').filtered('msgid == $0',newMessage.msgid);
       // console.log("adding msg "+ JSON.stringify(newMessage))
-      if(msg.isReceived && msg.length > 0) {
+      if(msg.length > 0) {
         console.log("ignoring msg "+msg)
         return
       }
@@ -109,6 +109,7 @@ return new Promise((resolve,reject) => {
     .then(realm => {
 
       let allMsg = realm.objects('Message95').filtered('useruid == $0',useruid)
+        // console.log("realm msg array is "+JSON.stringify(allMsg))
       resolve(allMsg)
   })
   .catch(error => {

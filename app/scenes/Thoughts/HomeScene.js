@@ -53,11 +53,11 @@ async function navigateToProfile() {
 
   let messageRef = firestore().collection('messages');
    messageRef.add({
-      fromusername : "User A",
+      fromusername : "User 4",
       fromuid : "AD9jnDWbPKYPOFD4C355b1ja7bF2",
       tousername : "Kabir",
       touid : "DD9jnDWbPKYPOFD4C355b1ja7bF2",
-      message : "Message A 1",
+      message : "Message A 2",
       at : timestamp,
       delivered : false
     })

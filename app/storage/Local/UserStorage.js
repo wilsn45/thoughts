@@ -14,6 +14,8 @@ const ShowOnlyKey = "@ShowOnly"
 const ShowExceptKey = "@ShowExcept"
 const HiddenKey = "@Hidden"
 const IsPrivateProfileKey = "@IsPrivateProfile"
+const FavoriteConversationKey = "@FavoriteConversation"
+
 
 export async function setUserToken (token){
   try {
@@ -261,6 +263,45 @@ export async function getIsPrivate () {
     throw new Error(err.message)
   }
 }
+
+// export async function setFavouriteConversatin(uid) {
+//   try {
+//     let favCon = await getFavoriteConversation()
+//     favCon.push(uid)
+//     let hiddenPromise = AsyncStorage.setItem(FavoriteConversationKey,JSON.stringify(favCon))
+//     await hiddenPromise
+//    } catch (err) {
+//     throw new Error(err.message)
+//   }
+// }
+//
+// export async function removeFavoriteConversation(uid) {
+//   try {
+//     let favCon = await getFavoriteConversation()
+//
+//     const index = array.indexOf(uid);
+//       if (index > -1) {
+//         favCon.splice(index, 1);
+//      }
+//     favCon.push(uid)
+//     let hiddenPromise = AsyncStorage.setItem(FavoriteConversationKey,JSON.stringify(favCon))
+//     await hiddenPromise
+//    } catch (err) {
+//     throw new Error(err.message)
+//   }
+// }
+// export async function getFavoriteConversation () {
+//   try {
+//     let hiddenPromise = AsyncStorage.getItem(FavoriteConversationKey)
+//     let users = await hiddenPromise
+//     if(users) {
+//       return  JSON.parse(users)
+//     }
+//     return []
+//   } catch (err) {
+//     throw new Error(err.message)
+//   }
+// }
 
 export async function setUserData(token,number,country)  {
   try {

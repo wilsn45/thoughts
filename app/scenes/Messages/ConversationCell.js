@@ -16,7 +16,7 @@ useEffect(() => {
   if(message.image) {
     getImageURL()
   }
-  console.log("message is "+JSON.stringify(message))
+  // console.log("message is "+JSON.stringify(message))
 }, []);
 
 async function getImageURL() {
