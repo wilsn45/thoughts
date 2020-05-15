@@ -13,7 +13,6 @@ import Icon from 'react-native-vector-icons/Feather';
 import Modal from 'react-native-modal';
 import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
-import SelectViewerModal from "./SelectViewerModal";
 import BlockedListModal  from "./BlockedListModal";
 import * as api from "thoughts/app/services/ProfileServices";
 import  * as User  from "thoughts/app/User";
@@ -34,10 +33,7 @@ export default function SettingsScene(props) {
   }, []);
 
  async function loadValues() {
-    let option = await userStorage.getSelectShowOption()
-    setSelectedOption(option)
     let isPrivate = User.isPrivate
-    console.log("current private state "+isPrivate)
     setPrivateState(isPrivate)
 }
   async function navigateToProfile() {
@@ -52,28 +48,6 @@ export default function SettingsScene(props) {
     setShowThought(!showThought)
   }
 
-  async function selectShowAll() {
-     setSelectedOption("1")
-     await userStorage.setSelectShowOption("1")
-  }
-
-  function selectShowOnly() {
-    setShowSelectModal(true)
-    setSelectionOption("Only")
-  }
-  function selectShowExcept() {
-    setShowSelectModal(true)
-    setSelectionOption("Except")
-  }
-
-  function selectHidden() {
-    setShowSelectModal(true)
-    setSelectionOption("Hide")
-  }
-
-  function showBlockedUser() {
-    setShowBlockedList(true)
-  }
 
   function modalCloseCallBack() {
       setShowSelectModal(false)
@@ -83,33 +57,11 @@ export default function SettingsScene(props) {
     setShowBlockedList(false)
   }
 
-  async function modalDoneCallBack(list) {
-    try {
-      setShowSelectModal(false)
-      if(selectionOption == "Only") {
-        await userStorage.setShowOnly(list)
-        await userStorage.setSelectShowOption("3")
-        setSelectedOption("3")
-      }
-      else if(selectionOption == "Except") {
-        await userStorage.setShowExcept(list)
-        await userStorage.setSelectShowOption("2")
-        setSelectedOption("2")
-      }else  if(selectionOption == "Hide"){
-        await userStorage.setHidden(list)
-      }else {
-          console.log("IGNORE")
-      }
-    }catch(err) {
-      console.log("modalDoneCallBack error is "+err)
-    }
-
-  }
 
   async function setPrivate() {
       let newState = !privateState
       setPrivateState(newState)
-}
+  }
 
 
 return (
@@ -128,61 +80,8 @@ return (
   </View>
 
   <View style = {styles.optionsViews}>
-    <View style = {styles.show}>
-    <TouchableOpacity
-      style = {styles.privacyOptionView}
-      onPress={() => showThoughtOptions()}
-      underlayColor='#fff'
-      >
-        <Text style = {styles.optionText}> Show thoughts to </Text>
-          <Icon name={showThought ? 'chevron-up':'chevron-down'}  style = {styles.messageView} size={40} />
-    </TouchableOpacity>
 
-    {
-      showThought &&
-       <View style = {styles.thoughtsOptionSuperView}>
-       <TouchableOpacity
-         style = {styles.showThoughtView}
-         onPress={() => selectShowAll()}
-         disabled = {selectedOption == "1"}
-         underlayColor='#fff'
-         >
-           <Text style = {styles.optionText}> All </Text>
-           <View style={selectedOption == 1 ? styles.selected : styles.unselected}/>
-       </TouchableOpacity>
-       <TouchableOpacity
-         style = {styles.showThoughtView}
-         onPress={() => selectShowExcept()}
-         underlayColor='#fff'
-         >
-           <Text style = {styles.optionText}> All except.. </Text>
-           <View style={selectedOption == 2 ? styles.selected : styles.unselected}/>
-
-       </TouchableOpacity>
-       <TouchableOpacity
-         style = {styles.showThoughtView}
-         onPress={() => selectShowOnly()}
-         underlayColor='#fff'
-         >
-           <Text style = {styles.optionText}> Only </Text>
-           <View style={selectedOption == 3 ? styles.selected : styles.unselected}/>
-       </TouchableOpacity>
-
-      </View>
-    }
-    </View>
-    <View style = {styles.hide}>
-    <TouchableOpacity
-      style = {styles.privacyOptionView}
-      onPress={() => selectHidden()}
-      underlayColor='#fff'
-      >
-      <Text style = {styles.optionText}> Hide </Text>
-
-    </TouchableOpacity>
-    </View>
-
-    <View style = {styles.blocked}>
+   <View style = {styles.blocked}>
     <TouchableOpacity
       style = {styles.privacyOptionView}
       onPress={() => showBlockedUser()}
@@ -206,9 +105,7 @@ return (
 
 
   </View>
-   <Modal isVisible={showSelectModal} swipeArea={50} style = {{alignSelf : "center",width : '85%'}} >
-     <SelectViewerModal  closeCallBack = {modalCloseCallBack} modalDoneCallBack = {modalDoneCallBack}  selectionOption = {selectionOption}/>
-  </Modal>
+
 
   <Modal isVisible={showBlockedList} swipeArea={50} style = {{alignSelf : "center",width : '85%'}} >
     <BlockedListModal  closeCallBackBlock = {modalBlockCloseCallBack} />
@@ -248,16 +145,6 @@ const styles = StyleSheet.create({
     // borderWidth : 2,
     alignItems : "center"
   },
-  show : {
-    width : '100%',
-    alignItems : 'center',
-    marginBottom : 10,
-  },
-  hide : {
-    width : '100%',
-    alignItems : 'center',
-      marginBottom : 10,
-  },
   blocked : {
     width : '100%',
     alignItems : 'center',
@@ -266,7 +153,7 @@ const styles = StyleSheet.create({
   isPrivate : {
     width : '100%',
     alignItems : 'center',
-      marginBottom : 10,
+    marginBottom : 10,
   },
   privacyOptionView : {
    height : 60,
@@ -285,11 +172,6 @@ const styles = StyleSheet.create({
     fontFamily: "Thonburi",
     fontWeight : "100",
   },
-  thoughtsOptionSuperView : {
-    width : '95%',
-    height : 800,
-    alignItems : "center"
-  },
   showThoughtView : {
     flex : 0.06,
     width : '87%',
@@ -301,18 +183,6 @@ const styles = StyleSheet.create({
     paddingRight : 10,
     marginBottom : 10,
     flexDirection : 'row'
-  },
-  unselected: {
-    width : 15,
-    height : 15,
-    borderRadius : 7,
-    borderWidth : 1
-  },
-  selected : {
-    width : 15,
-    height : 15,
-    borderRadius : 7,
-    backgroundColor : "#149cea"
   },
   privateUnselected: {
     width : 20,

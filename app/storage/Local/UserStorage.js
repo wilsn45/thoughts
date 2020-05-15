@@ -9,10 +9,6 @@ const UserSexKey = "@UserSex"
 const UserTagsKey = "@UserTags"
 const UserProfileBaseDataKey = "@UserProfileBaseData"
 const UserCountryKey = "@UserCountry"
-const SelectedShowThoughtOptionKey = "@SelectedShowThoughtOption"
-const ShowOnlyKey = "@ShowOnly"
-const ShowExceptKey = "@ShowExcept"
-const HiddenKey = "@Hidden"
 const IsPrivateProfileKey = "@IsPrivateProfile"
 const FavoriteConversationKey = "@FavoriteConversation"
 
@@ -157,89 +153,6 @@ export async function getUserProfileMinBase64(){
   try {
     let base64Promise = AsyncStorage.getItem(UserProfileBaseDataKey)
     return await base64Promise
-  } catch (err) {
-    throw new Error(err.message)
-  }
-}
-export async function setSelectShowOption (option){
-  try {
-    let selectedPromise = AsyncStorage.setItem(SelectedShowThoughtOptionKey,option)
-    await selectedPromise
-   } catch (err) {
-    throw new Error(err.message)
-  }
-}
-
-export async function getSelectShowOption () {
-  try {
-    let selectedPromise = AsyncStorage.getItem(SelectedShowThoughtOptionKey)
-    return await selectedPromise
-  } catch (err) {
-    throw new Error(err.message)
-  }
-}
-
-export async function setShowOnly(users) {
-  try {
-    let showOnlyPromise = AsyncStorage.setItem(ShowOnlyKey,JSON.stringify(users))
-    await showOnlyPromise
-   } catch (err) {
-    throw new Error(err.message)
-  }
-}
-
-export async function getShowOnly () {
-  try {
-    let showOnlyPromise = AsyncStorage.getItem(ShowOnlyKey)
-    let users = await showOnlyPromise
-    if(users) {
-      return JSON.parse(users)
-    }
-    return []
-  } catch (err) {
-    throw new Error(err.message)
-  }
-}
-
-export async function setShowExcept(users) {
-  try {
-    let showExceptPromise = AsyncStorage.setItem(ShowExceptKey,JSON.stringify(users))
-    await showExceptPromise
-   } catch (err) {
-    throw new Error(err.message)
-  }
-}
-
-export async function getShowExcept () {
-  try {
-    let showExceptPromise = AsyncStorage.getItem(ShowExceptKey)
-    let users = await showExceptPromise
-    if(users) {
-      return JSON.parse(users)
-    }
-    return []
-  } catch (err) {
-    throw new Error(err.message)
-  }
-}
-
-export async function setHidden(users) {
-  try {
-    let hiddenPromise = AsyncStorage.setItem(HiddenKey,JSON.stringify(users))
-    await hiddenPromise
-   } catch (err) {
-    throw new Error(err.message)
-  }
-}
-
-export async function getHidden () {
-  try {
-    let hiddenPromise = AsyncStorage.getItem(HiddenKey)
-    let users = await hiddenPromise
-    if(users) {
-      return  JSON.parse(users)
-    }
-    return []
   } catch (err) {
     throw new Error(err.message)
   }
