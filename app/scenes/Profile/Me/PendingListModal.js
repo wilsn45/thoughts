@@ -5,77 +5,101 @@ import {View,
         TouchableOpacity,
         FlatList,
         Text} from 'react-native';
-import UserSelectCell  from "thoughts/app/components/UserSelectCell";
+import UserPendingCell  from "./UserPendingCell";
 import Icon from 'react-native-vector-icons/Feather';
-import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import * as realm from "thoughts/app/storage/Realm/ProfileRealm";
+import * as api from "thoughts/app/services/ProfileServices";
+var Spinner = require('react-native-spinkit');
 
-export default function SelectViewerModal ({closeCallBack,modalDoneCallBack,selectionOption}) {
+export default function PendingListModal ({closeCallBackPending}) {
+  const[isLoading, setIsLoading] = useState(true);
   const[userList, setUserList] = useState(null);
   const[title, setTitle] = useState("");
-  const[list, setList] = useState([]);
+  let selectedList = []
 
 
   useEffect(() => {
-    if (selectionOption=="Only") {
-      setTitle("Show Only To")
-    }else {
-      setTitle("Show Except")
-    }
+    setTitle("Pending Requests")
     loadList()
   }, []);
 
   async function loadList () {
-    let allList = await realm.getFollowers()
-    let selList
-    if(selectionOption == "Only") {
-      selList = await userStorage.getShowOnly()
-    } else if (selectionOption == "Except") {
-      selList = await userStorage.getShowExcept()
-    } else {
-      selList = await userStorage.getHidden()
-    }
-    setList(selList)
-    let selArray = []
-    for (index in allList) {
-      let user = {
-        uid :  allList[index].uid,
-        username : allList[index].username,
-        isSelected : selList ? selList.includes(allList[index].uid) :false
+
+    let userListPromise =  api.getPendingRequests()
+    let list = await userListPromise
+    let dicArray = getUserDictArray(list)
+    setUserList(dicArray)
+    setIsLoading(false)
+}
+
+function getUserDictArray(userList) {
+  let dicArray = []
+   for (var user in userList) {
+     let dic = {
+       uid : user,
+       username : userList[user]
+     }
+    dicArray.push(dic)
+  }
+  return dicArray
+}
+
+function rejectRequest(uid) {
+  try {
+    api.rejectRequest(uid)
+    let tmpPnd = []
+    let pendings = userList
+    for (index in pendings) {
+      if(pendings[index].uid != uid) {
+        tmpPnd.push(pendings[index])
       }
-      selArray.push(user)
     }
-
-    setUserList(selArray)
-}
-
- function makeFinalList() {
-   modalDoneCallBack(list)
- }
-
-function cellCallback(uid,isSelected) {
-
-   if(isSelected) {
-      let lst  = list
-      lst.push(uid)
-      setList(lst)
+    if(tmpPnd.length<1) {
+      closeCallBackPending()
+    }
+    setUserList(tmpPnd)
   }
-   else {
-     let lst  = list.filter((e)=>(e !== uid))
-     setList(lst)
+  catch(err) {
+    console.log("rejectRequest error is "+err)
   }
 }
+
+function acceptRequest(uid,username) {
+  try {
+    console.log("accept this one "+uid)
+    api.acceptRequest(uid,username)
+    let tmpPnd = []
+    let pendings = userList
+    for (index in pendings) {
+      if(pendings[index].uid != uid) {
+        tmpPnd.push(pendings[index])
+      }
+    }
+    if(tmpPnd.length<1) {
+      closeCallBackPending()
+    }
+    setUserList(tmpPnd)
+  }
+  catch(err) {
+    console.log("acceptRequest error is "+err)
+  }
+}
+
 
 return (
 
   <View style = {styles.main}>
   {
+    isLoading &&
+    <Spinner  isVisible={true} size={50} type="Arc" color="#189afd"/>
+  }
+  { !isLoading &&
      userList &&
     <View style = {styles.superView}>
       <View style = {styles.headerView}>
       <TouchableOpacity
                style = {{marginLeft : 10,marginTop : 10,flex : 0.5}}
-               onPress={() => closeCallBack()}>
+               onPress={() => closeCallBackPending()}>
                <Icon name={"x"}  size={28}  color={"gray"}   />
           </TouchableOpacity>
 
@@ -85,18 +109,11 @@ return (
         <View style={styles.tableView}>
           <FlatList
             data={userList}
-            renderItem={({ item }) => <UserSelectCell cellCallback = {cellCallback} user={item} selectionOption={selectionOption} />}
+            renderItem={({ item }) => <UserPendingCell user={item} acceptCallBack={acceptRequest}  rejectCallBack = {rejectRequest}/>}
             keyExtractor={user => user.username}
           />
         </View>
-
-        <TouchableOpacity
-        style={ styles.setButtonView}
-        onPress={() => makeFinalList()}
-        underlayColor='#fff'>
-        <Text style={styles.buttonText}>Done</Text>
-        </TouchableOpacity>
-    </View>
+      </View>
   }
 
 

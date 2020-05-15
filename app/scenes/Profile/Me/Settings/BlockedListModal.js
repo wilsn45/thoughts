@@ -5,7 +5,7 @@ import {View,
         TouchableOpacity,
         FlatList,
         Text} from 'react-native';
-import UserBlockedCell  from "thoughts/app/components/UserBlockedCell";
+import UserBlockedCell  from "./UserBlockedCell";
 import Icon from 'react-native-vector-icons/Feather';
 import * as realm from "thoughts/app/storage/Realm/ProfileRealm";
 import * as api from "thoughts/app/services/ProfileServices";

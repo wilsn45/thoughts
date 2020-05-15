@@ -47,21 +47,21 @@ export default function HomeScene(props) {
 },[]);
 
 async function navigateToProfile() {
-  // navigate('MyProfile')
-  let unixtime = new Date().valueOf()
-  let timestamp = Math.floor(unixtime/1000)
-
-  let messageRef = firestore().collection('messages');
-   messageRef.add({
-      fromusername : "User 4",
-      fromuid : "AD9jnDWbPKYPOFD4C355b1ja7bF2",
-      tousername : "Kabir",
-      touid : "DD9jnDWbPKYPOFD4C355b1ja7bF2",
-      message : "Message A 2",
-      at : timestamp,
-      delivered : false
-    })
-    console.log("timestampe "+timestamp)
+  navigate('MyProfile')
+  // let unixtime = new Date().valueOf()
+  // let timestamp = Math.floor(unixtime/1000)
+  //
+  // let messageRef = firestore().collection('messages');
+  //  messageRef.add({
+  //     fromusername : "User 4",
+  //     fromuid : "AD9jnDWbPKYPOFD4C355b1ja7bF2",
+  //     tousername : "Kabir",
+  //     touid : "DD9jnDWbPKYPOFD4C355b1ja7bF2",
+  //     message : "Message A 2",
+  //     at : timestamp,
+  //     delivered : false
+  //   })
+  //   console.log("timestampe "+timestamp)
 }
 
   function navigateToAMessages() {
