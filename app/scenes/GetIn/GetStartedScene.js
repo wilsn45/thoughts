@@ -12,53 +12,37 @@ import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import * as imageHelper from "thoughts/app/helper/ImageHelper";
 import { useAuth } from "thoughts/app/provider";
 import Icon from 'react-native-vector-icons/Feather';
-import CountryCodeModal from "./CountryCodeModal";
 import Modal from 'react-native-modal';
 import * as RNLocalize from "react-native-localize";
-import {CountryCodeList} from "thoughts/app/storage/Local/CountryCodeList";
 var Spinner = require('react-native-spinkit');
     export default function GetStarted(props) {
        const {navigation} = props;
        const {navigate} = navigation;
 
     //1 - DECLARE VARIABLES
-    const [confirmation, setConfirmation] = useState(null);
-    const [selectCountryCode, setSelectCountryCode] = useState(false);
-    const [otcView, setOtcView] = useState(false);
+    const [loginSelected, setLoginSelected] = useState(false);
+    const [username, setUsername] = useState(null);
+    const [password, setPassword] = useState(null);
+
+    const [usernamePlaceholder, setUsernamePlaceholder] = useState("username or email");
+    const [passwordPlaceholder, setPasswordPlaceholder] = useState("password");
 
     const [error, setError] = useState(null);
-    const [message, setMessage] = useState("Can I get your number?");
+
 
     const [buttonText, setButtonText] = useState("Get Started");
     const [isLoading, setIsLoading] = useState(false);
 
-    const [phoneNumber, setPhoneNumber] = useState("");
-    const [dial_code, setDialCode] = useState("");
-    const [countryCode, setCountryCode] = useState(null);
-    const [country, setCountry] = useState(null);
-    const [otc, setOtc] = useState("");
+
 
     useEffect(() => {
         try {
-         let country = RNLocalize.getCountry()
-         var result = CountryCodeList.find(obj => {
-            return obj.code === country
-        })
-         if (!countryCode) {
-            setCountryCode(result.code + " " + result.dial_code)
-            setDialCode(result.dial_code)
-            setCountry(result.code)
-        }
+
     }
     catch(err) {
         console.log("error" + err)
     }
-});
-
-    function validE164(num) {
-       return /^\+?[1-9]\d{1,14}$/.test(num)
-   }
-
+  });
 
    function showError(message="Oops..we are broken.") {
     setIsLoading(false)
@@ -75,46 +59,6 @@ function clearError() {
     }
 }
 
-function selectCountryCallback (dial_code,code) {
-    setCountryCode(code + " " + dial_code)
-    setDialCode(dial_code)
-    setCountry(code)
-    setSelectCountryCode(false)
-}
-
-function showOtc() {
-    setIsLoading(false)
-    setOtcView(true)
-    setButtonText("Get In")
-    setMessage("We just sent you a code, please let us know that.")
-    setError(false)
-}
-
-async function sendOtc () {
-    setIsLoading(true)
-    try {
-        // const number = dial_code+phoneNumber;
-        // if (!validE164(number)) {
-        //     showError("Incorrect phone number")
-        //     return;
-        //
-        // }
-        // Keyboard.dismiss()
-        // let phoneNumberPromise = api.numberSignIn(number)
-        // let confirmation = await phoneNumberPromise
-        // setConfirmation(confirmation)
-        showOtc()
-
-    } catch (err) {
-        if(err.message.includes("[auth/invalid-phone-number]"))
-         {
-            showError("Incorrect phone number")
-            return
-         }
-         console.log("error is " + err)
-         showError()
-    }
-}
 
 async function verifyOtc () {
      let code = otc.replace(/ /g, "")
@@ -168,16 +112,17 @@ async function verifyOtc () {
         console.log("error is " + err)
     }
 }
-function updateOtcValue(value) {
-  if(otc.length > value.length) {
-    value = value.slice(0,value.length-2)
-    setOtc(value)
-  }else {
-    setOtc(value + "  ")
 
+function changeOption(value) {
+  setLoginSelected(value)
+  if(value) {
+      setUsernamePlaceholder("username email or number")
+      setPasswordPlaceholder("password")
+  }else {
+    setUsernamePlaceholder("choose username")
+    setPasswordPlaceholder("choose password")
   }
 }
-
 
 return (
 
@@ -187,46 +132,57 @@ return (
 
     <View style = {styles.center}>
 
-    <Text style={styles.thoughtsText}>Hey</Text>
+    <View style = {{width : '55%',marginTop : 100, flexDirection : 'row', alignItems : "center", justifyContent : 'space-between', borderWidth : 0, borderColor : "red", marginBottom : 30}}>
+        <TouchableOpacity
+          onPress={() => changeOption(true)}>
+          <Text style={loginSelected ? styles.optionSelected : styles.optionUnSelected}>Login</Text>
+        </TouchableOpacity>
 
-    { !otcView &&
-    <View style = {styles.phone}>
-    <View style>
-    <TouchableOpacity
-      onPress={() => setSelectCountryCode(true)}
-      disabled={otcView} >
-    <Text style = {styles.countryCodeText} >{countryCode}</Text>
-    </TouchableOpacity>
-    </View>
-    <TextInput style={styles.phoneNumberTextView}
-      keyboardType = "phone-pad"
-      onChangeText={(value) => { setPhoneNumber(value); clearError()}}
-      editable={true}
-      maxLength={10}
-      autoFocus = {true}
-    />
-    </View>
-    }
-    { otcView &&
-        <View style = {styles.otc}>
-        <View style = {styles.otcIconView}>
-        <Icon name={'lock'}  size={30} />
+        <TouchableOpacity
+          onPress={() => changeOption(false)}>
+          <Text style={!loginSelected ? styles.optionSelected : styles.optionUnSelected}>Sign Up</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style = {{flex : 1, marginTop : 50,width : '80%', alignItems : "center", justifyContent : 'center', borderWidth : 0, borderColor : "red",}}>
+
+        <TextInput style={styles.textinput}
+          onChangeText={(value) => setUsername(value)}
+          autoFocus = {true}
+          placeholder = {usernamePlaceholder}
+          placeholderTextColor = "#696a6b"
+         />
+
+         <TextInput style={styles.textinput}
+           onChangeText={(value) => setPassword(value)}
+          autoFocus = {true}
+          placeholder = {passwordPlaceholder}
+          placeholderTextColor = "#696a6b"
+          />
+
+      </View>
+      <View style = {{height : 50, marginTop : 0,borderWidth : 0, borderColor : "red"}}>
+      {
+        loginSelected &&
+        <TouchableOpacity
+          onPress={() => forgotPassword()}>
+          <Text style = {{fontSize: 15, fontFamily: "Thonburi",fontWeight : "100",color : "#cbcbcb"}}>forgot password?</Text>
+        </TouchableOpacity>
+      }
+      </View>
+
+
+      {
+        error && <View style={styles.messageView}>
+          <Text style= { error ? styles.errorText : styles.messageText}>
+            {error}
+          </Text>
         </View>
-        <TextInput style={styles.phoneNumberTextView}
-        keyboardType = "phone-pad"
-        onChangeText={(value) => updateOtcValue(value)}
-        maxLength={18}
-        value = {otc}
-        autoFocus = {true}
-        />
-        </View>
-    }
-    <View style={styles.messageView}>
-      <Text style= { error ? styles.errorText : styles.messageText}>
-        {message}
-      </Text>
+      }
+
     </View>
 
+    <View style = {styles.bottomView}>
     {
         isLoading &&
         <View style = {styles.loadingView}>
@@ -237,7 +193,7 @@ return (
     {
         !isLoading &&
         <TouchableOpacity
-        style={ styles.getButtonView}
+        style={ styles.getButtonDisabled}
         onPress={() => otcView ? verifyOtc() : sendOtc()}
         underlayColor='#fff'
         >
@@ -245,13 +201,13 @@ return (
         </TouchableOpacity>
     }
 
-
+    <TouchableOpacity
+      onPress={() => forgotPassword()}>
+      <Text style = {{marginTop : 20, fontSize: 15, fontFamily: "Thonburi",fontWeight : "100",color : "#32c2ff"}}>Privacy Policy</Text>
+    </TouchableOpacity>
 
     </View>
 
-    <Modal isVisible={selectCountryCode} swipeArea={50} style = {{width: 200}} >
-    <CountryCodeModal  selectCountryCallback = {selectCountryCallback}/>
-    </Modal>
 
     </View>
 
@@ -264,73 +220,52 @@ const styles = StyleSheet.create({
         flex : 1,
         alignItems : "center",
         justifyContent : "center",
-        flexDirection: 'row',
-        backgroundColor : "#fff",
+       backgroundColor : "#fff",
 
     },
     center : {
-      flex : 0.9,
-      height : '40%',
+      flex : 0.5,
+      width : '90%',
       alignSelf: 'center',
-      flexDirection: 'column',
+      justifyContent : "center",
       alignItems : "center",
+      borderColor : "red",
+      borderWidth : 0,
+},
+bottomView : {
+  flex : 0.3,
+  width : '90%',
+  alignSelf: 'center',
+  justifyContent : "flex-start",
+  alignItems : "center",
+  borderColor : "blue",
+  borderWidth : 0,
 
-  },
-  thoughtsText : {
+},
+optionUnSelected : {
     fontSize: 28,
     fontFamily: "Thonburi",
-    fontWeight : "100"
+    fontWeight : "100",
+    color : "#cbcbcb",
+    marginBottom : 50,
 },
-phone : {
-   marginTop : 50,
-   height : 60,
-   width : '80%',
-   flexDirection: 'row',
-   // borderColor: '#F0F0F0',
-   // borderBottomWidth : 2,
-   borderRadius: 1,
-   justifyContent : "center",
-   alignItems : "center",
+optionSelected : {
+  fontSize: 32,
+  fontFamily: "Thonburi",
+  fontWeight : "100",
+  color : "#32c2ff",
+  marginBottom : 50,
 },
-countryCodeText : {
-    color : 'black',
-    fontSize: 24,
-    fontWeight : "400"
-},
-phoneCodeTextView : {
-   color : 'black',
-   fontSize: 21,
-   marginRight: 5,
-},
-phoneNumberTextView : {
-    marginLeft : 10,
-    flex: 0.8,
-    height : '100%',
-    color : 'black',
-    fontSize: 24,
-    textAlign : "auto"
-},
-
-otc : {
-   height : 60,
-   marginTop : 50,
-   width : '80%',
-   flexDirection: 'row',
-   // borderColor: '#F0F0F0',
-   // borderBottomWidth : 2,
-   borderRadius: 15,
-},
-otcIconView : {
-   marginLeft: 30,
-   marginRight: 10,
-   flex: 0.15,
-   justifyContent : "center"
-},
-otcTextInputView : {
-   flex: 0.8,
-   height : '100%',
-   marginLeft: 10,
-   textAlign : "center"
+textinput : {
+  width : '100%',
+  height : '25%',
+  color : 'black',
+  fontSize: 24,
+  textAlign : "auto",
+  borderBottomWidth : 1,
+  borderColor : "black",
+  paddingLeft : 10,
+  marginBottom : 70
 },
 messageView : {
     width : '70%',
@@ -354,11 +289,21 @@ errorText : {
     fontFamily: "Thonburi",
     color : "red",
 },
-getButtonView: {
-    marginTop : 40,
+
+getButtonDisabled: {
+    marginTop : 100,
+    width : '80%',
+    height : 60,
+    backgroundColor:'#9ea7b0',
+    borderRadius:25,
+    justifyContent:  "center",
+    alignSelf: "center"
+},
+getButtonEnabled: {
+    marginTop : 100,
     width : '70%',
     height : 60,
-    backgroundColor:'#189afd',
+    backgroundColor:'#32c2ff',
     borderRadius:25,
     justifyContent:  "center",
     alignSelf: "center"
