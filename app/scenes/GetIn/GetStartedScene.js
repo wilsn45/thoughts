@@ -23,6 +23,7 @@ var Spinner = require('react-native-spinkit');
     const [loginSelected, setLoginSelected] = useState(false);
     const [username, setUsername] = useState(null);
     const [password, setPassword] = useState(null);
+    const [verifyPin, setVerifyPin] = useState("");
 
     const [usernamePlaceholder, setUsernamePlaceholder] = useState("Username or Email");
     const [passwordPlaceholder, setPasswordPlaceholder] = useState("Password");
@@ -33,7 +34,7 @@ var Spinner = require('react-native-spinkit');
     const [buttonText, setButtonText] = useState("Get Started");
     const [isLoading, setIsLoading] = useState(false);
 
-    const [verifyPin, showVerifyPin] = useState(false);
+    const [showVerifyPin, setShowVerifyPin] = useState(false);
 
 
 
@@ -66,7 +67,7 @@ async function login() {
 }
 
 async function signUp() {
-  showVerifyPin(true)
+  setShowVerifyPin(true)
   //setIsLoading(true)
 }
 
@@ -136,14 +137,18 @@ function changeOption(value) {
   }
 }
 
-function screenTouched() {
-  Keyboard.dismiss
-  showVerifyPin(false)
+function verifyPinCallBack(value) {
+  if(verifyPin.length > value.length) {
+    value = value.slice(0,value.length-3)
+    setVerifyPin(value)
+  }else {
+    setVerifyPin(value + "   ")
+  }
 }
 
 return (
 
-    <TouchableWithoutFeedback onPress={screenTouched} accessible={false}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
 
     <View style = {styles.main} >
 
@@ -225,7 +230,7 @@ return (
     </TouchableOpacity>
 
     </View>
-    <Modal isVisible={verifyPin} swipeArea={50} style = {{alignSelf : "center",width : '80%'}} >
+    <Modal isVisible={showVerifyPin} swipeArea={50} style = {{alignSelf : "center",width : '80%'}} >
       <View style = {{width : '100%', height : 200, backgroundColor : "#fff", justifyContent : "center"}}>
 
       <Text style= { {alignSelf : "center", marginBottom : 30, fontSize: 20,fontFamily: "Thonburi",fontWeight : "100", color : "#cbcbcb",}}>
@@ -233,14 +238,12 @@ return (
       </Text>
 
 
-      <TextInput style={{width :'50%', borderBottomWidth : 1,alignSelf : "center", fontSize: 24,fontFamily: "Thonburi",fontWeight : "100", }}
-        onChangeText={(value) => setPassword(value)}
-       autoFocus = {true}
-       secureTextEntry={loginSelected}
-       />
-
-
-
+      <TextInput style={{width :150, borderBottomWidth : 1,alignSelf : "center",paddingLeft : 10, paddingRight : 20, fontSize: 24,fontFamily: "Thonburi",fontWeight : "100", }}
+        onChangeText={(value) => verifyPinCallBack(value)}
+        maxLength={16}
+        value = {verifyPin}
+        autoFocus = {true}
+      />
 
       </View>
     </Modal>
