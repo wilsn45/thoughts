@@ -24,8 +24,8 @@ var Spinner = require('react-native-spinkit');
     const [username, setUsername] = useState(null);
     const [password, setPassword] = useState(null);
 
-    const [usernamePlaceholder, setUsernamePlaceholder] = useState("username or email");
-    const [passwordPlaceholder, setPasswordPlaceholder] = useState("password");
+    const [usernamePlaceholder, setUsernamePlaceholder] = useState("Username or Email");
+    const [passwordPlaceholder, setPasswordPlaceholder] = useState("Password");
 
     const [error, setError] = useState(null);
 
@@ -59,9 +59,16 @@ function clearError() {
     }
 }
 
+async function login() {
+  setIsLoading(!isLoading)
+}
+
+async function signUp() {
+  setIsLoading(true)
+}
 
 async function verifyOtc () {
-     let code = otc.replace(/ /g, "")
+
     setIsLoading(true)
     try {
        //  if (otc.length < 6) {
@@ -116,11 +123,13 @@ async function verifyOtc () {
 function changeOption(value) {
   setLoginSelected(value)
   if(value) {
-      setUsernamePlaceholder("username email or number")
-      setPasswordPlaceholder("password")
+      setUsernamePlaceholder("Username or Email")
+      setPasswordPlaceholder("Password")
+      setButtonText("Get In")
   }else {
-    setUsernamePlaceholder("choose username")
-    setPasswordPlaceholder("choose password")
+    setUsernamePlaceholder("Choose username")
+    setPasswordPlaceholder("Password")
+    setButtonText("Get Started")
   }
 }
 
@@ -150,14 +159,15 @@ return (
           onChangeText={(value) => setUsername(value)}
           autoFocus = {true}
           placeholder = {usernamePlaceholder}
-          placeholderTextColor = "#696a6b"
+          placeholderTextColor = "#88898a"
          />
 
          <TextInput style={styles.textinput}
            onChangeText={(value) => setPassword(value)}
           autoFocus = {true}
+          secureTextEntry={loginSelected}
           placeholder = {passwordPlaceholder}
-          placeholderTextColor = "#696a6b"
+          placeholderTextColor = "#88898a"
           />
 
       </View>
@@ -166,15 +176,15 @@ return (
         loginSelected &&
         <TouchableOpacity
           onPress={() => forgotPassword()}>
-          <Text style = {{fontSize: 15, fontFamily: "Thonburi",fontWeight : "100",color : "#cbcbcb"}}>forgot password?</Text>
+          <Text style = {{fontSize: 18, fontFamily: "Thonburi",fontWeight : "100",color : "#cbcbcb"}}>Forgot password?</Text>
         </TouchableOpacity>
       }
       </View>
 
 
       {
-        error && <View style={styles.messageView}>
-          <Text style= { error ? styles.errorText : styles.messageText}>
+        error && <View>
+          <Text style= { error ? styles.errorText : styles.errorText}>
             {error}
           </Text>
         </View>
@@ -193,8 +203,8 @@ return (
     {
         !isLoading &&
         <TouchableOpacity
-        style={ styles.getButtonDisabled}
-        onPress={() => otcView ? verifyOtc() : sendOtc()}
+        style={username && password ? styles.getButtonEnabled : styles.getButtonDisabled}
+        onPress={() => loginSelected ? login() : signUp()}
         underlayColor='#fff'
         >
         <Text style={styles.buttonText}>{buttonText}</Text>
@@ -236,7 +246,7 @@ bottomView : {
   flex : 0.3,
   width : '90%',
   alignSelf: 'center',
-  justifyContent : "flex-start",
+  justifyContent : "space-between",
   alignItems : "center",
   borderColor : "blue",
   borderWidth : 0,
@@ -260,24 +270,17 @@ textinput : {
   width : '100%',
   height : '25%',
   color : 'black',
-  fontSize: 24,
+  fontSize: 20,
   textAlign : "auto",
   borderBottomWidth : 1,
   borderColor : "black",
   paddingLeft : 10,
   marginBottom : 70
 },
-messageView : {
-    width : '70%',
-    height : 60,
-    alignItems : "center",
-    justifyContent : "center",
-    // borderColor : "red",
-    // borderWidth : 1
-},
-messageText : {
+errorText : {
     width : '100%',
     fontSize: 16,
+    alignSelf : 'center',
     fontFamily: "Thonburi",
     color : '#189afd',
     fontWeight : "100",
@@ -301,7 +304,7 @@ getButtonDisabled: {
 },
 getButtonEnabled: {
     marginTop : 100,
-    width : '70%',
+    width : '80%',
     height : 60,
     backgroundColor:'#32c2ff',
     borderRadius:25,
@@ -309,7 +312,7 @@ getButtonEnabled: {
     alignSelf: "center"
 },
 loadingView: {
-  marginTop : 40,
+  marginTop : 100,
   width : '70%',
   height : 60,
   // borderColor : "#189afd",
