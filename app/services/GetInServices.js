@@ -19,6 +19,23 @@ let confirmation  = null
 const storage = firebase.storage()
 
 
+
+export async function signUp(email,password){
+  try{
+      let url = API_URL+"signUp?email="+email+"&&password="+password
+      console.log("url is "+url)
+      let res = await axios.get(url);
+      if(res.status==200) {
+        return true
+      }
+      return false
+  }catch (e) {
+      console.log("api follow is "+e)
+      throw new Error(e);
+  }
+}
+
+
  export async function numberSignIn(number) {
     return new Promise((resolve,reject) => {
      auth().signInWithPhoneNumber(number).then ( (confirmation) =>{

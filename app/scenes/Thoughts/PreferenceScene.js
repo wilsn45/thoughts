@@ -4,12 +4,12 @@ import {View,
     Text,
     TouchableOpacity} from 'react-native';
 
-import * as api from "thoughts/app/services/UserGetInServices";
+import * as api from "thoughts/app/services/GetInServices";
 import { useAuth } from "thoughts/app/provider";
 
 
 export default function Preference() {
-    
+
     return (
 
         <View style={{flex: 1, paddingHorizontal: 16, backgroundColor:"#fff"}}>
@@ -18,9 +18,9 @@ export default function Preference() {
     );
 };
 
-const styles = StyleSheet.create({ 
+const styles = StyleSheet.create({
 
-    
+
 });
 
 Preference.navigationOptions = ({}) => {

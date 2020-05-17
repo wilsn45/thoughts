@@ -6,7 +6,7 @@ import {View,
   TextInput,
   TouchableOpacity
 } from 'react-native';
-import * as api from "thoughts/app/services/UserGetInServices";
+import * as api from "thoughts/app/services/GetInServices";
 import { useAuth } from "thoughts/app/provider";
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import Icon from 'react-native-vector-icons/Feather';

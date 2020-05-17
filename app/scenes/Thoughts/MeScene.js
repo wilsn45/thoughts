@@ -4,7 +4,7 @@ import {View,
     Text,
     TouchableOpacity} from 'react-native';
 
-import * as api from "thoughts/app/services/UserGetInServices";
+import * as api from "thoughts/app/services/GetInServices";
 import { useAuth } from "thoughts/app/provider";
 
 
@@ -18,25 +18,25 @@ export default function Me(props) {
     async function onClick() {
       navigate('Talk');
     }
-    
+
     return (
 
         <View style={{flex: 1, paddingHorizontal: 16, backgroundColor:"#fff"}}>
            <Text> Chat List </Text>
 
            <TouchableOpacity
-                
+
                  onPress={() => onClick()}>
-                
+
                 <Text>Talk</Text>
                </TouchableOpacity>
         </View>
     );
 };
 
-const styles = StyleSheet.create({ 
+const styles = StyleSheet.create({
 
-    
+
 });
 
 Me.navigationOptions = ({}) => {

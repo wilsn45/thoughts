@@ -7,7 +7,7 @@ import {View,
     TouchableWithoutFeedback,
     Keyboard} from 'react-native';
 
-import * as api from "thoughts/app/services/UserGetInServices";
+import * as api from "thoughts/app/services/GetInServices";
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import * as imageHelper from "thoughts/app/helper/ImageHelper";
 import { useAuth } from "thoughts/app/provider";
@@ -32,6 +32,8 @@ var Spinner = require('react-native-spinkit');
 
     const [buttonText, setButtonText] = useState("Get Started");
     const [isLoading, setIsLoading] = useState(false);
+
+    const [verifyPin, showVerifyPin] = useState(false);
 
 
 
@@ -64,7 +66,8 @@ async function login() {
 }
 
 async function signUp() {
-  setIsLoading(true)
+  showVerifyPin(true)
+  //setIsLoading(true)
 }
 
 async function verifyOtc () {
@@ -127,15 +130,20 @@ function changeOption(value) {
       setPasswordPlaceholder("Password")
       setButtonText("Get In")
   }else {
-    setUsernamePlaceholder("Choose username")
+    setUsernamePlaceholder("Email")
     setPasswordPlaceholder("Password")
     setButtonText("Get Started")
   }
 }
 
+function screenTouched() {
+  Keyboard.dismiss
+  showVerifyPin(false)
+}
+
 return (
 
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+    <TouchableWithoutFeedback onPress={screenTouched} accessible={false}>
 
     <View style = {styles.main} >
 
@@ -217,7 +225,25 @@ return (
     </TouchableOpacity>
 
     </View>
+    <Modal isVisible={verifyPin} swipeArea={50} style = {{alignSelf : "center",width : '80%'}} >
+      <View style = {{width : '100%', height : 200, backgroundColor : "#fff", justifyContent : "center"}}>
 
+      <Text style= { {alignSelf : "center", marginBottom : 30, fontSize: 20,fontFamily: "Thonburi",fontWeight : "100", color : "#cbcbcb",}}>
+        Enter verification pin
+      </Text>
+
+
+      <TextInput style={{width :'50%', borderBottomWidth : 1,alignSelf : "center", fontSize: 24,fontFamily: "Thonburi",fontWeight : "100", }}
+        onChangeText={(value) => setPassword(value)}
+       autoFocus = {true}
+       secureTextEntry={loginSelected}
+       />
+
+
+
+
+      </View>
+    </Modal>
 
     </View>
 
