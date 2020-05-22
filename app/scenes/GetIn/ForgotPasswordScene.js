@@ -21,12 +21,13 @@ var Spinner = require('react-native-spinkit');
        const {navigate} = navigation;
 
     //1 - DECLARE VARIABLES
-    const [cred, setCred] = useState(null);
+    const [input, setInput] = useState(null);
+    const [email, setEmail] = useState(null);
     const [validpin, setValidPin] = useState(null);
     const [verifyPin, setVerifyPin] = useState("");
-    let passedCred = useNavigationParam('cred');
+    let cred = useNavigationParam('cred');
 
-    const [credPlaceholder, setCredPlaceholder] = useState("Username or Email");
+    const [inputPlaceholder, setInputPlaceholder] = useState("Username or Email");
 
 
     const [error, setError] = useState(null);
@@ -41,9 +42,8 @@ var Spinner = require('react-native-spinkit');
 
 
 useEffect(() => {
-  console.log("cred "+passedCred)
-    if(passedCred) {
-        setCred(passedCred)
+  if(cred) {
+        setInput(cred)
       }
 }, []);
 
@@ -51,28 +51,35 @@ async function verify() {
   // navigate('SetUserInfo', {email : "skk.wilson@gmail.com", password : "kabir4577"});
   setIsLoading(true)
 
-  let resp = await api.signUp(username)
+  let resp = await api.forgotPassword(input)
   if(!resp) {
     setIsLoading(false)
     setError("oops! we are broken")
     return
   }
-  if(resp.userExists) {
-    setError("An user already exists with this email id.")
+  if(!resp.userExists) {
+    setError("No user exists with given email/username")
     setIsLoading(false)
     return
   }
   let pin = resp.pin
+  console.log("Pin is "+pin)
+  console.log("email is "+resp.email)
+  setEmail(resp.email)
   setValidPin(pin)
   setShowVerifyPin(true)
   setIsLoading(false)
 }
 
 async function setPassword() {
-
+  setIsLoading(true)
+  let resp = await api.updatePassword(email,input)
+  setIsLoading(false)
+  if(resp) {
+    console.log("Going for login")
+  //  let resp = await api.login(username,input)
+  }
 }
-
-
 
 
 async function verifyPinCallBack(value) {
@@ -101,10 +108,11 @@ async function verifyPinCallBack(value) {
       setPinError("Invalid Pin")
       return
     }
+    setInput(null)
     setShowVerifyPin(false)
     setVerifed(true)
-    setCredPlaceholder("New Password")
-    setButtonText("Get In")
+    setInputPlaceholder("New Password")
+    setButtonText("Update Password")
   }
 }
 
@@ -130,16 +138,16 @@ return (
     <View style = {styles.center}>
 
     <TextInput style={styles.textinput}
-          onChangeText={(value) => {setError(null);setCred(value)}}
+          onChangeText={(value) => {setError(null);setInput(value)}}
           autoFocus = {true}
-          value = {cred}
-          placeholder = {credPlaceholder}
+          value = {input}
+          placeholder = {inputPlaceholder}
           placeholderTextColor = "#88898a"
      />
 
 
 
-      <View style = {{height : 30, width : '100%', alignItems : "center", borderWidth : 0}}>
+      <View style = {{height : 30, width : '100%',marginTop : 50, alignItems : "center", borderWidth : 0}}>
       {
         error &&
           <Text style= {{fontSize: 17,fontFamily: "Thonburi",color : "red"}}>
@@ -161,8 +169,8 @@ return (
     {
         !isLoading &&
         <TouchableOpacity
-        style={cred ? styles.getButtonEnabled : styles.getButtonDisabled}
-        onPress={() =>  verify()}
+        style={input ? styles.getButtonEnabled : styles.getButtonDisabled}
+        onPress={() => {verifed ? setPassword() : verify()}}
         underlayColor='#fff'
         >
         <Text style={styles.buttonText}>{buttonText}</Text>

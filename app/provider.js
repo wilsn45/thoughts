@@ -24,7 +24,6 @@ function AuthProvider(props) {
 
             let username = await userStorage.getUserName()
             if(!username) {
-              console.log("i am no username set")
               return AuthStatus.LOGGED_OUT
             }
 

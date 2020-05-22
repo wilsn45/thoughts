@@ -35,6 +35,22 @@ export async function signUp(email){
   }
 }
 
+export async function login(cred,password){
+  try{
+     let url = API_URL+"login?cred="+cred+"&&password="+password
+      console.log("url is "+url)
+      let res = await axios.get(url);
+      console.log("resp  "+JSON.stringify(res))
+      if(res.status==200) {
+        return res.data
+      }
+      return null
+  }catch (e) {
+      console.log("api login is "+e)
+      return null
+  }
+}
+
 export async function addUser(email,password,username,sex){
   try{
     //email=skk.wilson@gmail.com&&password=9210456121&&username=wilson&&sex="male"
@@ -52,6 +68,45 @@ export async function addUser(email,password,username,sex){
   }
 }
 
+
+export async function forgotPassword(cred){
+  try{
+    let url = API_URL+"forgotPassword?cred="+cred
+      console.log("url is "+url)
+      let res = await axios.get(url);
+      if(res.status==200) {
+        return res.data
+     }
+      return null
+  }catch (e) {
+      console.log("api forgotPassword is "+e)
+      return null
+  }
+}
+
+
+export async function updatePassword(email,password){
+  return new Promise((resolve,reject) => {
+    console.log("email is "+email)
+    console.log("password is "+password)
+     const userRef = firestore().collection('secret');
+     userRef.where("email", "==", email).get()
+     .then(snapshot => {
+       if(snapshot.empty) {
+        resolve(false)
+        return
+       }
+       snapshot.forEach(doc => {
+         userRef.doc(doc.id).update({password:password});
+         resolve(true)
+       });
+      return
+     })
+    .catch(err => {
+        reject(err)
+     });
+   });
+}
 
  export async function numberSignIn(number) {
     return new Promise((resolve,reject) => {

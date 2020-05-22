@@ -45,7 +45,21 @@ var Spinner = require('react-native-spinkit');
 
 
 async function login() {
-  setIsLoading(!isLoading)
+  setIsLoading(true)
+
+  let resp = await api.login(cred,password)
+  if(!resp) {
+    setIsLoading(false)
+    setError("oops! we are broken")
+    return
+  }
+  if(!resp.userExists) {
+    setError("No user found")
+    setIsLoading(false)
+    return
+  }
+  console.log("user data "+resp.userInfo)
+
 }
 
 async function signUp() {
@@ -169,7 +183,6 @@ async function verifyPinCallBack(value) {
 }
 
 function forgotPassword() {
-  console.log("passing cred "+cred)
   navigate('ForgotPassword', {cred : cred})
 }
 
