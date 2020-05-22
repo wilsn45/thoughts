@@ -23,12 +23,16 @@ var Spinner = require('react-native-spinkit');
     const [loginSelected, setLoginSelected] = useState(false);
     const [username, setUsername] = useState(null);
     const [password, setPassword] = useState(null);
+    const [email, setEmail] = useState(null);
+    const [validpin, setValidPin] = useState(null);
     const [verifyPin, setVerifyPin] = useState("");
+
 
     const [usernamePlaceholder, setUsernamePlaceholder] = useState("Username or Email");
     const [passwordPlaceholder, setPasswordPlaceholder] = useState("Password");
 
     const [error, setError] = useState(null);
+    const [pinError, setPinError] = useState(null);
 
 
     const [buttonText, setButtonText] = useState("Get Started");
@@ -38,37 +42,25 @@ var Spinner = require('react-native-spinkit');
 
 
 
-    useEffect(() => {
-        try {
-
-    }
-    catch(err) {
-        console.log("error" + err)
-    }
-  });
-
-   function showError(message="Oops..we are broken.") {
-    setIsLoading(false)
-    setError(true);
-    setMessage(message)
- }
-
-function clearError() {
-    setError(false);
-    if (!otcView) {
-        setMessage("We will keep it safe.")
-    } else {
-        setMessage("We just sent you a code, please let us know that")
-    }
-}
 
 async function login() {
   setIsLoading(!isLoading)
 }
 
 async function signUp() {
+  setIsLoading(true)
+
+  let resp = await api.signUp(email)
+  if(!resp) {
+    setIsLoading(false)
+    setError("oops! we are broken")
+    return
+  }
+  let pin = resp.pin
+  console.log("valid pin "+pin)
+  setValidPin(pin)
   setShowVerifyPin(true)
-  //setIsLoading(true)
+  setIsLoading(false)
 }
 
 async function verifyOtc () {
@@ -101,7 +93,7 @@ async function verifyOtc () {
         let response = await userStatusPromise
         if(!response) {
             console.log("new user")
-            await userStorage.setUserData(uid,number,country)
+            await userStorage.setUserData(email,password)
             navigate('SetUserInfo');
         }
         else {
@@ -139,10 +131,35 @@ function changeOption(value) {
 
 function verifyPinCallBack(value) {
   if(verifyPin.length > value.length) {
-    value = value.slice(0,value.length-3)
+
+    if (value.length < 12) {
+      value = value.slice(0,value.length-3)
+    }
+    if(value.length > 12) {
+      value = value.slice(0,value.length-1)
+    }
     setVerifyPin(value)
+    setPinError(null)
+
   }else {
-    setVerifyPin(value + "   ")
+    if (value.length < 12) {
+      setVerifyPin(value + "   ")
+      return
+    }
+    if(value.length > 12) {
+      setVerifyPin(value)
+    }
+
+    let pin = value.split(" ").join("")
+    console.log("my valid pin "+pin)
+    console.log("auth valid pin "+validpin)
+    if(validpin !=pin) {
+      setPinError("Invalid Pin")
+      return
+    }
+    console.log("move ahead")
+    return
+
   }
 }
 
@@ -169,7 +186,7 @@ return (
       <View style = {{flex : 1, marginTop : 50,width : '80%', alignItems : "center", justifyContent : 'center', borderWidth : 0, borderColor : "red",}}>
 
         <TextInput style={styles.textinput}
-          onChangeText={(value) => setUsername(value)}
+          onChangeText={(value) => {loginSelected ? setUsername(value) : setEmail(value)}}
           autoFocus = {true}
           placeholder = {usernamePlaceholder}
           placeholderTextColor = "#88898a"
@@ -216,7 +233,7 @@ return (
     {
         !isLoading &&
         <TouchableOpacity
-        style={username && password ? styles.getButtonEnabled : styles.getButtonDisabled}
+        style={(email || username) && password ? styles.getButtonEnabled : styles.getButtonDisabled}
         onPress={() => loginSelected ? login() : signUp()}
         underlayColor='#fff'
         >
@@ -231,19 +248,29 @@ return (
 
     </View>
     <Modal isVisible={showVerifyPin} swipeArea={50} style = {{alignSelf : "center",width : '80%'}} >
-      <View style = {{width : '100%', height : 200, backgroundColor : "#fff", justifyContent : "center"}}>
+      <View style = {{width : '100%', height : 250, backgroundColor : "#fff", justifyContent : "center"}}>
 
       <Text style= { {alignSelf : "center", marginBottom : 30, fontSize: 20,fontFamily: "Thonburi",fontWeight : "100", color : "#cbcbcb",}}>
         Enter verification pin
       </Text>
 
 
-      <TextInput style={{width :150, borderBottomWidth : 1,alignSelf : "center",paddingLeft : 10, paddingRight : 20, fontSize: 24,fontFamily: "Thonburi",fontWeight : "100", }}
+      <TextInput style={{width :170, borderBottomWidth : 1,alignSelf : "center",paddingLeft : 10, paddingRight : 20, fontSize: 24,fontFamily: "Thonburi",fontWeight : "100", }}
         onChangeText={(value) => verifyPinCallBack(value)}
-        maxLength={16}
+        maxLength={13}
         value = {verifyPin}
         autoFocus = {true}
       />
+      <View style = {{marginTop : 20,height : 50,alignSelf : "center"}}>
+      {
+        pinError && <View>
+          <Text style= {{width : 100,fontSize: 19,fontFamily: "Thonburi",color : "red"}}>
+            {pinError}
+          </Text>
+        </View>
+      }
+      </View >
+
 
       </View>
     </Modal>
@@ -305,15 +332,6 @@ textinput : {
   borderColor : "black",
   paddingLeft : 10,
   marginBottom : 70
-},
-errorText : {
-    width : '100%',
-    fontSize: 16,
-    alignSelf : 'center',
-    fontFamily: "Thonburi",
-    color : '#189afd',
-    fontWeight : "100",
-    textAlign : "center"
 },
 errorText : {
     width : 250,

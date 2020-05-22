@@ -20,18 +20,33 @@ const storage = firebase.storage()
 
 
 
-export async function signUp(email,password){
+export async function signUp(email){
   try{
-      let url = API_URL+"signUp?email="+email+"&&password="+password
+    let url = API_URL+"signUp?email="+email
       console.log("url is "+url)
       let res = await axios.get(url);
       if(res.status==200) {
-        return true
-      }
-      return false
+        return res.data
+     }
+      return null
   }catch (e) {
       console.log("api follow is "+e)
-      throw new Error(e);
+      return null
+  }
+}
+
+export async function verifyPin(email){
+  try{
+    let url = API_URL+"signUp?email="+email
+      console.log("url is "+url)
+      let res = await axios.get(url);
+      if(res.status==200) {
+        return res.data
+     }
+      return null
+  }catch (e) {
+      console.log("api follow is "+e)
+      return null
   }
 }
 
