@@ -2,8 +2,6 @@ import AsyncStorage from '@react-native-community/async-storage'
 import * as  User  from "thoughts/app/User";
 
 const UserTokenKey = "@UserToken"
-const UserActiveKey = "@UserActive"
-const UserNumberKey = "@UserNumber"
 const UserNameKey = "@UserName"
 const UserSexKey = "@UserSex"
 const UserTagsKey = "@UserTags"
@@ -26,42 +24,6 @@ export async function getUserToken () {
   try {
     let tokenPromise = AsyncStorage.getItem(UserTokenKey)
     return await tokenPromise
-  } catch (err) {
-    throw new Error(err.message)
-  }
-}
-
-export async function setUserActive(){
-  try {
-    let activePromise = AsyncStorage.setItem(UserActiveKey,"true")
-    await activePromise
-   } catch (err) {
-    throw new Error(err.message)
-  }
-}
-
-export async function getIsUserActive() {
-  try {
-    let activePromise = AsyncStorage.getItem(UserActiveKey)
-    return await activePromise
-  } catch (err) {
-    throw new Error(err.message)
-  }
-}
-
-export async function setUserNumber(number){
-  try {
-    let numberPromise = AsyncStorage.setItem(UserNumberKey,number)
-    await numberPromise
-   } catch (err) {
-    throw new Error(err.message)
-  }
-}
-
-export async function getUserNumber (){
-  try {
-    let numberPromise = AsyncStorage.getItem(UserNumberKey)
-    return await numberPromise
   } catch (err) {
     throw new Error(err.message)
   }
@@ -216,17 +178,35 @@ export async function getIsPrivate () {
 //   }
 // }
 
-export async function setUserData(token,number,country)  {
+export async function setUserData(email,password)  {
   try {
-    await setUserToken(token)
-    await setUserNumber(number)
-    await setUserCountry(country)
-    await setMessageLast(0)
-    await setThoughtsLast(0)
+    await setUserEmail(email)
+    await setUserPassword(password)
   }
   catch (err) {
-    throw handler(err);
+    console.log("api addUser is "+err)
+    return null
   }
+}
+
+export async function initNewUser(uid,username,sex) {
+   try {
+     console.log("new uid is "+uid)
+    await setUserToken(uid)
+    await setUserName(username)
+    await setUserSex(sex)
+    await setIsPrivate(false)
+    //await setUserProfileMinBase64(profileBase64)
+
+    User.uid = uid
+    User.username = username
+    User.sex = sex
+    User.isPrivate = false
+}
+   catch (err) {
+     console.log("api addUser is "+err)
+     return null
+   }
 }
 
 export async function initUser(uid,response,profileBase64) {

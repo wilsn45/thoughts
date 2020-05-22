@@ -35,18 +35,20 @@ export async function signUp(email){
   }
 }
 
-export async function verifyPin(email){
+export async function addUser(email,password,username,sex){
   try{
-    let url = API_URL+"signUp?email="+email
-      console.log("url is "+url)
-      let res = await axios.get(url);
-      if(res.status==200) {
-        return res.data
+    //email=skk.wilson@gmail.com&&password=9210456121&&username=wilson&&sex="male"
+    let url = API_URL+"addNewUser?email="+email+"&&password="+password+"&&username="+username+"&&sex="+sex
+    console.log("url is "+url)
+    let res = await axios.get(url);
+    if(res.status==200) {
+        await userStorage.initNewUser(res.data.token, username,sex)
+        return true
      }
-      return null
+    return false
   }catch (e) {
-      console.log("api follow is "+e)
-      return null
+      console.log("api addUser is "+e)
+      return false
   }
 }
 
@@ -99,10 +101,10 @@ export async function getUserData(uid){
   			if(snapshot.empty) {
   			 console.log("available")
          resolve(true)
-  		  }else {
-  				console.log("not available")
-          resolve(false)
-  			}
+         return
+  		  }
+        console.log("not available")
+        resolve(false)
   			return
   		})
   	 .catch(err => {
@@ -132,7 +134,7 @@ export async function getMostPopularTags(){
    });
 }
 
-export async function addNewUser(){
+export async function _addNewUser(){
   try {
     let token = await userStorage.getUserToken()
     let number = await userStorage.getUserNumber()

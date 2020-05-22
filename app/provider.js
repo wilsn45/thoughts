@@ -22,20 +22,21 @@ function AuthProvider(props) {
     const getAuthState = async () => {
         try {
 
-            let token = await userStorage.getUserToken();
-            let registered = await userStorage.getIsUserActive()
-            if (token) {
-                let username = await userStorage.getUserName();
-                let sex = await userStorage.getUserSex();
-                let isPrivate = await userStorage.getIsPrivate();
-                User.uid = token
-                User.username = username
-                User.sex = sex
-                User.isPrivate = isPrivate
-                return registered ? AuthStatus.ACTIVATED : AuthStatus.LOGGED_IN
-            } else {
-                return AuthStatus.LOGGED_OUT
+            let username = await userStorage.getUserName()
+            if(!username) {
+              console.log("i am no username set")
+              return AuthStatus.LOGGED_OUT
             }
+
+            console.log("i am active")
+            let token = await userStorage.getUserToken()
+            let sex = await userStorage.getUserSex()
+            let isPrivate = await userStorage.getIsPrivate()
+            User.uid = token
+            User.username = username
+            User.sex = sex
+            User.isPrivate = isPrivate
+            return AuthStatus.ACTIVATED
 
         } catch (error) {
             throw new Error(error)

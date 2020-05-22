@@ -16,44 +16,42 @@ import Icon from 'react-native-vector-icons/Feather';
 import Modal from 'react-native-modal';
 import * as RNLocalize from "react-native-localize";
 var Spinner = require('react-native-spinkit');
-    export default function GetStarted(props) {
+ export default function ForgotPassword(props) {
        const {navigation} = props;
        const {navigate} = navigation;
 
     //1 - DECLARE VARIABLES
-    const [loginSelected, setLoginSelected] = useState(true);
     const [cred, setCred] = useState(null);
-    const [password, setPassword] = useState(null);
-    const [email, setEmail] = useState(null);
     const [validpin, setValidPin] = useState(null);
     const [verifyPin, setVerifyPin] = useState("");
-
+    let passedCred = useNavigationParam('cred');
 
     const [credPlaceholder, setCredPlaceholder] = useState("Username or Email");
-    const [passwordPlaceholder, setPasswordPlaceholder] = useState("Password");
+
 
     const [error, setError] = useState(null);
     const [pinError, setPinError] = useState(null);
 
 
-    const [buttonText, setButtonText] = useState("Get Started");
+    const [buttonText, setButtonText] = useState("Verify");
     const [isLoading, setIsLoading] = useState(false);
+    const [verifed, setVerifed] = useState(false);
 
     const [showVerifyPin, setShowVerifyPin] = useState(false);
 
 
+useEffect(() => {
+  console.log("cred "+passedCred)
+    if(passedCred) {
+        setCred(passedCred)
+      }
+}, []);
 
-
-async function login() {
-  setIsLoading(!isLoading)
-}
-
-async function signUp() {
-
+async function verify() {
   // navigate('SetUserInfo', {email : "skk.wilson@gmail.com", password : "kabir4577"});
   setIsLoading(true)
 
-  let resp = await api.signUp(email)
+  let resp = await api.signUp(username)
   if(!resp) {
     setIsLoading(false)
     setError("oops! we are broken")
@@ -70,71 +68,12 @@ async function signUp() {
   setIsLoading(false)
 }
 
-async function verifyOtc () {
+async function setPassword() {
 
-    setIsLoading(true)
-    try {
-       //  if (otc.length < 6) {
-       //     showError("Thats not the code")
-       //     return;
-       //
-       // }
-       Keyboard.dismiss()
-       // let numberVerifyPromise = api.numberVerify(code,confirmation)
-       // let user = await numberVerifyPromise;
-       //
-       //  if (!user) {
-       //   showError()
-       //   return
-       //  }
-
-        let uid =    "DD9jnDWbPKYPOFD4C355b1ja7bF2"
-        let number =  "+919958565727"
-        // let uid =    user.uid
-        // let number =  user.phoneNumber
-
-        console.log("id is " +uid)
-        console.log("number is " +number)
-
-        let userStatusPromise = api.getUserData(uid,number)
-        let response = await userStatusPromise
-        if(!response) {
-            console.log("new user")
-            await userStorage.setUserData(email,password)
-            navigate('SetUserInfo');
-        }
-        else {
-           console.log("old user")
-            let url = await api.getMinProfileUrl(uid)
-            let imageHelperPromise = imageHelper.saveProfileBase64(url)
-            let profileBase64 = await imageHelperPromise
-            await userStorage.initUser(uid,response,profileBase64)
-            navigate('App');
-        }
- }
- catch(err) {
-        if(err.message.includes("[auth/invalid-verification-code]"))
-         {
-            showError("Thats not the code")
-            return
-         }
-        showError()
-        console.log("error is " + err)
-    }
 }
 
-function changeOption(value) {
-  setLoginSelected(value)
-  if(value) {
-      setCredPlaceholder("Username or Email")
-      setPasswordPlaceholder("Password")
-      setButtonText("Get In")
-  }else {
-    setCredPlaceholder("Email")
-    setPasswordPlaceholder("Password")
-    setButtonText("Get Started")
-  }
-}
+
+
 
 async function verifyPinCallBack(value) {
   if(verifyPin.length > value.length) {
@@ -163,14 +102,14 @@ async function verifyPinCallBack(value) {
       return
     }
     setShowVerifyPin(false)
-    await userStorage.setUserData(email,password)
-    navigate('SetUserInfo', {email : email, password : password});
+    setVerifed(true)
+    setCredPlaceholder("New Password")
+    setButtonText("Get In")
   }
 }
 
-function forgotPassword() {
-  console.log("passing cred "+cred)
-  navigate('ForgotPassword', {cred : cred})
+function navigateBack() {
+  navigate('GetStarted')
 }
 
 return (
@@ -179,46 +118,26 @@ return (
 
     <View style = {styles.main} >
 
+    <TouchableOpacity
+      style = {{marginTop : 30}}
+      onPress={() => navigateBack()}
+      underlayColor='#fff'
+     >
+
+      <Icon name={'chevron-left'}  style = {{}} size={40} />
+    </TouchableOpacity>
+
     <View style = {styles.center}>
 
-    <View style = {{width : '55%',marginTop : 100, flexDirection : 'row', alignItems : "center", justifyContent : 'space-between', borderWidth : 0, borderColor : "red", marginBottom : 30}}>
-        <TouchableOpacity
-          onPress={() => changeOption(true)}>
-          <Text style={loginSelected ? styles.optionSelected : styles.optionUnSelected}>Login</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => changeOption(false)}>
-          <Text style={!loginSelected ? styles.optionSelected : styles.optionUnSelected}>Sign Up</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style = {{flex : 1, marginTop : 50,width : '80%', alignItems : "center", justifyContent : 'center', borderWidth : 0, borderColor : "red",}}>
-
-        <TextInput style={styles.textinput}
-          onChangeText={(value) => {setError(null); loginSelected ? setCred(value) : setEmail(value)}}
+    <TextInput style={styles.textinput}
+          onChangeText={(value) => {setError(null);setCred(value)}}
           autoFocus = {true}
+          value = {cred}
           placeholder = {credPlaceholder}
           placeholderTextColor = "#88898a"
-         />
+     />
 
-         <TextInput style={styles.textinput}
-           onChangeText={(value) => {setError(null);setPassword(value)}}
-          secureTextEntry={loginSelected}
-          placeholder = {passwordPlaceholder}
-          placeholderTextColor = "#88898a"
-          />
 
-      </View>
-      <View style = {{height : 50, marginTop : 0,borderWidth : 0, borderColor : "red"}}>
-      {
-        loginSelected &&
-        <TouchableOpacity
-          onPress={() => forgotPassword()}>
-          <Text style = {{fontSize: 18, fontFamily: "Thonburi",fontWeight : "100",color : "#cbcbcb"}}>Forgot password?</Text>
-        </TouchableOpacity>
-      }
-      </View>
 
       <View style = {{height : 30, width : '100%', alignItems : "center", borderWidth : 0}}>
       {
@@ -242,18 +161,13 @@ return (
     {
         !isLoading &&
         <TouchableOpacity
-        style={(email || cred) && password ? styles.getButtonEnabled : styles.getButtonDisabled}
-        onPress={() => loginSelected ? login() : signUp()}
+        style={cred ? styles.getButtonEnabled : styles.getButtonDisabled}
+        onPress={() =>  verify()}
         underlayColor='#fff'
         >
         <Text style={styles.buttonText}>{buttonText}</Text>
         </TouchableOpacity>
     }
-
-    <TouchableOpacity
-      onPress={() => forgotPassword()}>
-      <Text style = {{marginTop : 20, fontSize: 15, fontFamily: "Thonburi",fontWeight : "100",color : "#32c2ff"}}>Privacy Policy</Text>
-    </TouchableOpacity>
 
     </View>
 
@@ -299,15 +213,15 @@ return (
 const styles = StyleSheet.create({
     main : {
         flex : 1,
-        alignItems : "center",
-        justifyContent : "center",
+        alignItems : "flex-start",
+        justifyContent : "flex-start",
        backgroundColor : "#fff",
 
     },
     center : {
-      flex : 0.5,
+      flex : 0.7,
       width : '90%',
-      alignSelf: 'center',
+      alignSelf : "center",
       justifyContent : "center",
       alignItems : "center",
       borderColor : "red",
@@ -338,15 +252,13 @@ optionSelected : {
   marginBottom : 50,
 },
 textinput : {
-  width : '100%',
-  height : '25%',
+  width : '80%',
   color : 'black',
   fontSize: 20,
   textAlign : "auto",
   borderBottomWidth : 1,
   borderColor : "black",
   paddingLeft : 10,
-  marginBottom : 70
 },
 getButtonDisabled: {
     marginTop : 100,
@@ -389,7 +301,7 @@ buttonText: {
 
 });
 
-GetStarted.navigationOptions = ({}) => {
+ForgotPassword.navigationOptions = ({}) => {
     return {
         title: ``
     }

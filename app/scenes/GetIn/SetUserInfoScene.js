@@ -7,10 +7,12 @@ import {View,
   TouchableOpacity
 } from 'react-native';
 import * as api from "thoughts/app/services/GetInServices";
+import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 import { useAuth } from "thoughts/app/provider";
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 import Icon from 'react-native-vector-icons/Feather';
 var Spinner = require('react-native-spinkit');
+import Modal from 'react-native-modal';
 import {Keyboard} from 'react-native'
 
 
@@ -20,22 +22,28 @@ let isNewUser;
 export default function SetUserInfoScene(props) {
   const {navigation} = props;
   const {navigate} = navigation;
+let email = useNavigationParam('email');
+let password = useNavigationParam('password');
 const[userName, setUserName] = useState(null);
 const[timer, setTimer] = useState(null);
 const[userNameFound, setUserNameFound] = useState(false);
-const[error, setError] = useState();
+const[error, setError] = useState(false);
 const[isFinding, setIsFinding] = useState(false);
 
-const[male, setMale] = useState(false);
-const[female, setFemale] = useState(false);
-const[nonBinary, setNonBinary] = useState(false);
-const[sex, setSex] = useState(null);
+const [isLoading, setIsLoading] = useState(false);
 
 useEffect(() => {
 
 });
 
 function userNameCallBack(value) {
+  // console.log("length "+value.length)
+  if(!value) {
+    console.log("empty")
+    setIsFinding(false)
+    clearTimeout(timer);
+    return
+  }
   setError(null)
   setUserNameFound(false)
   clearTimeout(timer);
@@ -48,7 +56,9 @@ function userNameCallBack(value) {
 }
 
 function isUsernameAvailable(value) {
-  setUserName(value)
+if(!value) {
+  return
+}
   api.isUserNameAvailable(value)
   .then( availale => {
     if(!availale) {
@@ -57,6 +67,8 @@ function isUsernameAvailable(value) {
     else {
       Keyboard.dismiss()
       setUserNameFound(true)
+      setUserName(value)
+
     }
     setIsFinding(false)
   })
@@ -66,30 +78,36 @@ function isUsernameAvailable(value) {
     })
 }
 
-async function setUserInfo() {
+async function setUserInfo(sex) {
   try {
-    await  userStorage.setUserName(userName)
-    await userStorage.setUserSex(sex)
-    navigate('SelectTag');
+    setIsLoading(true)
+    setError(false)
+    let res =  await api.addUser(email,password,userName,sex)
+    if(res) {
+      navigate('App')
+    }else {
+      setError(true)
+    }
   }catch (err) {
-    console.log("idher error is "+err)
+    console.log("error is "+err)
   }
 }
 
 return (
   <View style={styles.main}>
    <View style = {styles.middleView}>
-   <Text style={styles.thoughtsText}>Choose a username</Text>
 
    <View style = {styles.usernameView}>
     <View style={styles.middleSubView}>
 
      <TextInput style={styles.userNameTextView}
        onChangeText={(value) => userNameCallBack(value)}
+       placeholder = "Choose a username"
+       placeholderColor = {"#cbcbcb"}
         autoFocus = {true}
     />
     {
-      isFinding && <Spinner  isVisible={true} size={25} type="Arc" color="#189afd"/>
+      isFinding && <Spinner  isVisible={true} size={25} type="Arc" color="#32c2ff"/>
     }
     </View>
     {
@@ -103,34 +121,61 @@ return (
       <View style = {styles.sexView}>
 
       <TouchableOpacity
-        style={ male ? styles.maleSelctedView : styles.maleView}
-        onPress={() => {setMale(true); setSex("Male"); setFemale(false); setNonBinary(false) }}
+        style={styles.maleView}
+        onPress={() => setUserInfo("Male")}
        >
-        <Text  style={ male ? styles.maleSelctedText : styles.maleText}> Male </Text>
+        <Text  style={styles.maleText}> Male </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={ female ? styles.femaleSelctedView : styles.femaleView}
-        onPress={() => {setFemale(true); setSex("Female"); setMale(false); setNonBinary(false)}}
+        style={styles.femaleView}
+        onPress={() => setUserInfo("Male")}
        >
-        <Text  style={ female ? styles.femaleSelctedText : styles.femaleText}> Female </Text>
+        <Text  style={ styles.femaleText}> Female </Text>
       </TouchableOpacity>
 
-
+      <TouchableOpacity
+        style={ styles.nonBinaryView}
+        onPress={() => setUserInfo("NonBinary")}
+       >
+        <Text  style={styles.nonBinaryText}> Non Binary </Text>
+      </TouchableOpacity>
 
       </View>
     }
 
-      { sex &&
+
+    <Modal isVisible={isLoading} swipeArea={50} style = {{alignSelf : "center",width : '80%'}} >
+      <View style = {{width : '100%', height : 150, backgroundColor : "#fff", alignItems : "center",justifyContent : "center"}}>
+
+      {
+      !error &&
+          <Spinner  isVisible={true} size={50} type="Arc" color="#32c2ff"/>
+      }
+      {
+        error &&
+
+        <View style = {{width : '100%',flex : 1, marginLeft : 10,marginTop : 5,alignItems : "flex-start", justifyContent : "flex-start"}}>
           <TouchableOpacity
-          style={ styles.setButtonView}
-          onPress={() => setUserInfo()}
-          underlayColor='#fff'>
-          <Text style={styles.buttonText}>Done</Text>
-          </TouchableOpacity>
+                 style = {{marginLeft : 5,marginTop : 5, marginBottom : 40,alignSelf : "flex-start"}}
+                 onPress={() => setIsLoading(false)}>
+                 <Icon name={"x"}  size={28}  color={"gray"}   />
+            </TouchableOpacity>
+
+            <Text style= {{width : 300,alignSelf : "center", fontSize: 19,fontFamily: "Thonburi",color : "red"}}>
+              Oops!.. We are broken(
+            </Text>
+        </View>
+
+
+
       }
 
-    </View>
+
+
+      </View>
+    </Modal>
+  </View>
 </View>
 
   );
@@ -179,11 +224,10 @@ const styles = StyleSheet.create({
 
   },
   userNameTextView : {
-   width : '50%',
-   color : '#189afd',
+   width : '75%',
+   color : '#32c2ff',
    fontSize: 25,
    marginRight : 25,
-   textAlign:'center',
   },
 
   setButtonView: {
@@ -210,23 +254,24 @@ const styles = StyleSheet.create({
      textAlign:'center',
  },
  sexView : {
-   flex : 0.4,
-   width : '95%',
+   marginTop : 100,
+   flex : 0.6,
+   width : '100%',
    flexDirection : "row",
-   justifyContent: 'center',
+   justifyContent: 'space-between',
+   // borderWidth : 1
  },
  maleView : {
-   width : '35%',
-   height : '50%',
+   width : '30%',
+   height : '40%',
    alignItems: 'center',
    justifyContent: 'center',
    borderColor: '#149cea',
-   marginRight : 50,
    borderWidth : 2,
 
  },
  maleSelctedView : {
-   width : '35%',
+   width : '30%',
    height : '50%',
    alignItems: 'center',
    justifyContent: 'center',
@@ -245,8 +290,8 @@ const styles = StyleSheet.create({
  },
 
  femaleView : {
-   width : '35%',
-   height : '50%',
+   width : '30%',
+   height : '40%',
    alignItems: 'center',
    justifyContent: 'center',
    borderColor: '#e6007b',
@@ -273,7 +318,7 @@ const styles = StyleSheet.create({
 
  nonBinaryView : {
    width : '30%',
-   height : '60%',
+   height : '40%',
    alignItems: 'center',
    justifyContent: 'center',
    borderColor: '#bcc1bf',
