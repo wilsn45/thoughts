@@ -22,13 +22,13 @@ function AuthProvider(props) {
     const getAuthState = async () => {
         try {
 
-            let username = await userStorage.getUserName()
-            if(!username) {
+            let token = await userStorage.getUserToken()
+            if(!token) {
               return AuthStatus.LOGGED_OUT
             }
 
             console.log("i am active")
-            let token = await userStorage.getUserToken()
+            let username = await userStorage.getUserName()
             let sex = await userStorage.getUserSex()
             let isPrivate = await userStorage.getIsPrivate()
             User.uid = token

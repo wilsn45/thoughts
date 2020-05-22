@@ -4,9 +4,18 @@ const admin = require('firebase-admin');
 admin.initializeApp();
 const db = admin.firestore();
 const storage = admin.storage();
-
+const nodemailer = require('nodemailer')
 
 const { parse } = require('querystring');
+
+
+let transporter = nodemailer.createTransport({
+		service: 'gmail',
+    auth: {
+        user: 'shakya4577@gmail.com',
+        pass: '9210456121'
+    }
+});
 //twillo
 // const twilio = require('twilio')
 // const accountSid = functions.config().twilio.sid
@@ -15,6 +24,270 @@ const { parse } = require('querystring');
 // const client = new twilio(accountSid,accountToken)
 // const twilioNumber = "+12056904590"
 
+
+
+exports.signUp = functions.https.onRequest((req, resp) => {
+	try {
+
+		const email = req.query.email
+		const usersRef = db.collection('secret')
+
+		usersRef.where("email", "==", email)
+		.get()
+		.then((docSnapshot) => {
+			if (!docSnapshot.empty) {
+				console.log("sing up: user exists")
+				resp.status(200).json({userExists: true})
+				return
+			}
+		  sendEmail(email,true)
+				.then(pin => {
+					resp.status(200).json({userExists: false, pin: pin})
+					return
+				})
+				.catch(err => {
+					console.log("signUp failure", err)
+					resp.status(400).send(new Error("Failed to process"))
+			 })
+			return
+		})
+		.catch( err => {
+			console.log("signUp failure", err)
+			resp.status(400).send(new Error("Failed to process"))
+		});
+	}catch(error) {
+		console.log("signUp failure", error)
+		resp.status(400).send(new Error("Failed to process"))
+	}
+});
+
+function sendEmail(email,isSignUp) {
+	return new Promise((resolve,reject) => {
+
+		const dest = email;
+		var pin = Math.floor(1000 + Math.random() * 9000);
+
+		let subject
+		let bodyString
+		if (isSignUp) {
+			 subject = 'Welcome to Thoughts!!!'
+			 bodyString =  `<p style="font-size: 16px;">Your verification pin is ${pin} </p>
+					<br />
+					<img src="https://images.prod.meredith.com/product/fc8754735c8a9b4aebb786278e7265a5/1538025388228/l/rick-and-morty-pickle-rick-sticker" />
+			`
+		}
+		else {
+			 subject = 'Forgot Password!!!'
+			 bodyString =  `<p style="font-size: 16px;">Your verification pin to set password is ${pin} </p>
+					<br />
+					<img src="https://images.prod.meredith.com/product/fc8754735c8a9b4aebb786278e7265a5/1538025388228/l/rick-and-morty-pickle-rick-sticker" />
+			`
+		}
+
+      const mailOptions = {
+            from: '"thoughts" <shakya4577@gmail.com>',
+            to: email,
+            subject: subject,
+            html:  bodyString // email content in HTML
+        };
+
+        // returning result
+        return transporter.sendMail(mailOptions, (erro, info) => {
+            if(erro){
+							console.log("sendVerificationPin "+erro)
+                reject(erro)
+            }
+						console.log("mail send")
+            resolve(pin)
+        })
+
+	});
+}
+
+exports.addNewUser = functions.https.onRequest((req, resp) => {
+	try {
+
+		const email = req.query.email
+		const password = req.query.password
+		const username = req.query.username
+		const sex = req.query.sex
+
+		let secretUser = {
+			email : email,
+			password : password,
+			username : username
+		}
+
+		let newUser = {
+		  	email : email,
+				username : username,
+				sex : sex,
+				isPrivate : false
+		}
+
+		db.collection('secret').add(secretUser)
+		.then (docRef => {
+				db.collection('user').doc(docRef.id).set(newUser)
+				resp.status(200).json({token: docRef.id})
+				return
+		})
+		.catch(err => {
+			console.log("addNewUser failure", err)
+			resp.status(400).send(new Error("Failed to process"))
+		})
+
+	}catch(error) {
+		console.log("addNewUser failure", error)
+		resp.status(400).send(new Error("Failed to process"))
+	}
+});
+
+
+exports.login = functions.https.onRequest((req, resp) => {
+	try {
+
+		const cred = req.query.cred
+		const password = req.query.password
+
+		var re = /\S+@\S+\.\S+/;
+    let isEmail = re.test(String(cred).toLowerCase());
+
+		console.log("is email "+isEmail)
+
+		let secretQry = null
+
+		if(isEmail) {
+			secretQry = db.collection('secret')
+			.where("email", "==", cred)
+			.where("password", "==", password)
+		}
+		else {
+			secretQry = db.collection('secret')
+			.where("username", "==", cred)
+			.where("password", "==", password)
+		}
+
+		secretQry
+			.get()
+			.then((snapshot) => {
+				if (snapshot.empty) {
+					resp.status(200).json({userExists : false, userInfo : null})
+					return
+				}
+
+				snapshot.forEach(doc => {
+      		console.log(doc.id, '=>', doc.data());
+					getUser(doc.data().username)
+ 					.then(data => {
+ 							resp.status(200).json({userExists : true , userInfo : data})
+ 							return
+ 					 })
+ 					.catch(err => {
+ 						console.log("login failure", err)
+ 						resp.status(200).send()
+ 					})
+     		});
+
+				return
+			})
+			.catch( err => {
+				console.log("login failure", err)
+				resp.status(400).send(err)
+			});
+	}catch(error) {
+		console.log("signUp failure", error)
+		resp.status(400).send(error)
+	}
+});
+
+
+function getUser(username) {
+	return new Promise((resolve,reject) => {
+		const usersRef = db.collection('user')
+		usersRef
+		.where("username", "==", username)
+		.get()
+		.then((snapshot) => {
+
+			if (snapshot.empty) {
+				reject(new Error("User doesn't exists"))
+				return
+			}
+			snapshot.forEach(doc => {
+				let data = {
+					uid : doc.id,
+					username : doc.data().username,
+					sex : doc.data().sex,
+					isPrivate : doc.data().isPrivate
+				}
+			 resolve(data)
+			});
+		 return
+	 })
+	 .catch( err => {
+			 console.log("getUser error is "+err)
+		 reject(err)
+	 });
+	});
+}
+
+
+
+exports.forgotPassword = functions.https.onRequest((req, resp) => {
+	try {
+
+		const cred = req.query.cred
+
+		var re = /\S+@\S+\.\S+/;
+    let isEmail = re.test(String(cred).toLowerCase());
+
+		console.log("is email "+isEmail)
+
+		let secretQry = null
+
+		if(isEmail) {
+			secretQry = db.collection('secret')
+			.where("email", "==", cred)
+		}
+		else {
+			secretQry = db.collection('secret')
+			.where("username", "==", cred)
+		}
+
+		secretQry
+			.get()
+			.then((snapshot) => {
+				if (snapshot.empty) {
+					resp.status(200).json({userExists: false})
+					return
+				}
+
+				snapshot.forEach(doc => {
+
+					let email = doc.data().email
+					console.log("email is", '=>', email);
+					sendEmail(email,false)
+						.then(pin => {
+							resp.status(200).json({userExists: true, pin: pin, email : email})
+							return
+						})
+						.catch(err => {
+							console.log("forgotPassword failure", err)
+							resp.status(400).send(new Error("Failed to process"))
+					 })
+     		});
+
+				return
+			})
+			.catch( err => {
+				console.log("forgotPassword failure", err)
+				resp.status(400).send(err)
+			});
+	}catch(error) {
+		console.log("forgotPassword failure", error)
+		resp.status(400).send(error)
+	}
+});
 
 
 //API to check if user is new to thoughts or not
@@ -359,7 +632,6 @@ exports.block = functions.https.onRequest((req, resp) => {
 			 			removeFollowingBlock(useruid,myuid)
 						.then(success => {
 							resp.status(200).send()
-							updateCount(myuid,useruid)
 							return
 						})
 						.catch(err => {
@@ -753,6 +1025,8 @@ function getCounts(uid) {
 }
 
 
+
+
 function newUserOnBoard(number,authToken) {
 	console.log(" newUserOnBoarduser token is", authToken)
 	let newUserData = {
@@ -767,8 +1041,75 @@ function newUserOnBoard(number,authToken) {
 	return db.collection('user').doc(authToken).set(newUserData)
 }
 
+exports.replyOnThought = functions.https.onRequest((req, resp) => {
+	try {
+		 let senderuid = req.headers.useruid
+		 let creatoruid = req.headers.creatoruid
 
+		 let sendername = req.query.username
+		 let creatorname = req.query.creatorname
 
+		 let thoughtsuid = req.query.thoughtsuid
+		 let thoughtsTitle = req.query.thoughtsTitle
+		 let message = req.query.message
+		 let thoughtsRef = req.query.thoughtsRef
+
+		 let users =  [senderuid,creatoruid]
+		 var time = new Date();
+
+		 let chatsRef = db.collection("chats");
+		  chatsRef.where("users", 'array-contains', senderuid)
+	    chatsRef.where("users", 'array-contains', creatoruid).get()
+		 .then(snapshot => {
+			  console.log("snapshot: ", snapshot);
+			 if(snapshot.empty) {
+
+				let response = chatsRef.add({
+					 users : users,
+					 lastmessagetimestamp : admin.firestore.FieldValue.serverTimestamp()
+				 })
+				 .then(docRef => {
+    	 	  chatsRef.doc(docRef.id).collection('messages').add({
+							sender : sendername,
+	 					 	message : message,
+	 					 	thoughtsTitle : thoughtsTitle,
+	 					 	thoughtsRef : thoughtsuid,
+							timestamp : admin.firestore.FieldValue.serverTimestamp()
+						})
+					 resp.status(200).send()
+					return
+				})
+			.catch(err => {
+    				console.error("Error adding document: ", error);
+						resp.status(400).send(err)
+			 });
+
+		 }
+		 snapshot.forEach(doc => {
+			 chatsRef.doc(doc.id).update({sender:sendername,message:message,thoughtsTitle : thoughtsTitle,thoughtsRef : thoughtsuid});
+			 chatsRef.doc(doc.id).collection('messages').add({
+				 	sender : sendername,
+				 	message : message,
+				 	thoughtsTitle : thoughtsTitle,
+				 	thoughtsRef : thoughtsuid,
+					timestamp : admin.firestore.FieldValue.serverTimestamp()
+				 })
+				resp.status(200).send()
+      });
+
+			 return
+		 })
+		 .catch(err => {
+			 console.log("replyOnThought eror is "+err)
+			 resp.status(400).send(err)
+		 })
+
+	}
+	catch(error) {
+		console.log("replyOnThought error is "+error)
+		resp.status(400).send(error)
+	}
+});
 
 function responseBuilder(isSuccess,data=null,error="") {
 

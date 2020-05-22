@@ -40,7 +40,7 @@ export async function login(cred,password){
      let url = API_URL+"login?cred="+cred+"&&password="+password
       console.log("url is "+url)
       let res = await axios.get(url);
-      console.log("resp  "+JSON.stringify(res))
+      // console.log("resp  "+JSON.stringify(res))
       if(res.status==200) {
         return res.data
       }
@@ -58,8 +58,13 @@ export async function addUser(email,password,username,sex){
     console.log("url is "+url)
     let res = await axios.get(url);
     if(res.status==200) {
-        await userStorage.initNewUser(res.data.token, username,sex)
-        return true
+        let custResp =  {
+          uid : res.data.token,
+          username : username,
+          sex : sex,
+          isPrivate : false
+        }
+        return custResp
      }
     return false
   }catch (e) {
@@ -107,6 +112,29 @@ export async function updatePassword(email,password){
      });
    });
 }
+
+
+export async function getMinProfile(token,sex){
+  let url
+  try {
+    url = await getMinProfileUrl(token)
+    console.log("url in try "+url)
+  }
+  catch(err) {
+    if (sex == "Male") {
+      url = BoyProfileMinURL
+    }else {
+      url = GirlProfileMinURL
+    }
+    console.log("url in catch "+url)
+  }
+  let imageHelperPromise = imageHelper.saveProfileBase64(url)
+  let profileBase64 = await imageHelperPromise
+  userStorage.setUserProfileMinBase64(profileBase64)
+  // console.log("profile base 64 "+profileBase64)
+  return
+}
+
 
  export async function numberSignIn(number) {
     return new Promise((resolve,reject) => {

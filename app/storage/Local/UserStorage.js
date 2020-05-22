@@ -189,41 +189,23 @@ export async function setUserData(email,password)  {
   }
 }
 
-export async function initNewUser(uid,username,sex) {
+export async function initUser(resp) {
    try {
-     console.log("new uid is "+uid)
-    await setUserToken(uid)
-    await setUserName(username)
-    await setUserSex(sex)
-    await setIsPrivate(false)
-    //await setUserProfileMinBase64(profileBase64)
+    await setUserToken(resp.uid)
+    await setUserName(resp.username)
+    await setUserSex(resp.sex)
+    await setIsPrivate(resp.isPrivate)
 
-    User.uid = uid
-    User.username = username
-    User.sex = sex
-    User.isPrivate = false
-}
-   catch (err) {
-     console.log("api addUser is "+err)
-     return null
-   }
-}
+    // await setUserProfileMinBase64(profileBase64)
 
-export async function initUser(uid,response,profileBase64) {
-   try {
-    await setUserToken(uid)
-    await setUserName(response.username)
-    await setUserSex(response.sex)
-    await setTags(response.tags)
-    await setUserCountry(response.country)
-    await setIsPrivate(response.isPrivate)
-    await setUserActive()
-    await setUserProfileMinBase64(profileBase64)
+    User.uid = resp.uid
+    User.username = resp.username
+    User.sex = resp.sex
+    User.isPrivate = resp.isPrivate
 
-    User.uid = uid
-    User.username = response.username
-    User.sex = response.sex
-    User.isPrivate = response.isPrivate
+    console.log("uid  "+User.uid)
+    console.log("isprivate  "+User.isPrivate)
+
 }
    catch (err) {
      throw Error(err);

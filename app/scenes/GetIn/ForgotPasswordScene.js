@@ -74,9 +74,21 @@ async function verify() {
 async function setPassword() {
   setIsLoading(true)
   let resp = await api.updatePassword(email,input)
-  setIsLoading(false)
   if(resp) {
-    console.log("Going for login")
+    let respLogin = await api.login(email,input)
+    if(!respLogin) {
+      setIsLoading(false)
+      setError("oops! we are broken")
+      return
+    }
+    if(!respLogin.userExists) {
+      setError("No user found")
+      setIsLoading(false)
+      return
+    }
+    await userStorage.initUser(respLogin.userInfo)
+    await api.getMinProfile(respLogin.userInfo.uid,respLogin.userInfo.sex)
+    navigate('App')
   //  let resp = await api.login(username,input)
   }
 }
@@ -141,6 +153,7 @@ return (
           onChangeText={(value) => {setError(null);setInput(value)}}
           autoFocus = {true}
           value = {input}
+          autoCapitalize='none'
           placeholder = {inputPlaceholder}
           placeholderTextColor = "#88898a"
      />

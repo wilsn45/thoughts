@@ -58,13 +58,21 @@ async function login() {
     setIsLoading(false)
     return
   }
-  console.log("user data "+resp.userInfo)
-
+  await userStorage.initUser(resp.userInfo)
+  await api.getMinProfile(resp.userInfo.uid,resp.userInfo.sex)
+  navigate('App')
 }
 
 async function signUp() {
 
   // navigate('SetUserInfo', {email : "skk.wilson@gmail.com", password : "kabir4577"});
+  var re = /\S+@\S+\.\S+/;
+  let isEmail = re.test(String(email).toLowerCase());
+
+  if(!isEmail) {
+    setError("Invalid emaild id")
+    return
+  }
   setIsLoading(true)
 
   let resp = await api.signUp(email)
@@ -212,6 +220,7 @@ return (
           onChangeText={(value) => {setError(null); loginSelected ? setCred(value) : setEmail(value)}}
           autoFocus = {true}
           placeholder = {credPlaceholder}
+          autoCapitalize='none'
           placeholderTextColor = "#88898a"
          />
 
@@ -219,6 +228,7 @@ return (
            onChangeText={(value) => {setError(null);setPassword(value)}}
           secureTextEntry={loginSelected}
           placeholder = {passwordPlaceholder}
+          autoCapitalize='none'
           placeholderTextColor = "#88898a"
           />
 

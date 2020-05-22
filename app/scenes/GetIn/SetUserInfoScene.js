@@ -82,9 +82,12 @@ async function setUserInfo(sex) {
   try {
     setIsLoading(true)
     setError(false)
-    let res =  await api.addUser(email,password,userName,sex)
-    if(res) {
+    let resp =  await api.addUser(email,password,userName,sex)
+    if(resp) {
+      await userStorage.initUser(resp)
+      await api.getMinProfile(resp.uid,resp.sex)
       navigate('App')
+
     }else {
       setError(true)
     }
@@ -129,7 +132,7 @@ return (
 
       <TouchableOpacity
         style={styles.femaleView}
-        onPress={() => setUserInfo("Male")}
+        onPress={() => setUserInfo("Female")}
        >
         <Text  style={ styles.femaleText}> Female </Text>
       </TouchableOpacity>
