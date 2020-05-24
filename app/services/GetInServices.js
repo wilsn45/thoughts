@@ -1,10 +1,8 @@
 import axios from 'axios';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import * as c from "../storage/Constants";
 import React, { useState } from 'react';
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
-import * as contactListHelper from "thoughts/app/helper/ContactListtHelper";
 import * as imageHelper from "thoughts/app/helper/ImageHelper";
 import { firebase } from '@react-native-firebase/storage';
 import * as  User  from "thoughts/app/User";
@@ -15,7 +13,6 @@ const API_URL = "https://us-central1-thoughts-fe76a.cloudfunctions.net/"
 
 const usersCollection = firestore().collection('Users');
 const thought_peopleCollection = firestore().collection('thought_people');
-let confirmation  = null
 const storage = firebase.storage()
 
 
@@ -134,29 +131,6 @@ export async function getMinProfile(token,sex){
   // console.log("profile base 64 "+profileBase64)
   return
 }
-
-
- export async function numberSignIn(number) {
-    return new Promise((resolve,reject) => {
-     auth().signInWithPhoneNumber(number).then ( (confirmation) =>{
-        resolve (confirmation)
-     }).catch (err => {
-       reject(err)
-     })
-    });
- }
-
-
- export async function numberVerify(otc,confirmation) {
-   return new Promise((resolve,reject) => {
-     confirmation.confirm(otc).then( (user) =>{
-         resolve(user)
-     }).catch(function (err) {
-        reject(err)
-    })
-  });
-}
-
 
 export async function getUserData(uid){
  return new Promise((resolve,reject) => {

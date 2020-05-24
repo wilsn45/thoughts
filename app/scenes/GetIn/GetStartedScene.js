@@ -10,11 +10,10 @@ import {View,
 import * as api from "thoughts/app/services/GetInServices";
 import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
-import * as imageHelper from "thoughts/app/helper/ImageHelper";
 import { useAuth } from "thoughts/app/provider";
 import Icon from 'react-native-vector-icons/Feather';
 import Modal from 'react-native-modal';
-import * as RNLocalize from "react-native-localize";
+
 var Spinner = require('react-native-spinkit');
     export default function GetStarted(props) {
        const {navigation} = props;
@@ -92,58 +91,6 @@ async function signUp() {
   setIsLoading(false)
 }
 
-async function verifyOtc () {
-
-    setIsLoading(true)
-    try {
-       //  if (otc.length < 6) {
-       //     showError("Thats not the code")
-       //     return;
-       //
-       // }
-       Keyboard.dismiss()
-       // let numberVerifyPromise = api.numberVerify(code,confirmation)
-       // let user = await numberVerifyPromise;
-       //
-       //  if (!user) {
-       //   showError()
-       //   return
-       //  }
-
-        let uid =    "DD9jnDWbPKYPOFD4C355b1ja7bF2"
-        let number =  "+919958565727"
-        // let uid =    user.uid
-        // let number =  user.phoneNumber
-
-        console.log("id is " +uid)
-        console.log("number is " +number)
-
-        let userStatusPromise = api.getUserData(uid,number)
-        let response = await userStatusPromise
-        if(!response) {
-            console.log("new user")
-            await userStorage.setUserData(email,password)
-            navigate('SetUserInfo');
-        }
-        else {
-           console.log("old user")
-            let url = await api.getMinProfileUrl(uid)
-            let imageHelperPromise = imageHelper.saveProfileBase64(url)
-            let profileBase64 = await imageHelperPromise
-            await userStorage.initUser(uid,response,profileBase64)
-            navigate('App');
-        }
- }
- catch(err) {
-        if(err.message.includes("[auth/invalid-verification-code]"))
-         {
-            showError("Thats not the code")
-            return
-         }
-        showError()
-        console.log("error is " + err)
-    }
-}
 
 function changeOption(value) {
   setLoginSelected(value)
