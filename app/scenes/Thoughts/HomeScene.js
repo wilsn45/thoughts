@@ -72,6 +72,9 @@ async function navigateToProfile() {
     console.log("Sending message to "+uid)
   }
 
+  function closeNewThought() {
+    showNewThought(false)
+  }
   return (
 
     <View style = {styles.main}>
@@ -170,7 +173,7 @@ async function navigateToProfile() {
 
       <TouchableOpacity
         style = {styles.superViewBottom}
-        onPress={() => navigateToProfile()}
+        onPress={() => showNewThought(true)}
         underlayColor='#fff'
        >
         <Icon name={'circle'}  style = {styles.thoughtsView} size={80} />
@@ -186,6 +189,9 @@ async function navigateToProfile() {
 
       </View>
 
+      <Modal isVisible={newThought} swipeArea={50} style = {{alignSelf : "center",width : '85%'}} >
+        <NewThought  closeCallBack = {closeNewThought} />
+     </Modal>
 
     </View>
     );

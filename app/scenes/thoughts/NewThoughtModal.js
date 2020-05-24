@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import {View, 
+import {View,
         Image,
         Text,
-        TextInput, 
+        TextInput,
         StyleSheet,
         TouchableOpacity,
         TouchableWithoutFeedback,
@@ -29,8 +29,7 @@ export default function NewThought ({closeCallBack}) {
     const [optionThree, setOptionThree] = useState("")
     const [optionFour, setOptionFour] = useState("")
 
-    const [locationFlag, setLocationFlag] = useState(true)
-    
+
     const [optionFlag, setOptionFlag] = useState(false)
 
 
@@ -57,18 +56,18 @@ export default function NewThought ({closeCallBack}) {
         setOptionFlag(!optionFlag)
       }
 
-      
+
       function onImageClick () {
-      
+
 
         ImagePicker.showImagePicker(options, (response) => {
                  console.log('Response = ', response);
             if (response.didCancel) {
-               
+
         } else if (response.error) {
-               
+
         } else if (response.customButton) {
-            
+
         } else {
              const source = { uri: response.uri };
              console.log("counter adding +" + imageCounter)
@@ -138,7 +137,7 @@ export default function NewThought ({closeCallBack}) {
     return (
 
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      
+
     <View style = {styles.main}>
 
         <TouchableOpacity
@@ -147,13 +146,6 @@ export default function NewThought ({closeCallBack}) {
                  <Icon name={"x"}  size={32}  color={"gray"} style = {{marginTop : 10}}  />
             </TouchableOpacity>
 
-            { locationFlag && 
-                <View style = {styles.locationView}>
-                    <Icon name={"map-pin"}  size={18}   />
-                    <Text> Current location </Text>
-                </View>
-                
-            }
             <ScrollView style = {styles.ScrollView}>
             <View style = {styles.descView}>
 
@@ -198,28 +190,28 @@ export default function NewThought ({closeCallBack}) {
 
                   </View>
                 }
-              
+
               {
-                 optionFlag && 
+                 optionFlag &&
 
                  <View style = {styles.optionView}>
 
                 <TextInput style = {styles.optionInput}
                     placeholder = "Choice 1"
-                    onChangeText={(txt) => setOptionOne(txt)}> 
+                    onChangeText={(txt) => setOptionOne(txt)}>
                 </TextInput>
 
                 <View style = {{flexDirection : "row"}}>
 
                   <TextInput style = {styles.optionInput}s
                     placeholder = "Choice 2"
-                    onChangeText={(txt) => optionTwo(txt)}> 
+                    onChangeText={(txt) => optionTwo(txt)}>
                   </TextInput>
 
                   {
-                     !optionThreeVisisble && 
+                     !optionThreeVisisble &&
 
-                      <TouchableOpacity style = {{marginLeft : 5, alignSelf : "center"}} 
+                      <TouchableOpacity style = {{marginLeft : 5, alignSelf : "center"}}
                       onPress={() => setOptionThreeVisible(true)}>
                      <Icon name={"plus-circle"}  size={28}  />
                      </TouchableOpacity>
@@ -227,18 +219,18 @@ export default function NewThought ({closeCallBack}) {
               </View>
 
               {
-                 optionThreeVisisble && 
+                 optionThreeVisisble &&
 
                  <View style = {{flexDirection : "row"}}>
-                
+
                   <TextInput style = {styles.optionInput}s
                     placeholder = "Choice 3 (optional)"
-                    onChangeText={(txt) => setOptionThree(txt)}> 
+                    onChangeText={(txt) => setOptionThree(txt)}>
                   </TextInput>
 
                    {
-                     !optionFourVisisble &&  
-                     <TouchableOpacity style = {{marginLeft : 5, alignSelf : "center"}} 
+                     !optionFourVisisble &&
+                     <TouchableOpacity style = {{marginLeft : 5, alignSelf : "center"}}
                        onPress={() => setOptionFourVisible(true)}>
                       <Icon name={"plus-circle"}  size={28}  />
                      </TouchableOpacity>
@@ -247,47 +239,47 @@ export default function NewThought ({closeCallBack}) {
               }
 
               {
-                optionFourVisisble && 
+                optionFourVisisble &&
 
                 <TextInput style = {styles.optionInput}
                     placeholder = "Choice 4 (optional)"
-                    onChangeText={(txt) => setOptionFour(txt)}> 
+                    onChangeText={(txt) => setOptionFour(txt)}>
                 </TextInput>
               }
 
                </View>
-             
+
               }
 
             </ScrollView>
 
             <View style = {styles.toolView}>
 
-                <TouchableOpacity style = {styles.toolOption} 
+                <TouchableOpacity style = {styles.toolOption}
                  onPress={() => onImageClick()}>
                  <Icon name={"image"}  size={32}   />
                </TouchableOpacity>
 
-               <TouchableOpacity style = {styles.toolOption} 
+               <TouchableOpacity style = {styles.toolOption}
                  onPress={() => onOptionClick()}>
                  <Icon name={"list"}  size={32}  />
                </TouchableOpacity>
 
-                <TouchableOpacity style = {styles.toolOption} 
+                <TouchableOpacity style = {styles.toolOption}
                  onPress={() => onLocationClick()}>
                  <Icon name={"map-pin"}  size={32}  />
                </TouchableOpacity>
 
-               <TouchableOpacity style = {styles.postBottomView} 
+               <TouchableOpacity style = {styles.postBottomView}
                  onPress={() => onPostClick()}>
                 <Text style = {styles.postText}> post </Text>
                </TouchableOpacity>
-               
+
             </View>
        </View>
-      
+
     </TouchableWithoutFeedback>
-          
+
     );
 };
 
