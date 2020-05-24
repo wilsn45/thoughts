@@ -196,8 +196,6 @@ export async function initUser(resp) {
     await setUserSex(resp.sex)
     await setIsPrivate(resp.isPrivate)
 
-    // await setUserProfileMinBase64(profileBase64)
-
     User.uid = resp.uid
     User.username = resp.username
     User.sex = resp.sex
