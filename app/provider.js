@@ -26,8 +26,6 @@ function AuthProvider(props) {
             if(!token) {
               return AuthStatus.LOGGED_OUT
             }
-
-            console.log("i am active")
             let username = await userStorage.getUserName()
             let sex = await userStorage.getUserSex()
             let isPrivate = await userStorage.getIsPrivate()

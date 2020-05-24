@@ -1,27 +1,29 @@
 import React, { useState } from 'react';
 import {View,
-        Image,
-        Text,
-        TextInput,
-        StyleSheet,
-        TouchableOpacity,
-        TouchableWithoutFeedback,
-         Keyboard,
-        KeyboardAvoidingView,
-        ScrollView} from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
-import ImagePicker from 'react-native-image-picker';
-import ImageView from "thoughts/app/components/ImageViewComponent";
+  Image,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
+  KeyboardAvoidingView,
+  ScrollView} from 'react-native';
+  import Icon from 'react-native-vector-icons/Feather';
+  import ImagePicker from 'react-native-image-picker';
+  import ImageView from "thoughts/app/components/ImageViewComponent";
+  import * as imageHelper from "thoughts/app/helper/ImageHelper";
+  import * as messageapi from "thoughts/app/services/MessageServices";
 
-const options = {
-  title: 'Select Image',
-   storageOptions: {
-    skipBackup: true,
-    path: 'images',
-  },
-};
+  const options = {
+    title: 'Select Image',
+    storageOptions: {
+      skipBackup: true,
+      path: 'images',
+    },
+  };
 
-export default function NewThought ({closeCallBack}) {
+  export default function NewThought ({closeCallBack}) {
 
     const [desc, setDesc] = useState("")
     const [optionOne, setOptionOne] = useState("")
@@ -33,281 +35,287 @@ export default function NewThought ({closeCallBack}) {
     const [optionFlag, setOptionFlag] = useState(false)
 
 
-     const [imageOne, setImageOne] = useState()
-     const [imageTwo, setImageTwo] = useState()
-     const [imageThree, setImageThree] = useState()
-     const [imageFour, setImageFour] = useState()
-     const [imageFive, setImageFive] = useState()
-     const [imageSix, setImageSix] = useState()
+    const [imageOne, setImageOne] = useState()
+    const [imageTwo, setImageTwo] = useState()
+    const [imageThree, setImageThree] = useState()
+    const [imageFour, setImageFour] = useState()
+    const [imageFive, setImageFive] = useState()
+    const [imageSix, setImageSix] = useState()
 
 
-     const [imageCounter, setImageCounter] = useState(1)
+    const [imageCounter, setImageCounter] = useState(1)
 
 
 
-     const [optionThreeVisisble, setOptionThreeVisible] = useState(false)
-     const [optionFourVisisble, setOptionFourVisible] = useState(false)
+    const [optionThreeVisisble, setOptionThreeVisible] = useState(false)
+    const [optionFourVisisble, setOptionFourVisible] = useState(false)
 
-     async function onLocationClick() {
-        setLocationFlag(!locationFlag)
-      }
+    async function onLocationClick() {
+      setLocationFlag(!locationFlag)
+    }
 
-       async function onOptionClick() {
-        setOptionFlag(!optionFlag)
-      }
-
-
-      function onImageClick () {
+    async function onOptionClick() {
+      setOptionFlag(!optionFlag)
+    }
 
 
-        ImagePicker.showImagePicker(options, (response) => {
-                 console.log('Response = ', response);
-            if (response.didCancel) {
+    function onImageClick () {
+
+      ImagePicker.showImagePicker(options, (response) => {
+        // console.log('Response = ', response);
+        if (response.didCancel) {
 
         } else if (response.error) {
 
         } else if (response.customButton) {
 
         } else {
-             const source = { uri: response.uri };
-             console.log("counter adding +" + imageCounter)
-              console.log("source url +" + response.uri)
-                switch(imageCounter) {
-                    case 1 : setImageOne(source);break;
-                    case 2 : setImageTwo(source);break;
-                    case 3 : setImageThree(source);break;
-                    case 4 : setImageFour(source);break;
-                    case 5 : setImageFive(source);break;
-                    case 6 : setImageSix(source);break;
-                }
-                setImageCounter(imageCounter+1)
-            }
-         });
+          const source = { uri: response.uri };
+          // console.log("counter adding +" + imageCounter)
+          //  console.log("source url +" + response.uri)
+          switch(imageCounter) {
+            case 1 : setImageOne(source);break;
+            case 2 : setImageTwo(source);break;
+            case 3 : setImageThree(source);break;
+            case 4 : setImageFour(source);break;
+            case 5 : setImageFive(source);break;
+            case 6 : setImageSix(source);break;
+          }
+          setImageCounter(imageCounter+1)
+        }
+      });
 
-     }
+    }
 
-     function cancelCallback(number) {
+    function cancelCallback(number) {
 
-       console.log("counter deleting +" + imageCounter)
+      // console.log("counter deleting +" + imageCounter)
 
-         switch(number) {
-                    case 1 : {
-                      setImageOne(imageTwo)
-                      setImageTwo(imageThree)
-                      setImageThree(imageFour)
-                      setImageFour(imageFive)
-                      setImageFive(imageSix)
-                      setImageSix(null)
-                    };break;
-                    case 2 : {
-                      setImageTwo(imageThree)
-                      setImageThree(imageFour)
-                      setImageFour(imageFive)
-                      setImageFive(imageSix)
-                      setImageSix(null)
-                    };break;
-                    case 3 : {
-                      setImageThree(imageFour)
-                      setImageFour(imageFive)
-                      setImageFive(imageSix)
-                      setImageSix(null)
-                    };break;
-                    case 4 : {
-                      setImageFour(imageFive)
-                      setImageFive(imageSix)
-                      setImageSix(null)
-                    };break;
-                    case 5 : {
-                      setImageFive(imageSix)
-                      setImageSix(null)
-                    };break;
-                    case 6 : setImageSix(null);break;
-                }
-                setImageCounter(imageCounter-1)
-     }
+      switch(number) {
+        case 1 : {
+          setImageOne(imageTwo)
+          setImageTwo(imageThree)
+          setImageThree(imageFour)
+          setImageFour(imageFive)
+          setImageFive(imageSix)
+          setImageSix(null)
+        };break;
+        case 2 : {
+          setImageTwo(imageThree)
+          setImageThree(imageFour)
+          setImageFour(imageFive)
+          setImageFive(imageSix)
+          setImageSix(null)
+        };break;
+        case 3 : {
+          setImageThree(imageFour)
+          setImageFour(imageFive)
+          setImageFive(imageSix)
+          setImageSix(null)
+        };break;
+        case 4 : {
+          setImageFour(imageFive)
+          setImageFive(imageSix)
+          setImageSix(null)
+        };break;
+        case 5 : {
+          setImageFive(imageSix)
+          setImageSix(null)
+        };break;
+        case 6 : setImageSix(null);break;
+      }
+      setImageCounter(imageCounter-1)
+    }
 
 
 
-     function onPostClick () {
+    async function onPostClick () {
+      try {
+        let imageArray = []
+        if(imageOne) {
+          console.log("before compression "+imageOne.uri);
+          // let newImage = await imageHelper.getResizedImage(imageOne.uri)
+          // console.log("new compressed image is "+newImage)
+          await messageapi.postImage(imageOne.uri)
+          console.log("image uploaded")
+        }
+      }catch(err) {
+        console.log(err);
+      }
 
-     }
+   }
 
 
 
     return (
 
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
 
-    <View style = {styles.main}>
+      <View style = {styles.main}>
 
-        <TouchableOpacity
-                 style = {{marginLeft : 10,marginTop : 10}}
-                 onPress={() => closeCallBack()}>
-                 <Icon name={"x"}  size={32}  color={"gray"} style = {{marginTop : 10}}  />
+      <TouchableOpacity
+      style = {{marginLeft : 10,marginTop : 10}}
+      onPress={() => closeCallBack()}>
+      <Icon name={"x"}  size={32}  color={"gray"} style = {{marginTop : 10}}  />
+      </TouchableOpacity>
+
+      <ScrollView style = {styles.ScrollView}>
+      <View style = {styles.descView}>
+
+      <TextInput style = {styles.descTextView}
+      maxLength={250}
+      multiline
+      numberOfLines={9}
+      placeholder = "Write your heart out!"
+      onChangeText={(txt) => setDesc(txt)}
+      />
+      </View>
+
+      { imageOne &&
+
+        <View style= {{flexDirection : "row", height : 125, paddingLeft : 10}}>
+        {
+          imageOne && <ImageView source = {imageOne} cancelCallback = {cancelCallback} number = {1}/>
+        }
+        {
+          imageTwo && <ImageView source = {imageTwo} cancelCallback = {cancelCallback} number = {2}/>
+        }
+        {
+          imageThree && <ImageView source = {imageThree} cancelCallback = {cancelCallback} number = {3}/>
+        }
+
+        </View>
+      }
+
+      { imageFour &&
+
+        <View style= {{flexDirection : "row", height : 125, paddingLeft : 10}}>
+
+        {
+          imageFour && <ImageView source = {imageFour} cancelCallback = {cancelCallback} number = {4}/>
+        }
+        {
+          imageFive && <ImageView source = {imageFive} cancelCallback = {cancelCallback} number = {5}/>
+        }
+        {
+          imageSix && <ImageView source = {imageSix} cancelCallback = {cancelCallback} number = {6}/>
+        }
+
+        </View>
+      }
+
+      {
+        optionFlag &&
+
+        <View style = {styles.optionView}>
+
+        <TextInput style = {styles.optionInput}
+        placeholder = "Choice 1"
+        onChangeText={(txt) => setOptionOne(txt)}>
+        </TextInput>
+
+        <View style = {{flexDirection : "row"}}>
+
+        <TextInput style = {styles.optionInput}s
+        placeholder = "Choice 2"
+        onChangeText={(txt) => setOptionTwo(txt)}>
+        </TextInput>
+
+        {
+          !optionThreeVisisble &&
+
+          <TouchableOpacity style = {{marginLeft : 5, alignSelf : "center"}}
+          onPress={() => setOptionThreeVisible(true)}>
+          <Icon name={"plus-circle"}  size={28}  />
+          </TouchableOpacity>
+        }
+        </View>
+
+        {
+          optionThreeVisisble &&
+
+          <View style = {{flexDirection : "row"}}>
+
+          <TextInput style = {styles.optionInput}s
+          placeholder = "Choice 3 (optional)"
+          onChangeText={(txt) => setOptionThree(txt)}>
+          </TextInput>
+
+          {
+            !optionFourVisisble &&
+            <TouchableOpacity style = {{marginLeft : 5, alignSelf : "center"}}
+            onPress={() => setOptionFourVisible(true)}>
+            <Icon name={"plus-circle"}  size={28}  />
             </TouchableOpacity>
+          }
+          </View>
+        }
 
-            <ScrollView style = {styles.ScrollView}>
-            <View style = {styles.descView}>
+        {
+          optionFourVisisble &&
 
-                <TextInput style = {styles.descTextView}
-                     maxLength={250}
-                     multiline
-                    numberOfLines={9}
-                     placeholder = "Write your heart out!"
-                     onChangeText={(txt) => setDesc(txt)}
-                     />
-            </View>
+          <TextInput style = {styles.optionInput}
+          placeholder = "Choice 4 (optional)"
+          onChangeText={(txt) => setOptionFour(txt)}>
+          </TextInput>
+        }
 
-           { imageOne &&
+        </View>
 
-                  <View style= {{flexDirection : "row", height : 125, paddingLeft : 10}}>
-                     {
-                        imageOne && <ImageView source = {imageOne} cancelCallback = {cancelCallback} number = {1}/>
-                     }
-                     {
-                        imageTwo && <ImageView source = {imageTwo} cancelCallback = {cancelCallback} number = {2}/>
-                     }
-                     {
-                        imageThree && <ImageView source = {imageThree} cancelCallback = {cancelCallback} number = {3}/>
-                     }
+      }
 
-                  </View>
-                 }
+      </ScrollView>
 
-                  { imageFour &&
+      <View style = {styles.toolView}>
 
-                  <View style= {{flexDirection : "row", height : 125, paddingLeft : 10}}>
+      <TouchableOpacity style = {styles.toolOption}
+      onPress={() => onImageClick()}>
+      <Icon name={"image"}  color={"gray"} size={32}   />
+      </TouchableOpacity>
 
-                    {
-                      imageFour && <ImageView source = {imageFour} cancelCallback = {cancelCallback} number = {4}/>
-                    }
-                    {
-                       imageFive && <ImageView source = {imageFive} cancelCallback = {cancelCallback} number = {5}/>
-                    }
-                    {
-                      imageSix && <ImageView source = {imageSix} cancelCallback = {cancelCallback} number = {6}/>
-                    }
+      <TouchableOpacity style = {styles.toolOption}
+      onPress={() => onOptionClick()}>
+      <Icon name={"list"} color={"gray"} size={32}  />
+      </TouchableOpacity>
 
-                  </View>
-                }
+      <TouchableOpacity style = {styles.postBottomView}
+      onPress={() => onPostClick()}>
+      <Text style = {styles.postText}> post </Text>
+      </TouchableOpacity>
 
-              {
-                 optionFlag &&
+      </View>
+      </View>
 
-                 <View style = {styles.optionView}>
-
-                <TextInput style = {styles.optionInput}
-                    placeholder = "Choice 1"
-                    onChangeText={(txt) => setOptionOne(txt)}>
-                </TextInput>
-
-                <View style = {{flexDirection : "row"}}>
-
-                  <TextInput style = {styles.optionInput}s
-                    placeholder = "Choice 2"
-                    onChangeText={(txt) => optionTwo(txt)}>
-                  </TextInput>
-
-                  {
-                     !optionThreeVisisble &&
-
-                      <TouchableOpacity style = {{marginLeft : 5, alignSelf : "center"}}
-                      onPress={() => setOptionThreeVisible(true)}>
-                     <Icon name={"plus-circle"}  size={28}  />
-                     </TouchableOpacity>
-                  }
-              </View>
-
-              {
-                 optionThreeVisisble &&
-
-                 <View style = {{flexDirection : "row"}}>
-
-                  <TextInput style = {styles.optionInput}s
-                    placeholder = "Choice 3 (optional)"
-                    onChangeText={(txt) => setOptionThree(txt)}>
-                  </TextInput>
-
-                   {
-                     !optionFourVisisble &&
-                     <TouchableOpacity style = {{marginLeft : 5, alignSelf : "center"}}
-                       onPress={() => setOptionFourVisible(true)}>
-                      <Icon name={"plus-circle"}  size={28}  />
-                     </TouchableOpacity>
-                   }
-               </View>
-              }
-
-              {
-                optionFourVisisble &&
-
-                <TextInput style = {styles.optionInput}
-                    placeholder = "Choice 4 (optional)"
-                    onChangeText={(txt) => setOptionFour(txt)}>
-                </TextInput>
-              }
-
-               </View>
-
-              }
-
-            </ScrollView>
-
-            <View style = {styles.toolView}>
-
-                <TouchableOpacity style = {styles.toolOption}
-                 onPress={() => onImageClick()}>
-                 <Icon name={"image"}  size={32}   />
-               </TouchableOpacity>
-
-               <TouchableOpacity style = {styles.toolOption}
-                 onPress={() => onOptionClick()}>
-                 <Icon name={"list"}  size={32}  />
-               </TouchableOpacity>
-
-                <TouchableOpacity style = {styles.toolOption}
-                 onPress={() => onLocationClick()}>
-                 <Icon name={"map-pin"}  size={32}  />
-               </TouchableOpacity>
-
-               <TouchableOpacity style = {styles.postBottomView}
-                 onPress={() => onPostClick()}>
-                <Text style = {styles.postText}> post </Text>
-               </TouchableOpacity>
-
-            </View>
-       </View>
-
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
 
     );
-};
+  };
 
 
-const styles = StyleSheet.create({
+  const styles = StyleSheet.create({
     main : {
-        flex : 0.9,
-        width: '100%',
-        backgroundColor : "#fff"
+      flex : 0.9,
+      width: '100%',
+      backgroundColor : "#fff"
     },
     locationView : {
-        flex : 0.05,
-        marginTop : 10,
-        marginLeft : 10,
-        flexDirection : "row"
+      flex : 0.05,
+      marginTop : 10,
+      marginLeft : 10,
+      flexDirection : "row"
     },
     ScrollView : {
-       flex : 0.85,
-        marginTop : 10,
-        width : '100%',
-        borderColor: "pink",
-       //borderWidth : 1
+      flex : 0.85,
+      marginTop : 10,
+      width : '100%',
+      borderColor: "pink",
+      //borderWidth : 1
     },
     descView : {
-        width : '100%',
-        borderColor: "green",
-        marginBottom : 30
-       // borderWidth : 1
+      width : '100%',
+      borderColor: "green",
+      marginBottom : 30
+      // borderWidth : 1
     },
     descTextView : {
       marginLeft : 10,
@@ -315,11 +323,11 @@ const styles = StyleSheet.create({
       fontSize: 20,
       fontFamily: "Thonburi",
     },
-   optionView : {
-       width : '100%',
-       borderColor: "blue",
-       // borderWidth : 1,
-       paddingLeft : 10
+    optionView : {
+      width : '100%',
+      borderColor: "blue",
+      // borderWidth : 1,
+      paddingLeft : 10
     },
     optionInput : {
       height : 50,
@@ -331,28 +339,28 @@ const styles = StyleSheet.create({
       paddingLeft : 10
     },
     toolView : {
-        flex : 0.1,
-        marginTop : 10,
-        width : '100%',
-        borderColor: "blue",
+      flex : 0.1,
+      marginTop : 10,
+      width : '100%',
+      borderColor: "blue",
       // borderWidth : 1,
-        flexDirection : "row"
+      flexDirection : "row"
     },
     toolOption : {
-        marginTop : 10,
-        marginLeft : 30,
-        marginRight : 10,
+      marginTop : 10,
+      marginLeft : 30,
+      marginRight : 10,
     },
 
-     postBottomView : {
-        marginLeft : 50,
+    postBottomView : {
+      marginLeft : 100,
     },
     postText : {
-        fontSize: 26,
-        fontFamily: "Thonburi",
-        color : "#63b1bf",
-        alignSelf : "center"
+      fontSize: 26,
+      fontFamily: "Thonburi",
+      color : "#63b1bf",
+      alignSelf : "center"
     }
 
 
-});
+  });

@@ -114,6 +114,23 @@ export async function sendImageMessage(username,useruid,imageurll){
     }
 }
 
+
+export async function postImage(imageUrl){
+  try {
+
+     let unixtime = new Date().valueOf()
+     let timestamp = Math.floor(unixtime/1000)
+
+      let ext = imageUrl.split('.').pop();
+      let imagePath =  User.uid +'_'+timestamp+'.'+ext
+      const reference = firebase.storage().ref('thoughts/'+imagePath);
+      console.log("putting file "+imagePath)
+      await reference.putFile(imageUrl);
+    }catch(err) {
+        console.log("error is "+err)
+    }
+}
+
 export async function getMinProfileUrl(token){
   if(!token) {
     token = User.uid
