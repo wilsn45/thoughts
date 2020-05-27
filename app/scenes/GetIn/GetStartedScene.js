@@ -19,6 +19,8 @@ var Spinner = require('react-native-spinkit');
        const {navigation} = props;
        const {navigate} = navigation;
 
+    let txtInput
+    let txtInputPassword
     //1 - DECLARE VARIABLES
     const [loginSelected, setLoginSelected] = useState(true);
     const [cred, setCred] = useState(null);
@@ -47,18 +49,19 @@ async function login() {
   setIsLoading(true)
 
   let resp = await api.login(cred,password)
-  if(!resp) {
+  console.log("resp is "+JSON.stringify(resp) )
+  if(resp.error) {
     setIsLoading(false)
     setError("oops! we are broken")
     return
   }
-  if(!resp.userExists) {
-    setError("No user found")
+  if(!resp.data.userExists) {
+    setError("No user exists with given email/username")
     setIsLoading(false)
     return
   }
-  await userStorage.initUser(resp.userInfo)
-  await api.getMinProfile(resp.userInfo.uid,resp.userInfo.sex)
+  await userStorage.initUser(resp.data.userInfo)
+  await api.getMinProfile(resp.data.userInfo.uid,resp.data.userInfo.sex)
   navigate('App')
 }
 
@@ -75,17 +78,19 @@ async function signUp() {
   setIsLoading(true)
 
   let resp = await api.signUp(email)
-  if(!resp) {
+  console.log("resp is "+JSON.stringify(resp) )
+  if(resp.error) {
     setIsLoading(false)
     setError("oops! we are broken")
     return
   }
-  if(resp.userExists) {
+  if(resp.data.userExists) {
     setError("An user already exists with this email id.")
     setIsLoading(false)
     return
   }
-  let pin = resp.pin
+  let pin = resp.data.pin
+  console.log("pin "+pin)
   setValidPin(pin)
   setShowVerifyPin(true)
   setIsLoading(false)
@@ -94,6 +99,9 @@ async function signUp() {
 
 function changeOption(value) {
   setLoginSelected(value)
+  txtInput.clear()
+  txtInputPassword.clear()
+  setError(null)
   if(value) {
       setCredPlaceholder("Username or Email")
       setPasswordPlaceholder("Password")
@@ -132,7 +140,6 @@ async function verifyPinCallBack(value) {
       return
     }
     setShowVerifyPin(false)
-    await userStorage.setUserData(email,password)
     navigate('SetUserInfo', {email : email, password : password});
   }
 }
@@ -168,6 +175,7 @@ return (
           autoFocus = {true}
           placeholder = {credPlaceholder}
           autoCapitalize='none'
+          ref={input => { txtInput = input }}
           placeholderTextColor = "#88898a"
          />
 
@@ -176,6 +184,7 @@ return (
           secureTextEntry={loginSelected}
           placeholder = {passwordPlaceholder}
           autoCapitalize='none'
+          ref={input => { txtInputPassword = input }}
           placeholderTextColor = "#88898a"
           />
 

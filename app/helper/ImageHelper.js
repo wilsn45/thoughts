@@ -23,12 +23,13 @@ export async function saveProfileBase64 (url){
     }
   })
   .catch((errorMessage, statusCode) => {
+			console.log("saveProfileBase64 error "+ errorMessage)
     reject(errorMessage)
  	 })
  	});
  }
  catch(err) {
-	console.log("file helper error "+ err)
+	console.log("saveProfileBase64 error "+ err)
  }
 }
 

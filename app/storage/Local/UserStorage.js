@@ -178,16 +178,6 @@ export async function getIsPrivate () {
 //   }
 // }
 
-export async function setUserData(email,password)  {
-  try {
-    await setUserEmail(email)
-    await setUserPassword(password)
-  }
-  catch (err) {
-    console.log("api addUser is "+err)
-    return null
-  }
-}
 
 export async function initUser(resp) {
    try {

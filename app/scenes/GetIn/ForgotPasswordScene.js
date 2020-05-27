@@ -48,24 +48,24 @@ useEffect(() => {
 }, []);
 
 async function verify() {
-  // navigate('SetUserInfo', {email : "skk.wilson@gmail.com", password : "kabir4577"});
   setIsLoading(true)
 
   let resp = await api.forgotPassword(input)
-  if(!resp) {
+  console.log("resp is "+JSON.stringify(resp) )
+  if(resp.error) {
     setIsLoading(false)
     setError("oops! we are broken")
     return
   }
-  if(!resp.userExists) {
+  if(!resp.data.userExists) {
     setError("No user exists with given email/username")
     setIsLoading(false)
     return
   }
-  let pin = resp.pin
+  let pin = resp.data.pin
   console.log("Pin is "+pin)
-  console.log("email is "+resp.email)
-  setEmail(resp.email)
+  console.log("email is "+resp.data.email)
+  setEmail(resp.data.email)
   setValidPin(pin)
   setShowVerifyPin(true)
   setIsLoading(false)
@@ -73,24 +73,16 @@ async function verify() {
 
 async function setPassword() {
   setIsLoading(true)
-  let resp = await api.updatePassword(email,input)
-  if(resp) {
-    let respLogin = await api.login(email,input)
-    if(!respLogin) {
-      setIsLoading(false)
-      setError("oops! we are broken")
-      return
-    }
-    if(!respLogin.userExists) {
-      setError("No user found")
-      setIsLoading(false)
-      return
-    }
-    await userStorage.initUser(respLogin.userInfo)
-    await api.getMinProfile(respLogin.userInfo.uid,respLogin.userInfo.sex)
-    navigate('App')
-  //  let resp = await api.login(username,input)
+  let resp = await api.setPassword(email,input)
+  console.log("resp is "+JSON.stringify(resp) )
+  if (resp.error) {
+    setIsLoading(false)
+    setError("oops! we are broken")
+    return
   }
+  await userStorage.initUser(resp.data.userInfo)
+  await api.getMinProfile(resp.data.userInfo.uid,resp.data.userInfo.sex)
+  navigate('App')
 }
 
 

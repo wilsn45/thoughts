@@ -83,16 +83,25 @@ async function setUserInfo(sex) {
     setIsLoading(true)
     setError(false)
     let resp =  await api.addUser(email,password,userName,sex)
-    if(resp) {
-      await userStorage.initUser(resp)
-      await api.getMinProfile(resp.uid,resp.sex)
-      navigate('App')
-
-    }else {
+    //console.log("resp is "+JSON.stringify(resp) )
+    if(resp.error) {
       setError(true)
     }
+    let custRsp = {
+      uid : resp.data.token,
+      username : userName,
+      sex : sex,
+      isPrivate : false
+    }
+    await userStorage.initUser(custRsp)
+    await api.getMinProfile(resp.data.token,sex)
+    console.log("image uploaded")
+    setIsLoading(false)
+    navigate('App')
+
   }catch (err) {
-    console.log("error is "+err)
+    console.log("erorr is "+err)
+    setError(true)
   }
 }
 

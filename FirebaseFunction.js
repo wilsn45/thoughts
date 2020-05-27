@@ -29,7 +29,7 @@ let transporter = nodemailer.createTransport({
 exports.signUp = functions.https.onRequest((req, resp) => {
 	try {
 
-		const email = req.query.email
+		const email = req.query.email.toLowerCase();
 		const usersRef = db.collection('secret')
 
 		usersRef.where("email", "==", email)
@@ -107,7 +107,7 @@ function sendEmail(email,isSignUp) {
 exports.addNewUser = functions.https.onRequest((req, resp) => {
 	try {
 
-		const email = req.query.email
+		const email = req.query.email.toLowerCase();
 		const password = req.query.password
 		const username = req.query.username
 		const sex = req.query.sex
@@ -158,7 +158,7 @@ exports.login = functions.https.onRequest((req, resp) => {
 
 		if(isEmail) {
 			secretQry = db.collection('secret')
-			.where("email", "==", cred)
+			.where("email", "==", cred.toLowerCase())
 			.where("password", "==", password)
 		}
 		else {
@@ -184,7 +184,7 @@ exports.login = functions.https.onRequest((req, resp) => {
  					 })
  					.catch(err => {
  						console.log("login failure", err)
- 						resp.status(200).send()
+ 						resp.status(400).send(new Error("Failed to process"))
  					})
      		});
 
@@ -239,7 +239,7 @@ exports.forgotPassword = functions.https.onRequest((req, resp) => {
 		const cred = req.query.cred
 
 		var re = /\S+@\S+\.\S+/;
-    let isEmail = re.test(String(cred).toLowerCase());
+    let isEmail = re.test(String(cred));
 
 		console.log("is email "+isEmail)
 
@@ -247,7 +247,7 @@ exports.forgotPassword = functions.https.onRequest((req, resp) => {
 
 		if(isEmail) {
 			secretQry = db.collection('secret')
-			.where("email", "==", cred)
+			.where("email", "==", cred.toLowerCase())
 		}
 		else {
 			secretQry = db.collection('secret')
@@ -289,6 +289,49 @@ exports.forgotPassword = functions.https.onRequest((req, resp) => {
 	}
 });
 
+
+
+
+exports.setPassword = functions.https.onRequest((req, resp) => {
+	try {
+
+		const email = req.query.email.toLowerCase()
+		const password = req.query.password
+
+
+		db.collection('secret')
+		.where("email", "==", email)
+			.get()
+			.then((snapshot) => {
+				if (snapshot.empty) {
+					resp.status(400).send()
+					return
+				}
+
+				snapshot.forEach(doc => {
+					db.collection('secret').doc(doc.id).update({password:password})
+					getUser(doc.data().username)
+ 					.then(data => {
+ 							resp.status(200).json({userInfo : data})
+ 							return
+ 					 })
+ 					.catch(err => {
+ 						console.log("setPassword failure", err)
+ 						resp.status(400).send(new Error("Failed to process"))
+ 					})
+     		});
+
+				return
+			})
+			.catch( err => {
+				console.log("setPassword failure", err)
+				resp.status(400).send(err)
+			});
+	}catch(error) {
+		console.log("setPassword failure", error)
+		resp.status(400).send(error)
+	}
+});
 
 //API to check if user is new to thoughts or not
 exports.getUserStatus = functions.https.onRequest((req, resp) => {
