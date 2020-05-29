@@ -8,6 +8,10 @@ const nodemailer = require('nodemailer')
 
 const { parse } = require('querystring');
 
+const USER = "user"
+const SECRET = "secret"
+const PEOPLE = "people"
+
 
 let transporter = nodemailer.createTransport({
 		service: 'gmail',
@@ -25,12 +29,12 @@ let transporter = nodemailer.createTransport({
 // const twilioNumber = "+12056904590"
 
 
-
+//************************************GET IN/STARTED**************************************************//
 exports.signUp = functions.https.onRequest((req, resp) => {
 	try {
 
 		const email = req.query.email.toLowerCase();
-		const usersRef = db.collection('secret')
+		const usersRef = db.collection(SECRET)
 
 		usersRef.where("email", "==", email)
 		.get()
@@ -125,9 +129,9 @@ exports.addNewUser = functions.https.onRequest((req, resp) => {
 				isPrivate : false
 		}
 
-		db.collection('secret').add(secretUser)
+		db.collection(SECRET).add(secretUser)
 		.then (docRef => {
-				db.collection('user').doc(docRef.id).set(newUser)
+				db.collection(USER).doc(docRef.id).set(newUser)
 				resp.status(200).json({token: docRef.id})
 				return
 		})
@@ -157,12 +161,12 @@ exports.login = functions.https.onRequest((req, resp) => {
 		let secretQry = null
 
 		if(isEmail) {
-			secretQry = db.collection('secret')
+			secretQry = db.collection(SECRET)
 			.where("email", "==", cred.toLowerCase())
 			.where("password", "==", password)
 		}
 		else {
-			secretQry = db.collection('secret')
+			secretQry = db.collection(SECRET)
 			.where("username", "==", cred)
 			.where("password", "==", password)
 		}
@@ -177,7 +181,7 @@ exports.login = functions.https.onRequest((req, resp) => {
 
 				snapshot.forEach(doc => {
       		console.log(doc.id, '=>', doc.data());
-					getUser(doc.data().username)
+					getUserDataUsername(doc.data().username)
  					.then(data => {
  							resp.status(200).json({userExists : true , userInfo : data})
  							return
@@ -203,7 +207,7 @@ exports.login = functions.https.onRequest((req, resp) => {
 
 function getUser(username) {
 	return new Promise((resolve,reject) => {
-		const usersRef = db.collection('user')
+		const usersRef = db.collection(USER)
 		usersRef
 		.where("username", "==", username)
 		.get()
@@ -231,8 +235,6 @@ function getUser(username) {
 	});
 }
 
-
-
 exports.forgotPassword = functions.https.onRequest((req, resp) => {
 	try {
 
@@ -246,11 +248,11 @@ exports.forgotPassword = functions.https.onRequest((req, resp) => {
 		let secretQry = null
 
 		if(isEmail) {
-			secretQry = db.collection('secret')
+			secretQry = db.collection(SECRET)
 			.where("email", "==", cred.toLowerCase())
 		}
 		else {
-			secretQry = db.collection('secret')
+			secretQry = db.collection(SECRET)
 			.where("username", "==", cred)
 		}
 
@@ -289,9 +291,6 @@ exports.forgotPassword = functions.https.onRequest((req, resp) => {
 	}
 });
 
-
-
-
 exports.setPassword = functions.https.onRequest((req, resp) => {
 	try {
 
@@ -299,7 +298,7 @@ exports.setPassword = functions.https.onRequest((req, resp) => {
 		const password = req.query.password
 
 
-		db.collection('secret')
+		db.collection(SECRET)
 		.where("email", "==", email)
 			.get()
 			.then((snapshot) => {
@@ -333,59 +332,18 @@ exports.setPassword = functions.https.onRequest((req, resp) => {
 	}
 });
 
-//API to check if user is new to thoughts or not
-exports.getUserStatus = functions.https.onRequest((req, resp) => {
-	try {
 
-		const authToken = req.headers.authorization
-		const usersRef = db.collection('user').doc(authToken)
-		usersRef.get()
-		.then((docSnapshot) => {
-			if (docSnapshot.exists) {
-				resp.status(200).send(docSnapshot.data())
-			}
-			else {
-				resp.status(200).send(null)
-			}
-			return
-		})
-		.catch( err => {
-			console.log("getUserStatus failure", err)
-			resp.status(400).send(new Error("Failed to process"))
-		});
-	}catch(error) {
-		console.log("getUserStatus failure", error)
-		resp.status(400).send(new Error("Failed to process"))
-	}
-});
-// .collection("user")
-// .where("username", "==", "daniya")
 
-// exports.isUserNameAvailable = functions.https.onRequest((req, resp) => {
-// 	try {
-// 		 let username = req.query.username
-// 		 console.log("got username = "+ username)
-//
-// 		let userRef = db.collection("user");
-// 	  let query = userRef.where("username", "==", username).get()
-// 	  .then(snapshot => {
-// 			if(snapshot.empty) {
-// 			resp.status(200).json({ isAvailable: true })
-// 		 }else {
-// 				resp.status(200).json({ isAvailable: false })
-// 			}
-// 			return
-// 		})
-// 	 .catch(err => {
-// 			console.log("isUserNameAvailable failure", err)
-// 			resp.status(400).send(new Error("Failed to process"))
-//  		});
-// 	}
-// 	catch(error) {
-// 		console.log("isUserNameAvailable failure", error)
-// 		resp.status(400).send(new Error("Failed to process"))
-// 	}
-// });
+
+
+
+
+
+
+
+
+
+//************************************USER PROFILE**************************************************//
 
 exports.getUserProfileOverView = functions.https.onRequest((req, resp) => {
 	try {
@@ -394,10 +352,10 @@ exports.getUserProfileOverView = functions.https.onRequest((req, resp) => {
      getUserData(useruid)
 		 .then( userData => {
 			 console.log("userData "+JSON.stringify(userData))
-			 	getUserInfo(useruid)
-				.then(userInfo => {
-					getMyData(myuid,useruid)
-						.then( myData => {
+			 	getUserData(myuid)
+				.then(myData => {
+				 getUserInfo(useruid)
+						.then( userInfo => {
 							let data = userOverviewResponseBuilder(userInfo,userData,myData,myuid,useruid)
 								resp.status(200).json(data)
 								return
@@ -429,17 +387,17 @@ exports.getUserProfileOverView = functions.https.onRequest((req, resp) => {
 
 function getUserData(useruid) {
 	return new Promise((resolve,reject) => {
-		const usersRef = db.collection('followers').doc(useruid)
+		const usersRef = db.collection(PEOPLE).doc(useruid)
 		usersRef.get()
 		.then((snapshot) => {
 			if (!snapshot.exists) {
 				reject(Error("User doesn't exist"))
 			}
-			 console.log("whole data "+JSON.stringify(snapshot.data()))
 			let data = {
 				blocked : snapshot.data().blocked,
 				pendings : snapshot.data().pendings,
-				isPrivate : snapshot.data().isPrivate
+				followers : snapshot.data().followers,
+				followings : snapshot.data().followings,
 			}
 			resolve(data)
 			return
@@ -452,7 +410,7 @@ function getUserData(useruid) {
 
 function getUserInfo(uid) {
 	return new Promise((resolve,reject) => {
-		const usersRef = db.collection('user').doc(uid)
+		const usersRef = db.collection(USER).doc(uid)
 		usersRef.get()
 		.then((snapshot) => {
 			if (!snapshot.exists) {
@@ -461,9 +419,7 @@ function getUserInfo(uid) {
 			let data = {
 				username : snapshot.data().username,
 				sex : snapshot.data().sex,
-				tags : snapshot.data().tags,
-				followersCount : snapshot.data().followersCount,
-				followingsCount : snapshot.data().followingsCount,
+				isPrivate : snapshot.data().isPrivate,
 			}
 			resolve(data)
 			return
@@ -476,45 +432,39 @@ function getUserInfo(uid) {
 
 }
 
-function getMyData(myuid,useruid) {
-	return new Promise((resolve,reject) => {
-		const usersRef = db.collection('followers').doc(myuid)
-		usersRef.get()
-		.then((snapshot) => {
-			if (!snapshot.exists) {
-				reject(Error("User doesn't exist"))
-			}
-			let followings = snapshot.data().followings
-			let blocked = snapshot.data().blocked
-			let isFollowing = false
-			for (user in followings) {
-				if(user === useruid) {
-					isFollowing = true
-				}
-			}
-			let data = {
-				isFollowing : isFollowing,
-				blocked : blocked
-			}
-			resolve(data)
-			return
-		})
-		.catch( err => {
-			reject(err)
-		});
-	});
-}
-
-
 function userOverviewResponseBuilder (userInfo,userData,myData,myuid,useruid) {
 
 	let userBlocked = userData.blocked
-	let userPendingRequest = userData.pendings
+	let userPendings = userData.pendings
+	let userFollowings = userData.followings
+	let userFollowers = userData.followers
 	let myBlocked =  myData.blocked
-	let isFollowing = myData.isFollowing
+
+	console.log("user followings "+userFollowings)
+	console.log("user followers "+userFollowers)
+	console.log("user pendings "+userPendings)
+	console.log("user blocked "+userBlocked)
+
+	let isFollowing = false
 	let youareblocked =  false
 	let youblocked = false
 	let isRequested = false
+	let followersCount = 0
+	let followingCount = 0
+
+	for (index in userFollowers) {
+		followersCount++
+	}
+
+	for (index in userFollowings) {
+		followingCount++
+	}
+
+	for (index in userFollowers) {
+		if(userFollowers[index] === myuid) {
+			isFollowing = true
+		}
+	}
 
 	for (index in userBlocked) {
 		if(userBlocked[index] === myuid) {
@@ -522,8 +472,8 @@ function userOverviewResponseBuilder (userInfo,userData,myData,myuid,useruid) {
 		}
 	}
 
-	for (index in userPendingRequest) {
-		if(userPendingRequest[index] === myuid) {
+	for (index in userPendings) {
+		if(userPendings[index] === myuid) {
 			isRequested = true
 		}
 	}
@@ -544,43 +494,15 @@ function userOverviewResponseBuilder (userInfo,userData,myData,myuid,useruid) {
 			isRequested: isRequested,
 			isFollowing: isFollowing,
 			isPrivate: userData.isPrivate,
-			followersCount : userInfo.followersCount,
-			followingsCount : userInfo.followingsCount,
+			followersCount : followersCount,
+			followingsCount : followingCount,
 			username : userInfo.username,
 			sex : userInfo.sex,
 			tags : userInfo.tags
 		}
 	}
-
 }
 
-
-exports.unfollow= functions.https.onRequest((req, resp) => {
-	try {
-		 let useruid = req.headers.useruid
-		 let myuid = req.headers.myuid
-		 removeFollowing(myuid,useruid)
-		 .then(mSuccess => {
-			 		removeFollower(useruid,myuid)
-					.then(tSuccess => {
-						resp.status(200).send()
-						updateCount(myuid,useruid)
-						return
-					})
-					.catch(err => {
-						resp.status(400).send(err)
-					})
-					return
-		 })
-		 .catch(err => {
-			 resp.status(400).send(err)
-		 })
-	}
-	catch(error) {
-		console.log("unfollowUser error is "+err)
-		resp.status(400).send(new Error("Failed to process"))
-	}
-});
 
 exports.follow = functions.https.onRequest((req, resp) => {
 	try {
@@ -596,7 +518,6 @@ exports.follow = functions.https.onRequest((req, resp) => {
 							addFollowing(myuid,useruid,followingusername)
 							.then(success => {
 									resp.status(200).send()
-									updateCount(myuid,useruid)
 									return
 							})
 							.catch(err => {
@@ -615,6 +536,31 @@ exports.follow = functions.https.onRequest((req, resp) => {
 	}
 });
 
+exports.unfollow= functions.https.onRequest((req, resp) => {
+	try {
+		 let useruid = req.headers.useruid
+		 let myuid = req.headers.myuid
+		 removeFollowing(myuid,useruid)
+		 .then(mSuccess => {
+			 		removeFollower(useruid,myuid)
+					.then(tSuccess => {
+						resp.status(200).send()
+						return
+					})
+					.catch(err => {
+						resp.status(400).send(err)
+					})
+					return
+		 })
+		 .catch(err => {
+			 resp.status(400).send(err)
+		 })
+	}
+	catch(error) {
+		console.log("unfollowUser error is "+err)
+		resp.status(400).send(new Error("Failed to process"))
+	}
+});
 
 
 exports.acceptRequest = functions.https.onRequest((req, resp) => {
@@ -628,7 +574,6 @@ exports.acceptRequest = functions.https.onRequest((req, resp) => {
 			 			addFollowing(useruid,myuid,followingusername)
 						.then(success => {
 							resp.status(200).send()
-							updateCount(myuid,useruid)
 							return
 						})
 						.catch(err => {
@@ -648,19 +593,20 @@ exports.acceptRequest = functions.https.onRequest((req, resp) => {
 
 exports.cancelRequest = functions.https.onRequest((req, resp) => {
 	try {
-		 let useruid = req.headers.useruid
-		 let myuid = req.headers.myuid
-		  removePendings(useruid,myuid)
+		 let from = req.headers.from
+		 let of = req.headers.of
+		  removePendings(from,of)
 		 .then(success => {
 			 			resp.status(200).send()
 					return
 		 })
 		 .catch(err => {
+			 console.log("cancelRequest error is "+err)
 			 resp.status(400).send(err)
 		 })
 	}
 	catch(error) {
-		console.log("followUser error is "+err)
+		console.log("cancelRequest error is "+error)
 		resp.status(400).send(error)
 	}
 });
@@ -714,7 +660,7 @@ exports.unblock = functions.https.onRequest((req, resp) => {
 
 function addFollowing(to,uid,username) {
 	return new Promise((resolve,reject) => {
-		const usersRef = db.collection('followers').doc(to)
+		const usersRef = db.collection(PEOPLE).doc(to)
 		usersRef.get()
 		.then((snapshot) => {
 		 if (!snapshot.exists) {
@@ -735,7 +681,7 @@ function addFollowing(to,uid,username) {
 
 function removeFollowing(from,uid) {
 	return new Promise((resolve,reject) => {
-		const usersRef = db.collection('followers').doc(from)
+		const usersRef = db.collection(PEOPLE).doc(from)
 		usersRef.get()
 		.then((snapshot) => {
 		 if (!snapshot.exists) {
@@ -756,12 +702,13 @@ function removeFollowing(from,uid) {
 
 function addFollowerIsPrivate(to,uid,username) {
 	return new Promise((resolve,reject) => {
-		const usersRef = db.collection('followers').doc(to)
+		const usersRef = db.collection(PEOPLE).doc(to)
 		usersRef.get()
 		.then((snapshot) => {
 		 if (!snapshot.exists) {
 			 reject(new Error("User doesn't exists"))
 		 }
+		 console.log("data is "+snapshot.data())
 		 let isPrivate = snapshot.data().isPrivate
 			if (isPrivate) {
 			 let pendings = snapshot.data().pendings
@@ -805,7 +752,7 @@ function addFollower(to,uid) {
 
 function removeFollowingBlock(from,uid) {
 	return new Promise((resolve,reject) => {
-		const usersRef = db.collection('followers').doc(from)
+		const usersRef = db.collection(PEOPLE).doc(from)
 		usersRef.get()
 		.then((snapshot) => {
 		 if (!snapshot.exists) {
@@ -828,7 +775,7 @@ function removeFollowingBlock(from,uid) {
 
 function removeFollower(from,uid) {
 	return new Promise((resolve,reject) => {
-		const usersRef = db.collection('followers').doc(from)
+		const usersRef = db.collection(PEOPLE).doc(from)
 		usersRef.get()
 		.then((snapshot) => {
 		 if (!snapshot.exists) {
@@ -847,37 +794,16 @@ function removeFollower(from,uid) {
 	});
 }
 
-function addPendings(to,uid) {
+function removePendings(from,of) {
 	return new Promise((resolve,reject) => {
-		const usersRef = db.collection('followers').doc(to)
+		const usersRef = db.collection(PEOPLE).doc(from)
 		usersRef.get()
 		.then((snapshot) => {
 		 if (!snapshot.exists) {
 			 reject(new Error("User doesn't exists"))
 		 }
 		 let pendings = snapshot.data().pendings
-		 pendings[uid] = username
-		 usersRef.update({pendings:updatedPendings});
-		 resolve(true)
-		 return
-	 })
-	 .catch( err => {
-			 console.log("addFollower error is "+err)
-		 reject(err)
-	 });
-	});
-}
-
-function removePendings(from,uid) {
-	return new Promise((resolve,reject) => {
-		const usersRef = db.collection('followers').doc(from)
-		usersRef.get()
-		.then((snapshot) => {
-		 if (!snapshot.exists) {
-			 reject(new Error("User doesn't exists"))
-		 }
-		 let pendings = snapshot.data().pendings
-		 delete pendings[uid]
+		 delete pendings[of]
 		 usersRef.update({pendings:pendings});
 		 resolve(true)
 		 return
@@ -891,7 +817,7 @@ function removePendings(from,uid) {
 
 function removePendingsAcceptRequest(from,uid,username) {
 	return new Promise((resolve,reject) => {
-		const usersRef = db.collection('followers').doc(from)
+		const usersRef = db.collection(PEOPLE).doc(from)
 		usersRef.get()
 		.then((snapshot) => {
 		 if (!snapshot.exists) {
@@ -914,7 +840,7 @@ function removePendingsAcceptRequest(from,uid,username) {
 
 function addingToBlock(to,uid,username) {
 	return new Promise((resolve,reject) => {
-		const usersRef = db.collection('followers').doc(to)
+		const usersRef = db.collection(PEOPLE).doc(to)
 		usersRef.get()
 		.then((snapshot) => {
 		 if (!snapshot.exists) {
@@ -931,38 +857,15 @@ function addingToBlock(to,uid,username) {
 		 return
 	 })
 	 .catch( err => {
-			 console.log("removeFollowingBlock error is "+err)
+			 console.log("addingToBlock error is "+err)
 		  reject(err)
-	 });
-	});
-}
-
-
-
-function addBlock(to,uid) {
-	return new Promise((resolve,reject) => {
-		const usersRef = db.collection('followers').doc(to)
-		usersRef.get()
-		.then((snapshot) => {
-		 if (!snapshot.exists) {
-			 reject(new Error("User doesn't exists"))
-		 }
-		 let blocked = snapshot.data().blocked
-		 blocked[uid] = username
-		 usersRef.update({blocked:updatedBlocked});
-		 resolve(true)
-		 return
-	 })
-	 .catch( err => {
-			 console.log("addBlock error is "+err)
-		 reject(err)
 	 });
 	});
 }
 
 function removeBlock(from,uid) {
 	return new Promise((resolve,reject) => {
-		const usersRef = db.collection('followers').doc(from)
+		const usersRef = db.collection(PEOPLE).doc(from)
 		usersRef.get()
 		.then((snapshot) => {
 		 if (!snapshot.exists) {
@@ -975,113 +878,10 @@ function removeBlock(from,uid) {
 		 return
 	 })
 	 .catch( err => {
-			 console.log("removePendings error is "+err)
+			 console.log("removeBlock error is "+err)
 		 reject(err)
 	 });
 	});
-}
-
-exports.updateCounts = functions.firestore
-    .document('followers/{user}')
-    .onUpdate((change, context) => {
-      const uid = context.params.user;
-      const newValue = change.after.data();
-			let followers = newValue.followers
- 		 	let followings = newValue.followings
- 		 	let followersCount = 0
- 		 	let followingsCount = 0
-
- 		 	for (user in followers) {
- 			 	followersCount = followersCount+1
- 		 	}
-
- 		  for (user in followings) {
- 			 	followingsCount = followingsCount+1
- 		 	}
-    	return db.collection('user').doc(uid).update({followersCount : followersCount,followingsCount : followingsCount})
-
-      // perform desired operations ...
-});
-
-
-function updateCount(myuid,useruid) {
-return new Promise((resolve,reject) => {
-		getCounts(myuid)
-		.then( myCount => {
-			  let myFollowersCount = myCount.followers
-				let myFollowingsCount = myCount.followings
-				usersRef.update({followersCount: myFollowersCount,followingsCount:myFollowingsCount});
-
-				getCounts(useruid)
-				.then( theirCount => {
-					let theirFollowersCount = theirCount.followers
-					let theirFollowingsCount = theirCount.followings
-					usersRef.update({followersCount: theirFollowersCount,followingsCount:theirFollowingsCount});
-					return
-				})
-				.catch(err => {
-					console.log("updateCount error is "+err)
-				})
-				return
-		})
-		.catch(err => {
-			console.log("updateCount error is "+err)
-		})
-});
-
-}
-
-function getCounts(uid) {
-	return new Promise((resolve,reject) => {
-		const usersRef = db.collection('followers').doc(uid)
-		usersRef.get()
-		.then((snapshot) => {
-		 if (!snapshot.exists) {
-			 reject(new Error("User doesn't exists"))
-		 }
-		 let followers = snapshot.data().followers
-		 let followings = snapshot.data().followings
-		 let followersCount = 0
-		 let followingCount = 0
-
-		 for (user in followers) {
-			 followersCount = followersCount+1
-		 }
-
-		 for (user in followings) {
-			 followingCount = followingCount+1
-		 }
-
-		 let count = {
-			 followers : followersCount,
-			 followings : followingCount
-		 }
-		 console.log("data is "+ JSON.stringify(count))
-		 resolve(count)
-		 return
-	 })
-	 .catch( err => {
-			 console.log("getCounts error is "+err)
-		 reject(err)
-	 });
-	});
-}
-
-
-
-
-function newUserOnBoard(number,authToken) {
-	console.log(" newUserOnBoarduser token is", authToken)
-	let newUserData = {
-		sex : "",
-		age : "",
-		country : "",
-		number : number,
-		activity_pool : {},
-		show : [],
-		see : []
-	}
-	return db.collection('user').doc(authToken).set(newUserData)
 }
 
 exports.replyOnThought = functions.https.onRequest((req, resp) => {

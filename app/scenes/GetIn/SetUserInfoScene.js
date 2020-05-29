@@ -95,7 +95,6 @@ async function setUserInfo(sex) {
     }
     await userStorage.initUser(custRsp)
     await api.getMinProfile(resp.data.token,sex)
-    console.log("image uploaded")
     setIsLoading(false)
     navigate('App')
 
