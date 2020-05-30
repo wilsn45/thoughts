@@ -176,7 +176,7 @@ function navigateToHome() {
       navigate('MyProfile')
       return
     }
-    updateFlags(navUid)
+     navigate('Profile',{uid : navUid})
   }catch(err) {
     console.log("err is "+err)
   }

@@ -27,24 +27,15 @@ export default function UserList ({closeCallBack,navigateCallBack,userInfo,uid,s
   async function getUserList() {
     try {
       let list = []
-      if(showFollowing) {
-        for (item in userInfo.followings) {
-          let user = {
-            uid : item,
-            username : userInfo.followings[item]
-          }
-          list.push(user)
+      let data = showFollowing ? userInfo.followings : userInfo.followers
+
+      for (item in data) {
+        let user = {
+          uid : item,
+          username : data[item]
         }
-      } else {
-        for (item in userInfo.followers) {
-          let user = {
-            uid : item,
-            username : userInfo.followers[item]
-          }
-          list.push(user)
-        }
+        list.push(user)
       }
-      console.log("list is "+JSON.stringify(list))
       setUserList(list)
     }
     catch(err) {
