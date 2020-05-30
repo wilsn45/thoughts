@@ -21,10 +21,10 @@ import PendingListModal  from "./PendingListModal";
 import  * as User  from "thoughts/app/User";
 
 export default function MyProfileScene(props) {
-  const[isLoading, setIsLoading] = useState(false);
   const[showUserList, setShowUserList] = useState(false);
   const[showFollowing, setShowFollowing] = useState(true);
   const[showPendings, setShowPendings] = useState(false);
+
   const { navigate } = useNavigation();
 
   const[followerCount, setFollowerCount] = useState(0);
@@ -44,36 +44,35 @@ export default function MyProfileScene(props) {
   }, []);
 
 async function loadProfile() {
-  let followers = await realm.getFollowers()
-  let followings = await realm.getFollowings()
-  setFollowerCount(followers.length)
-  setFollowingCount(followings.length)
+  let profileData = await realm.getProfileData()
+  setFollowerCount(profileData.followers.length)
+  setFollowingCount(profileData.followings.length)
   let picDataMin = await userStorage.getUserProfileMinBase64()
   setPicData(picDataMin)
-  let picDataMax = await api.getMaxProfileUrl()
+  let picDataMax = await api.getProfileURL(User.uid,User.sex,true)
   setPicData(picDataMax)
 }
 
 async function getUserFoProfileData () {
   try {
-    let userListPrimise =  api.getMyUserList()
-    let usrLst = await userListPrimise
+    let userListPrimise =  api.getMyProfile()
+    let usrLstResp = await userListPrimise
+    if(!usrLstResp.success) {
+      return
+    }
+    let flgList = usrLstResp.data.followings
+    let flwrList = usrLstResp.data.followers
 
-    let flgList = usrLst.followings
-    let flwrList = usrLst.followers
     if (flwrList) {
       setFollowerCount(Object.keys(flwrList).length)
     }
     if(flgList) {
       setFollowingCount(Object.keys(flgList).length)
     }
-    realm.updateFollowings(flgList)
-    realm.updateFollowers(flwrList)
   }
   catch (err) {
     console.log("here error is "+err)
   }
-  setIsLoading(false)
 }
 
 
@@ -110,19 +109,13 @@ function showPendingRequets() {
 }
 
 function closePendingRequets() {
-
   setShowPendings(false)
-  getUserFoProfileData()
 }
 
   return (
 
     <View style = {styles.main}>
-    {
-      isLoading &&
-      <Spinner  isVisible={true} size={50} type="Arc" color="#189afd"/>
-    }
-    { !isLoading &&
+
     <View style = {styles.superView}>
       <View style = {styles.headerView}>
 
@@ -170,7 +163,6 @@ function closePendingRequets() {
 
             <TouchableOpacity
             onPress={() => showPendingRequets()}
-            disabled={followingCount < 1 }
             underlayColor='#fff'
             >
               <Text style = {styles.followerText}> Pending Requests </Text>
@@ -189,7 +181,7 @@ function closePendingRequets() {
       </View>
 
     </View>
-   }
+
    <Modal isVisible={showUserList} swipeArea={50} style = {{alignSelf : "flex-end",width : '65%'}} >
       <MyUserListModal  closeCallBack = {modalCloseCallBack} navigateCallBack = {modalNavigateCallBack}
       showFollowing = {showFollowing}/>

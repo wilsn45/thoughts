@@ -4,39 +4,25 @@ import firestore from '@react-native-firebase/firestore';
 import { firebase } from '@react-native-firebase/storage';
 import * as c from "../storage/Constants";
 import React, { useState } from 'react';
-import * as imageHelper from "thoughts/app/helper/ImageHelper";
-const API_URL = "https://us-central1-thoughts-fe76a.cloudfunctions.net/"
 import * as  User  from "thoughts/app/User";
-//Google Map API Key : AIzaSyCr65NbaaL4JvLuuvr5-n9QYH_1YxCRT1Q
+import * as  Ext  from "./ServiceExt";
+import * as realm from "thoughts/app/storage/Realm/ProfileRealm";
 
-const usersCollection = firestore().collection('Users');
+
+const API_URL = "https://us-central1-thoughts-fe76a.cloudfunctions.net/"
+const BoyProfileMinURL = "https://firebasestorage.googleapis.com/v0/b/thoughts-fe76a.appspot.com/o/profile%2Fmin%2FBoy.jpg?alt=media&token=027441a9-1cc8-4a16-950a-47173c04687b"
+const GirlProfileMinURL = "https://firebasestorage.googleapis.com/v0/b/thoughts-fe76a.appspot.com/o/profile%2Fmin%2FGirl.jpg?alt=media&token=40a5f04d-390a-4562-a21f-f581056aeada"
+
+const BoyProfileMaxURL = "https://firebasestorage.googleapis.com/v0/b/thoughts-fe76a.appspot.com/o/profile%2Fmax%2FBoy.jpg?alt=media&token=7e641d75-7fc4-41ec-9005-51ee7c8f292a"
+const GirlProfileMaxURL = "https://firebasestorage.googleapis.com/v0/b/thoughts-fe76a.appspot.com/o/profile%2Fmax%2FGirl.jpg?alt=media&token=53c5e7b7-8d57-412a-8ba8-f16d177a5b31"
+const PEOPLE = "people"
+
 const storage = firebase.storage()
-let confirmation  = null
-
-//
-// export async function getProfileOverView(){
-//   return new Promise((resolve,reject) => {
-//     const userRef = firestore().collection('user').doc(User.uid);
-//      userRef.get()
-//      .then(snapshot => {
-//        if(!snapshot.exists) {
-//         reject(new Error("Oops, could'not fetch user details"))
-//        }
-//        resolve(snapshot)
-//
-//        return
-//      })
-//     .catch(err => {
-//       console.log("getProfileOverView error is "+err)
-//           reject(err)
-//       })
-//    });
-// }
 
 
-export async function getMyUserList(showFollowing){
+export async function getMyProfile(){
   return new Promise((resolve,reject) => {
-    const userRef = firestore().collection('followers').doc(User.uid);
+    const userRef = firestore().collection(PEOPLE).doc(User.uid);
      userRef.get()
      .then(snapshot => {
        if(!snapshot.exists) {
@@ -44,149 +30,71 @@ export async function getMyUserList(showFollowing){
        }
        let data = {
          followers : snapshot.get('followers'),
-         followings : snapshot.get('followings')
+         followings : snapshot.get('followings'),
+         pendings : snapshot.get('pendings'),
+         blocked : snapshot.get('blocked'),
+         isPrivate : snapshot.get('isPrivate')
        }
-       resolve(data)
+       console.log("updating profile data")
+       realm.updateProfileData(data)
+       resolve(Ext.responseBuilderFirestore(true,data))
       return
      })
     .catch(err => {
         console.log("getUserList is "+err)
-        reject(err)
+        reject(Ext.responseBuilderFirestore(false))
      });
-   });
-}
-export async function getUserList(uid,showFollowing){
-  return new Promise((resolve,reject) => {
-    const userRef = firestore().collection('followers').doc(uid);
-     userRef.get()
-     .then(snapshot => {
-       if(!snapshot.exists) {
-        reject(new Error("Oops, could'not fetch user list"))
-       }
-       if (showFollowing) {
-         resolve(snapshot.get('followings'))
-      }else {
-         resolve(snapshot.get('followers'))
-       }
-      return
-     })
-    .catch(err => {
-        console.log("getUserList is "+err)
-        reject(err)
-     });
-   });
-}
-
-export async function getBlockedUser(){
-  return new Promise((resolve,reject) => {
-    const userRef = firestore().collection('followers').doc(User.uid);
-     userRef.get()
-     .then(snapshot => {
-       if(!snapshot.exists) {
-        reject(new Error("Oops, could'not fetch user details"))
-       }
-       resolve(snapshot.get('blocked'))
-
-       return
-     })
-    .catch(err => {
-      console.log("getBlockedUser error is "+err)
-          reject(err)
-      })
-   });
-}
-
-export async function unblock(useruid){
-  return new Promise((resolve,reject) => {
-    const userRef = firestore().collection('followers').doc(User.uid);
-     userRef.get()
-     .then(snapshot => {
-       if(!snapshot.exists) {
-        reject(new Error("Oops, could'not fetch user details"))
-       }
-       let tmpBlock = {}
-       let blocked = snapshot.get('blocked')
-       for (user in blocked) {
-         if(user != useruid) {
-           tmpBlock[user] = blocked[user]
-         }
-      }
-      userRef.update({blocked:tmpBlock});
-       resolve(true)
-
-       return
-     })
-    .catch(err => {
-      console.log("unblock error is "+err)
-          reject(err)
-      })
-   });
-}
-
-export async function getPendingRequests(){
-  return new Promise((resolve,reject) => {
-    const userRef = firestore().collection('followers').doc(User.uid);
-     userRef.get()
-     .then(snapshot => {
-       if(!snapshot.exists) {
-        reject(new Error("Oops, could'not fetch user details"))
-       }
-       resolve(snapshot.get('pendings'))
-
-       return
-     })
-    .catch(err => {
-      console.log("getBlockedUser error is "+err)
-          reject(err)
-      })
    });
 }
 
 export async function setPrivate(state){
   return new Promise((resolve,reject) => {
-    const userRef = firestore().collection('user').doc(User.uid);
+    const userRef = firestore().collection(PEOPLE).doc(User.uid);
      userRef.get()
      .then(snapshot => {
        if(!snapshot.exists) {
         reject(new Error("Oops, could'not fetch user details"))
        }
        userRef.update({isPrivate:state});
-       resolve(true)
+       resolve(Ext.responseBuilderFirestore(true))
        return
      })
     .catch(err => {
       console.log("setPrivate error is "+err)
-          reject(err)
+      reject(Ext.responseBuilderFirestore(false))
       })
    });
 }
 
-export async function getMaxProfileUrl(token){
-  if(!token) {
-    token = User.uid
+export async function getProfileURL(token,max){
+ try {
+    let resourceName
+    if(max) {
+      resourceName = '/profile/max/'+token+'.jpg'
+    }
+    else {
+      resourceName = '/profile/min/'+token+'.jpg'
+    }
+    const ref = await storage.ref(resourceName)
+    return await ref.getDownloadURL();
   }
-  let resourceName = '/profile_pic_max/'+token+'.jpg'
-  const ref = await storage.ref(resourceName)
-  return await ref.getDownloadURL();
+  catch(err) {
+    if (User.sex == "Male") {
+      return max ? BoyProfileMaxURL : BoyProfileMinURL
+    }else {
+      return max ? GirlProfileMaxURL : GirlProfileMinURL
+    }
+  }
 }
 
-export async function getMinProfileUrl(token){
-  if(!token) {
-    token = User.uid
-  }
-  let resourceName = '/profile_pic_min/'+token+'.jpg'
-  const ref = await storage.ref(resourceName)
-  return await ref.getDownloadURL();
-}
 
 export async function getUserProfileOverView(useruid){
     try{
         let url = API_URL+"getUserProfileOverView?useruid="+useruid+"&&myuid="+User.uid
         let res = await axios.get(url);
-        console.log("response is "+JSON.stringify(res.data))
-        return res.data;
+        return Ext.responseBuilderAPI(res);
     }catch (e) {
-        throw handler(e);
+        return Ext.responseBuilderAPI(null)
     }
 }
 
@@ -200,13 +108,10 @@ export async function follow(useruid,followingname){
         useruid :useruid
       }
       let res = await axios.get(url, {headers});
-      if(res.status==200) {
-        return true
-      }
-      return false
+      return Ext.responseBuilderAPI(res)
   }catch (e) {
       console.log("api follow is "+e)
-      throw new Error(e);
+      return Ext.responseBuilderAPI(null)
   }
 }
 
@@ -218,13 +123,10 @@ export async function unfollow(useruid){
         useruid :useruid
       }
       let res = await axios.get(url, {headers});
-      if(res.status==200) {
-        return true
-      }else
-        return false
+      return Ext.responseBuilderAPI(res)
   }catch (e) {
       console.log("api unfollow is "+e)
-      throw new Error(e);
+      return Ext.responseBuilderAPI(null)
   }
 }
 
@@ -237,59 +139,26 @@ export async function acceptRequest(useruid,followerusername){
         useruid :useruid
       }
       let res = await axios.get(url, {headers});
-      if(res.status==200) {
-        return true
-      }
-      return false
+      return Ext.responseBuilderAPI(res)
   }catch (e) {
-      console.log("api cancelRequest is "+e)
-      throw new Error(e);
+      console.log("api acceptRequest is "+e)
+      return Ext.responseBuilderAPI(null)
   }
 }
 
-export async function rejectRequest(useruid){
-  return new Promise((resolve,reject) => {
-    const userRef = firestore().collection('followers').doc(User.uid);
-     userRef.get()
-     .then(snapshot => {
-       if(!snapshot.exists) {
-        reject(new Error("Oops, could'not fetch user details"))
-       }
-       let tmpPndg = {}
-       let reqs = snapshot.get('pendings')
-       for (user in reqs) {
-         if(user != useruid) {
-           tmpPndg[user] = reqs[user]
-         }
-      }
-      userRef.update({pendings:tmpPndg});
-       resolve(true)
-
-       return
-     })
-    .catch(err => {
-      console.log("rejectRequest error is "+err)
-          reject(err)
-      })
-   });
-}
-
-export async function cancelRequest(useruid){
+export async function cancelRequest(from,of){
   try{
       let url = API_URL+"cancelRequest"
       const headers = {
-        myuid: User.uid,
-        useruid :useruid
+        from: from,
+        of :of
       }
       let res = await axios.get(url, {headers});
-      if(res.status==200) {
-        return true
-      }
-      return false
+      return Ext.responseBuilderAPI(res)
   }catch (e) {
       console.log("api cancelRequest is "+e)
-      throw new Error(e);
-  }
+      return Ext.responseBuilderAPI(null)
+    }
 }
 
 export async function block(useruid,blockingusername){
@@ -300,31 +169,24 @@ export async function block(useruid,blockingusername){
         useruid :useruid
       }
       let res = await axios.get(url, {headers});
-      if(res.status==200) {
-        return true
-      }else
-        return false
-  }catch (e) {
+      return Ext.responseBuilderAPI(res)
+    }catch (e) {
       console.log("api block is "+e)
-      throw new Error(e);
-  }
+      return Ext.responseBuilderAPI(null)
+    }
 }
 
-// export async function unblock(useruid){
-//   try{
-//       let myuid = await userStorage.getUserToken()
-//       let url = API_URL+"unblock"
-//       const headers = {
-//         myuid: myuid,
-//         useruid :useruid
-//       }
-//       let res = await axios.get(url, {headers});
-//       if(res.status==200) {
-//         return true
-//       }else
-//         return false
-//   }catch (e) {
-//       console.log("api unfollow is "+e)
-//       throw new Error(e);
-//   }
-// }
+export async function unblock(useruid){
+  try{
+      let url = API_URL+"unblock"
+      const headers = {
+        myuid: User.uid,
+        useruid :useruid
+      }
+      let res = await axios.get(url, {headers});
+      return Ext.responseBuilderAPI(res)
+    }catch (e) {
+      console.log("api unblock is "+e)
+      return Ext.responseBuilderAPI(null)
+    }
+}

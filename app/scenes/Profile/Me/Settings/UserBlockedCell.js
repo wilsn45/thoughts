@@ -17,7 +17,7 @@ useEffect(() => {
 }, []);
 
 async function getURL() {
-  let url = await api.getMinProfileUrl(user.uid)
+  let url = await api.getProfileURL(user.uid,false)
   setProfileURL(url)
 }
 

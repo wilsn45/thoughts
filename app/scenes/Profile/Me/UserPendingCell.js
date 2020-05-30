@@ -10,20 +10,17 @@ import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 
 export default function UserPendingCell({user,acceptCallBack,rejectCallBack}) {
 const[profileURL, setProfileURL] = useState();
-const[isAccepting, setIsAccepting] = useState(false);
 
 useEffect(() => {
   getURL()
 }, []);
 
 async function getURL() {
-  let url = await api.getMinProfileUrl(user.uid)
+  let url = await api.getProfileURL(user.uid,false)
   setProfileURL(url)
 }
 
-
  async function acceptRequest() {
-   setIsAccepting(!isAccepting)
    acceptCallBack(user.uid,user.username)
  }
 
@@ -47,10 +44,10 @@ async function getURL() {
 
      <View style ={styles.pendingView}>
      <TouchableOpacity
-       style={ isAccepting ? styles.setButtonAcceptingView : styles.setButtonView}
+       style={  styles.setButtonView}
        onPress={() => acceptRequest()}
        underlayColor='#fff'>
-       <Text style={isAccepting ? styles.buttonAcceptingText : styles.buttonText}>Accept</Text>
+       <Text style={ styles.buttonText}>Accept</Text>
     </TouchableOpacity>
     <TouchableOpacity
              onPress={() => rejectRequest()}>
@@ -126,25 +123,8 @@ const styles = StyleSheet.create ({
     alignItems: "center",
     marginRight : 10
   },
-  setButtonAcceptingView: {
-    flex : 0.9,
-    height : '50%',
-    borderColor:'#C0C0C0',
-    borderWidth : 1,
-    borderRadius:10,
-    justifyContent:  "center",
-    alignItems: "center",
-    marginRight : 10
-  },
   buttonText: {
     color:'#189afd',
-    textAlign:'center',
-    fontSize: 17,
-    fontFamily: "Thonburi",
-    fontWeight : "100",
-  },
-  buttonAcceptingText: {
-    color:'#C0C0C0',
     textAlign:'center',
     fontSize: 17,
     fontFamily: "Thonburi",

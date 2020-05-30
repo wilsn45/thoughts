@@ -16,17 +16,17 @@ import { useNavigation, useNavigationParam} from 'react-navigation-hooks'
 import * as api from "thoughts/app/services/ProfileServices";
 import UserListModal from "./UserListModal";
 var Spinner = require('react-native-spinkit');
-
+import  * as User  from "thoughts/app/User";
 
 
 export default function ProfileScene(props) {
   const[isLoading, setIsLoading] = useState(true);
   const[showUserList, setShowUserList] = useState(false);
-  const[showOptions, setShowOptions] = useState(false);
   const[showFollowing, setShowFollowing] = useState(true);
   const { navigate } = useNavigation();
   let uid = useNavigationParam('uid');
   const[username, setUsername] = useState("");
+  const[userInfo, setUserInfo] = useState();
   const[followerCount, setFollowerCount] = useState(0);
   const[followingCount, setFollowingCount] = useState(0);
   const[sex, setSex] = useState("");
@@ -37,27 +37,29 @@ export default function ProfileScene(props) {
   const[isPrivate, setIsPrivate] = useState(true);
   const[buttonStyleCode, setButtonStyleCode] = useState(1);
 
-  const[blockText, setBlockText] = useState("Block");
+  const[blocked, setBlocked] = useState(false);
 
   useEffect(() => {
+    setIsLoading(true)
     getUserProfileData()
   }, []);
 
 async function getUserProfileData () {
   try {
-
     setUseruid(uid)
     let response = await api.getUserProfileOverView(uid)
+    setIsLoading(false)
 
-    if(response.youareblocked) {
-      setIsLoading(false)
+    console.log("response is "+JSON.stringify(response.data))
+
+    if(response.data.youareblocked) {
       navigatePop()
     }
-    else if(response.isFollowing) {
+    else if(response.data.isFollowing) {
       setStatus("Following")
       setButtonStyleCode(2)
     }
-    else if(response.isRequested) {
+    else if(response.data.isRequested) {
       setStatus("Requested")
       setButtonStyleCode(3)
     }
@@ -65,23 +67,40 @@ async function getUserProfileData () {
       setStatus("Follow")
       setButtonStyleCode(1)
     }
-    if(response.youblocked) {
-      setBlockText("Unblock")
+    if(response.data.youblocked) {
+      setBlocked(true)
+      setButtonStyleCode(2)
+      setStatus("Unblock")
     }
-    let followerCount = response.followersCount
-    let followingCount = response.followingsCount
-    setUsername(response.username)
-    setSex(response.sex)
-    setIsPrivate(response.isPrivate)
+    let _userInfo = {
+      followers : response.data.followers,
+      followings : response.data.followings
+    }
+    setUserInfo(_userInfo)
 
-    if (followerCount) {
-      setFollowerCount(followerCount)
+    let _followingsCount = 0
+    let _followersCount = 0
+
+    for (item in response.data.followings) {
+      _followingsCount++
     }
 
-    if(followingCount) {
-      setFollowingCount(followingCount)
+    for (item in response.data.followers) {
+      _followersCount++
     }
-    let profileURl = await api.getMaxProfileUrl(uid)
+
+    setFollowerCount(_followersCount)
+    setFollowingCount(_followingsCount)
+
+    console.log("followers count "+_followersCount)
+    console.log("followings count "+_followingsCount)
+
+    setUsername(response.data.username)
+    setSex(response.data.sex)
+    setIsPrivate(response.data.isPrivate)
+
+
+    let profileURl = await api.getProfileURL(uid,true)
     setProfileURL(profileURl)
     setIsLoading(false)
 
@@ -93,54 +112,53 @@ async function getUserProfileData () {
 }
 
 async function actionPerform() {
-  if(status == "Following") {
-    let status = await api.unfollow(useruid)
-    if(status) {
-      setFollowerCount(followerCount-1)
+  if(status == "Unblock") {
+    let res = await api.unblock(useruid)
+    if(res.success) {
+      setStatus("Follow")
+      setButtonStyleCode(1)
+      setBlocked(false)
+    }
+  }
+  else if(status == "Following") {
+    let res = await api.unfollow(useruid)
+    if(res.success) {
       setStatus("Follow")
       setButtonStyleCode(1)
     }
   }
   else if(status == "Requested") {
-    let status = await api.cancelRequest(useruid)
-    if(status) {
+    let res = await api.cancelRequest(useruid,User.uid)
+    if(res.success) {
       setStatus("Follow")
       setButtonStyleCode(1)
     }
   }
   else if(status == "Follow" && isPrivate) {
-    let status = await api.follow(useruid,username)
-    if(status) {
+    let res = await api.follow(useruid,username)
+    if(res.success) {
       setStatus("Requested")
       setButtonStyleCode(3)
     }
   }
   else {
-    let status = await api.follow(useruid,username)
-    if(status) {
-      setFollowerCount(followerCount+1)
+    let res = await api.follow(useruid,username)
+    if(res.success) {
       setStatus("Following")
       setButtonStyleCode(2)
     }
   }
+  getUserProfileData()
 }
 
 async function blockUnblock() {
-  if (blockText == "Block") {
-    let status = await api.block(useruid,username)
-    if(status) {
-      setFollowerCount(followerCount-1)
-      setStatus("Follow")
-      setButtonStyleCode(1)
-      setBlockText("Unblock")
-    }
-  }else {
-    let status = await api.unblock(useruid)
-    if(status) {
-      setBlockText("Block")
-    }
+  let res = await api.block(useruid,username)
+  if(res.success) {
+    setStatus("Unblock")
+    setButtonStyleCode(2)
+    setBlocked(true)
+    getUserProfileData()
   }
-  setShowOptions(false)
 }
 
 function modalCloseCallBack () {
@@ -151,32 +169,33 @@ function navigateToHome() {
     navigate('Home')
 }
 
- function modalNavigateCallBack (newuid) {
+ function modalNavigateCallBack (navUid) {
   try {
-    updateFlags(newuid)
+    if(navUid == User.uid) {
+      setShowUserList(false)
+      navigate('MyProfile')
+      return
+    }
+    updateFlags(navUid)
   }catch(err) {
     console.log("err is "+err)
   }
 }
- function updateFlags(newuid) {
-   uid = newuid
+ function updateFlags(navUid) {
+   uid = navUid
    setIsLoading(true)
    setShowUserList(false)
    getUserProfileData()
 }
 
-function navigateToFollowerCount() {
+function showFollowers() {
   setShowFollowing(false)
   setShowUserList(true)
 }
 
-function navigateToFollowingCount() {
+function showFollowings() {
   setShowFollowing(true)
   setShowUserList(true)
-}
-
-function openOptions() {
-    setShowOptions(true)
 }
 
 function buttonStyle() {
@@ -212,7 +231,6 @@ return (
       <Spinner  isVisible={true} size={50} type="Arc" color="#189afd"/>
     }
     { !isLoading &&
-      <TouchableWithoutFeedback onPress={() => {setShowOptions(false)}} accessible={false}>
     <View style = {styles.superView}>
       <View style = {styles.headerView}>
 
@@ -225,13 +243,16 @@ return (
         <Icon name={'chevron-left'}  style = {styles.messageView} size={40} />
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style = {styles.superViewHeader}
-        onPress={() => openOptions()}
-        underlayColor='#fff'
-       >
-       <Icon name={'menu'}  style = {styles.messageView} size={30} />
-      </TouchableOpacity>
+     { !blocked &&
+       <TouchableOpacity
+         style = {styles.superViewHeader}
+         onPress={() => blockUnblock()}
+         underlayColor='#fff'
+        >
+        <Icon name={'slash'}  style = {styles.messageView} size={30} />
+       </TouchableOpacity>
+     }
+
 
 
       </View>
@@ -242,21 +263,21 @@ return (
         <Image style={sex == "female" ? styles.imageViewFemale : styles.imageViewMale} source={{uri: profileURL}}/>
       </View>
        <View style = {styles.userinfoView}>
-          <TouchableOpacity
-          onPress={() => navigateToFollowerCount()}
-          disabled={followerCount < 1 }
-          underlayColor='#fff'
-          >
-          <Text style = {styles.followerText}> {followerCount > 0 ? "Followers " +followerCount : "Followers" } </Text>
-          </TouchableOpacity>
+        <TouchableOpacity
+         onPress={() => showFollowers()}
+         disabled={followerCount < 1 }
+         underlayColor='#fff'
+         >
+         <Text style = {styles.followerText}> {followerCount > 0 ? "Followers " +followerCount : "Followers" } </Text>
+         </TouchableOpacity>
 
-          <TouchableOpacity
-          onPress={() => navigateToFollowingCount()}
-          disabled={followingCount < 1 }
-          underlayColor='#fff'
-          >
-            <Text style = {styles.followerText}> {followingCount > 0 ? "Followings " +followingCount : "Followings" } </Text>
-          </TouchableOpacity>
+         <TouchableOpacity
+         onPress={() => showFollowings()}
+         disabled={followingCount < 1 }
+         underlayColor='#fff'
+         >
+           <Text style = {styles.followerText}> {followingCount > 0 ? "Followings " +followingCount : "Followings" } </Text>
+        </TouchableOpacity>
 
           <TouchableOpacity
           onPress={() => actionPerform()}
@@ -276,32 +297,11 @@ return (
       </View>
 
     </View>
-    </TouchableWithoutFeedback>
    }
    <Modal isVisible={showUserList} swipeArea={50} style = {{alignSelf : "flex-end",width : '65%'}} >
-      <UserListModal  closeCallBack = {modalCloseCallBack} navigateCallBack = {modalNavigateCallBack} uid = {useruid} showFollowing = {showFollowing}/>
+      <UserListModal  closeCallBack = {modalCloseCallBack} navigateCallBack = {modalNavigateCallBack} uid = {useruid} userInfo = {userInfo} showFollowing = {showFollowing}/>
    </Modal>
-   {showOptions &&
-     <View style = {styles.optionView}>
-              <TouchableOpacity
-              onPress={() => hideView()}
-              underlayColor='#fff'
-              style = {styles.optionButtonView}
-              >
-                <Text style={styles.optionButtonText}> Hide Posts </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-              onPress={() => blockUnblock()}
-              underlayColor='#fff'
-              style = {styles.optionButtonView}
-              >
-                <Text style={styles.optionButtonText}> {blockText} </Text>
-              </TouchableOpacity>
-
-        </View>
-      }
-    </View>
+  </View>
 
     );
 }

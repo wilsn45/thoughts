@@ -44,13 +44,8 @@ export default function SettingsScene(props) {
      navigate('MyProfile')
   }
 
-  function showThoughtOptions() {
-    setShowThought(!showThought)
-  }
-
-
-  function modalCloseCallBack() {
-      setShowSelectModal(false)
+  function showBlockedUser() {
+    setShowBlockedList(true)
   }
 
   function modalBlockCloseCallBack() {

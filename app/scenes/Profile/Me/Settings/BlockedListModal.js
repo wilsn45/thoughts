@@ -20,41 +20,28 @@ export default function BlockedListModal ({closeCallBackBlock}) {
 
   useEffect(() => {
     setTitle("Blocked")
-    loadList()
+    getUserList()
   }, []);
 
-  async function loadList () {
-
-    let userListPromise =  api.getBlockedUser()
-    let list = await userListPromise
-    let dicArray = getUserDictArray(list)
-    setUserList(dicArray)
-    setIsLoading(false)
-}
-
-function getUserDictArray(userList) {
-  let dicArray = []
-   for (var user in userList) {
-     let dic = {
-       uid : user,
-       username : userList[user]
-     }
-    dicArray.push(dic)
+  async function getUserList() {
+    try {
+      let profileData =  await realm.getProfileData()
+      let list = profileData.blocked
+      setUserList(list)
+    }
+    catch(err) {
+      console.log("error is "+err)
+    }
   }
-  return dicArray
-}
+
 
 async function unblockUser(uid) {
   try {
     console.log("unblock this one "+uid)
     await api.unblock(uid)
-    let tmpBlock = []
-    let blocked = userList
-    for (index in blocked) {
-      if(blocked[index].uid != uid) {
-        tmpBlock.push(blocked[index])
-      }
-    }
+    let tmpBlock = userList.filter( obj =>  {
+      return obj.uid !== uid;
+    });
     if(tmpBlock.length<1) {
       closeCallBackBlock()
     }
@@ -69,12 +56,8 @@ async function unblockUser(uid) {
 return (
 
   <View style = {styles.main}>
-  {
-    isLoading &&
-    <Spinner  isVisible={true} size={50} type="Arc" color="#189afd"/>
-  }
-  { !isLoading &&
-     userList &&
+
+  { userList &&
     <View style = {styles.superView}>
       <View style = {styles.headerView}>
       <TouchableOpacity

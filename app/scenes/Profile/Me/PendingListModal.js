@@ -10,9 +10,9 @@ import Icon from 'react-native-vector-icons/Feather';
 import * as realm from "thoughts/app/storage/Realm/ProfileRealm";
 import * as api from "thoughts/app/services/ProfileServices";
 var Spinner = require('react-native-spinkit');
+import * as  User  from "thoughts/app/User";
 
 export default function PendingListModal ({closeCallBackPending}) {
-  const[isLoading, setIsLoading] = useState(true);
   const[userList, setUserList] = useState(null);
   const[title, setTitle] = useState("");
   let selectedList = []
@@ -20,40 +20,26 @@ export default function PendingListModal ({closeCallBackPending}) {
 
   useEffect(() => {
     setTitle("Pending Requests")
-    loadList()
+    getUserList()
   }, []);
 
-  async function loadList () {
-
-    let userListPromise =  api.getPendingRequests()
-    let list = await userListPromise
-    let dicArray = getUserDictArray(list)
-    setUserList(dicArray)
-    setIsLoading(false)
-}
-
-function getUserDictArray(userList) {
-  let dicArray = []
-   for (var user in userList) {
-     let dic = {
-       uid : user,
-       username : userList[user]
-     }
-    dicArray.push(dic)
+  async function getUserList() {
+    try {
+      let profileData =  await realm.getProfileData()
+      let list = profileData.pendings
+      setUserList(list)
+    }
+    catch(err) {
+      console.log("error is "+err)
+    }
   }
-  return dicArray
-}
 
 function rejectRequest(uid) {
   try {
-    api.rejectRequest(uid)
-    let tmpPnd = []
-    let pendings = userList
-    for (index in pendings) {
-      if(pendings[index].uid != uid) {
-        tmpPnd.push(pendings[index])
-      }
-    }
+    api.cancelRequest(User.uid,uid)
+    let tmpPnd = userList.filter( obj =>  {
+      return obj.uid !== uid;
+    });
     if(tmpPnd.length<1) {
       closeCallBackPending()
     }
@@ -68,13 +54,9 @@ function acceptRequest(uid,username) {
   try {
     console.log("accept this one "+uid)
     api.acceptRequest(uid,username)
-    let tmpPnd = []
-    let pendings = userList
-    for (index in pendings) {
-      if(pendings[index].uid != uid) {
-        tmpPnd.push(pendings[index])
-      }
-    }
+    let tmpPnd = userList.filter( obj =>  {
+      return obj.uid !== uid;
+    });
     if(tmpPnd.length<1) {
       closeCallBackPending()
     }
@@ -90,10 +72,6 @@ return (
 
   <View style = {styles.main}>
   {
-    isLoading &&
-    <Spinner  isVisible={true} size={50} type="Arc" color="#189afd"/>
-  }
-  { !isLoading &&
      userList &&
     <View style = {styles.superView}>
       <View style = {styles.headerView}>

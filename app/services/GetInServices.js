@@ -24,11 +24,11 @@ export async function signUp(email){
     let url = API_URL+"signUp?email="+email
       console.log("url is "+url)
       let res = await axios.get(url);
-      return Ext.responseBuilder(res)
+      return Ext.responseBuilderAPI(res)
 
   }catch (e) {
       console.log("api follow is "+e)
-      return Ext.responseBuilder(null)
+      return Ext.responseBuilderAPI(null)
   }
 }
 
@@ -37,10 +37,10 @@ export async function login(cred,password){
      let url = API_URL+"login?cred="+cred+"&&password="+password
       console.log("url is "+url)
       let res = await axios.get(url);
-      return Ext.responseBuilder(res)
+      return Ext.responseBuilderAPI(res)
   }catch (e) {
       console.log("api login is "+e)
-      return Ext.responseBuilder(null)
+      return Ext.responseBuilderAPI(null)
   }
 }
 
@@ -50,10 +50,10 @@ export async function addUser(email,password,username,sex){
     let url = API_URL+"addNewUser?email="+email+"&&password="+password+"&&username="+username+"&&sex="+sex
     console.log("url is "+url)
     let res = await axios.get(url);
-    return Ext.responseBuilder(res)
+    return Ext.responseBuilderAPI(res)
   }catch (e) {
       console.log("api addUser is "+e)
-      return Ext.responseBuilder(null)
+      return Ext.responseBuilderAPI(null)
   }
 }
 
@@ -63,10 +63,10 @@ export async function forgotPassword(cred){
     let url = API_URL+"forgotPassword?cred="+cred
       console.log("url is "+url)
       let res = await axios.get(url);
-      return Ext.responseBuilder(res)
+      return Ext.responseBuilderAPI(res)
   }catch (e) {
       console.log("api forgotPassword is "+e)
-      return Ext.responseBuilder(null)
+      return Ext.responseBuilderAPI(null)
   }
 }
 
@@ -75,10 +75,10 @@ export async function setPassword(email,password){
      let url = API_URL+"setPassword?email="+email+"&&password="+password
       console.log("url is "+url)
       let res = await axios.get(url);
-      return Ext.responseBuilder(res)
+      return Ext.responseBuilderAPI(res)
   }catch (e) {
       console.log("api login is "+e)
-      return Ext.responseBuilder(null)
+      return Ext.responseBuilderAPI(null)
   }
 }
 
@@ -123,29 +123,30 @@ export async function getMinProfile(token,sex){
     });
 }
 
-export async function getMostPopularTags(){
-  return new Promise((resolve,reject) => {
-     const userRef = firestore().collection('tags');
-     let tags = []
-     userRef.orderBy('impression', 'desc').limit(10).get()
-     .then(snapshot => {
-       if(snapshot.empty) {
-        reject(new Error("Oops, could'not fetch tags"))
-       }
-       snapshot.forEach(doc => {
-         tags.push(doc.id)
-         resolve(tags)
-       });
-       return
-     })
-    .catch(err => {
-        reject(err)
-     });
-   });
-}
-
 export async function getMinProfileUrl(token){
   let resourceName = '/profile/min/'+token+'.jpg'
   const ref = await storage.ref(resourceName)
   return await ref.getDownloadURL();
 }
+
+
+// export async function getMostPopularTags(){
+//   return new Promise((resolve,reject) => {
+//      const userRef = firestore().collection('tags');
+//      let tags = []
+//      userRef.orderBy('impression', 'desc').limit(10).get()
+//      .then(snapshot => {
+//        if(snapshot.empty) {
+//         reject(new Error("Oops, could'not fetch tags"))
+//        }
+//        snapshot.forEach(doc => {
+//          tags.push(doc.id)
+//          resolve(tags)
+//        });
+//        return
+//      })
+//     .catch(err => {
+//         reject(err)
+//      });
+//    });
+// }

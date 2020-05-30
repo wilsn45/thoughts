@@ -17,31 +17,27 @@ useEffect(() => {
 }, []);
 
 async function getURL() {
-  let url = await api.getMinProfileUrl(user.uid)
+  let url = await api.getProfileURL(user.uid,false)
   setProfileURL(url)
 }
 async function navigateToUser() {
   await userStorage.setViewingUserToken()
 }
   return (
+    <TouchableOpacity
+        onPress={() => cellNavigateCallBack(user.uid)}
+        underlayColor='#fff'>
     <View style = {styles.container}>
     <View style = {styles.leftView}>
-
-      <TouchableOpacity
-          onPress={() => cellNavigateCallBack(user.uid)}
-          underlayColor='#fff'>
-          <Image style={styles.imageView} source={{uri: profileURL}}/>
-        </TouchableOpacity>
+      <Image style={styles.imageView} source={{uri: profileURL}}/>
     </View>
 
 
     <View style = {styles.rightView}>
     <Text style = {styles.usernameText}> {user.username} </Text>
     </View>
-
-
-
 	</View>
+  </TouchableOpacity>
   );
 };
 

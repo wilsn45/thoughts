@@ -11,11 +11,9 @@ import * as api from "thoughts/app/services/ProfileServices";
 import UserCell  from "thoughts/app/components/UserCell";
 
 
-export default function UserList ({closeCallBack,navigateCallBack,uid,showFollowing}) {
-  const[isLoading, setIsLoading] = useState(true);
+export default function UserList ({closeCallBack,navigateCallBack,userInfo,uid,showFollowing}) {
   const[userList, setUserList] = useState(null);
   const[title, setTitle] = useState("");
-
 
   useEffect(() => {
     if (showFollowing) {
@@ -28,39 +26,39 @@ export default function UserList ({closeCallBack,navigateCallBack,uid,showFollow
 
   async function getUserList() {
     try {
-      let userListPromise =  api.getUserList(uid,showFollowing)
-      let list = await userListPromise
-      let dicArray = getUserDictArray(list)
-      setUserList(dicArray)
+      let list = []
+      if(showFollowing) {
+        for (item in userInfo.followings) {
+          let user = {
+            uid : item,
+            username : userInfo.followings[item]
+          }
+          list.push(user)
+        }
+      } else {
+        for (item in userInfo.followers) {
+          let user = {
+            uid : item,
+            username : userInfo.followers[item]
+          }
+          list.push(user)
+        }
+      }
+      console.log("list is "+JSON.stringify(list))
+      setUserList(list)
     }
     catch(err) {
       console.log("error is "+err)
     }
-    setIsLoading(false)
-  }
+}
 
-  function getUserDictArray(userList) {
-    let dicArray = []
-     for (var user in userList) {
-       let dic = {
-         uid : user,
-         username : userList[user]
-       }
-      dicArray.push(dic)
-    }
-    return dicArray
-  }
 
 
 return (
 
   <View style = {styles.main}>
   {
-    isLoading &&
-    <Spinner  isVisible={true} size={50} type="Arc" color="#189afd"/>
-  }
-  {
-    !isLoading && userList &&
+     userList &&
     <View style = {styles.superView}>
       <View style = {styles.headerView}>
       <TouchableOpacity

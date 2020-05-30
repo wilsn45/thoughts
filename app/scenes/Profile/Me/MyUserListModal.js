@@ -7,13 +7,12 @@ import {View,
         Text} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 var Spinner = require('react-native-spinkit');
-import * as api from "thoughts/app/services/ProfileServices";
+import * as realm from "thoughts/app/storage/Realm/ProfileRealm";
 import UserCell  from "thoughts/app/components/UserCell";
 import  * as User  from "thoughts/app/User";
 
 
 export default function MyUserList ({closeCallBack,navigateCallBack,showFollowing}) {
-  const[isLoading, setIsLoading] = useState(true);
   const[userList, setUserList] = useState(null);
   const[title, setTitle] = useState("");
 
@@ -28,39 +27,21 @@ export default function MyUserList ({closeCallBack,navigateCallBack,showFollowin
 
   async function getUserList() {
     try {
-      let userListPromise =  api.getUserList(User.uid,showFollowing)
-      let list = await userListPromise
-      let dicArray = getUserDictArray(list)
-      setUserList(dicArray)
+      let profileData =  await realm.getProfileData()
+      let list = showFollowing ? profileData.followings : profileData.followers
+      setUserList(list)
     }
     catch(err) {
       console.log("error is "+err)
     }
-    setIsLoading(false)
   }
-
-  function getUserDictArray(userList) {
-    let dicArray = []
-     for (var user in userList) {
-       let dic = {
-         uid : user,
-         username : userList[user]
-       }
-      dicArray.push(dic)
-    }
-    return dicArray
-  }
-
 
 return (
 
   <View style = {styles.main}>
+
   {
-    isLoading &&
-    <Spinner  isVisible={true} size={50} type="Arc" color="#189afd"/>
-  }
-  {
-    !isLoading && userList &&
+   userList &&
     <View style = {styles.superView}>
       <View style = {styles.headerView}>
       <TouchableOpacity
@@ -125,13 +106,4 @@ const styles = StyleSheet.create({
         marginTop : 15
     }
 
-
-
 });
-
-
-// <FlatList
-//   data={userList}
-//   renderItem={({ user }) => <UserCell username={user.username} profileURL = {user.profileURL} />}
-//   keyExtractor={user => user.username}
-//   />
