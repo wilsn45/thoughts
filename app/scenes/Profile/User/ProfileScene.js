@@ -18,7 +18,6 @@ import UserListModal from "./UserListModal";
 var Spinner = require('react-native-spinkit');
 import  * as User  from "thoughts/app/User";
 
-
 export default function ProfileScene(props) {
   const[isLoading, setIsLoading] = useState(true);
   const[showUserList, setShowUserList] = useState(false);
@@ -31,7 +30,7 @@ export default function ProfileScene(props) {
   const[followingCount, setFollowingCount] = useState(0);
   const[sex, setSex] = useState("");
   const[profileURL, setProfileURL] = useState();
-  const[useruid, setUseruid] = useState(useruid);
+
 
   const[status, setStatus] = useState(null);
   const[isPrivate, setIsPrivate] = useState(true);
@@ -46,11 +45,8 @@ export default function ProfileScene(props) {
 
 async function getUserProfileData () {
   try {
-    setUseruid(uid)
     let response = await api.getUserProfileOverView(uid)
     setIsLoading(false)
-
-    console.log("response is "+JSON.stringify(response.data))
 
     if(response.data.youareblocked) {
       navigatePop()
@@ -92,13 +88,9 @@ async function getUserProfileData () {
     setFollowerCount(_followersCount)
     setFollowingCount(_followingsCount)
 
-    console.log("followers count "+_followersCount)
-    console.log("followings count "+_followingsCount)
-
     setUsername(response.data.username)
     setSex(response.data.sex)
     setIsPrivate(response.data.isPrivate)
-
 
     let profileURl = await api.getProfileURL(uid,true)
     setProfileURL(profileURl)
@@ -113,7 +105,7 @@ async function getUserProfileData () {
 
 async function actionPerform() {
   if(status == "Unblock") {
-    let res = await api.unblock(useruid)
+    let res = await api.unblock(uid)
     if(res.success) {
       setStatus("Follow")
       setButtonStyleCode(1)
@@ -121,28 +113,28 @@ async function actionPerform() {
     }
   }
   else if(status == "Following") {
-    let res = await api.unfollow(useruid)
+    let res = await api.unfollow(uid)
     if(res.success) {
       setStatus("Follow")
       setButtonStyleCode(1)
     }
   }
   else if(status == "Requested") {
-    let res = await api.cancelRequest(useruid,User.uid)
+    let res = await api.cancelRequest(uid,User.uid)
     if(res.success) {
       setStatus("Follow")
       setButtonStyleCode(1)
     }
   }
   else if(status == "Follow" && isPrivate) {
-    let res = await api.follow(useruid,username)
+    let res = await api.follow(uid,username)
     if(res.success) {
       setStatus("Requested")
       setButtonStyleCode(3)
     }
   }
   else {
-    let res = await api.follow(useruid,username)
+    let res = await api.follow(uid,username)
     if(res.success) {
       setStatus("Following")
       setButtonStyleCode(2)
@@ -152,7 +144,7 @@ async function actionPerform() {
 }
 
 async function blockUnblock() {
-  let res = await api.block(useruid,username)
+  let res = await api.block(uid,username)
   if(res.success) {
     setStatus("Unblock")
     setButtonStyleCode(2)
@@ -165,28 +157,27 @@ function modalCloseCallBack () {
     setShowUserList(false)
 }
 
-function navigateToHome() {
-    navigate('Home')
+function navigateBack() {
+  navigation.goBack()
 }
 
  function modalNavigateCallBack (navUid) {
   try {
+    setShowUserList(false)
     if(navUid == User.uid) {
-      setShowUserList(false)
       navigate('MyProfile')
       return
     }
-     navigate('Profile',{uid : navUid})
+    navigate( {
+      routeName :'Profile',
+      params : {uid : navUid},
+      key : navUid
+    })
   }catch(err) {
     console.log("err is "+err)
   }
 }
- function updateFlags(navUid) {
-   uid = navUid
-   setIsLoading(true)
-   setShowUserList(false)
-   getUserProfileData()
-}
+
 
 function showFollowers() {
   setShowFollowing(false)
@@ -236,7 +227,7 @@ return (
 
       <TouchableOpacity
         style = {styles.superViewHeader}
-        onPress={() => navigateToHome()}
+        onPress={() => navigateBack()}
         underlayColor='#fff'
        >
 
@@ -299,7 +290,7 @@ return (
     </View>
    }
    <Modal isVisible={showUserList} swipeArea={50} style = {{alignSelf : "flex-end",width : '65%'}} >
-      <UserListModal  closeCallBack = {modalCloseCallBack} navigateCallBack = {modalNavigateCallBack} uid = {useruid} userInfo = {userInfo} showFollowing = {showFollowing}/>
+      <UserListModal  closeCallBack = {modalCloseCallBack} navigateCallBack = {modalNavigateCallBack} uid = {uid} userInfo = {userInfo} showFollowing = {showFollowing}/>
    </Modal>
   </View>
 

@@ -43,8 +43,6 @@ export default function UserList ({closeCallBack,navigateCallBack,userInfo,uid,s
     }
 }
 
-
-
 return (
 
   <View style = {styles.main}>

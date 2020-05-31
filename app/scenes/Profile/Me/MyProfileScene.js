@@ -91,7 +91,11 @@ function navigateToHome() {
 
 async function modalNavigateCallBack (uid) {
    setShowUserList(false)
-   navigate('Profile',{uid : uid})
+   navigate( {
+     routeName :'Profile',
+     params : {uid : uid},
+     key : uid
+   })
 }
 
 function navigateToFollowerCount() {
