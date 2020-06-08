@@ -3,7 +3,7 @@ import {StyleSheet, View, Text} from 'react-native';
 import { StackActions } from 'react-navigation';
 import { useAuth } from "thoughts/app/provider";
 var Spinner = require('react-native-spinkit');
-import {AuthStatus} from "thoughts/app/storage/Constants"
+import {AuthStatus} from "thoughts/app/storage/constants"
 import * as userStorage from "thoughts/app/storage/Local/UserStorage";
 
 export default function AuthLoading(props) {
@@ -17,7 +17,7 @@ export default function AuthLoading(props) {
     async function initialize() {
         try {
              let status = await getAuthState();
-            
+
              if (status == AuthStatus.ACTIVATED) {
                 navigate('App');
              }

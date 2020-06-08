@@ -5,7 +5,7 @@ import  * as User  from "thoughts/app/User";
 
 //IMPORT REDUCER, INITIAL STATE AND ACTION TYPES
 import reducer, {initialState, LOGGED_IN, LOGGED_OUT} from "./reducer";
-import {AuthStatus} from "thoughts/app/storage/Constants"
+import {AuthStatus} from "thoughts/app/storage/constants"
 
 // CONFIG KEYS [Storage Keys]===================================
 export const TOKEN_KEY = 'token';
