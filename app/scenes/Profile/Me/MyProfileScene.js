@@ -57,8 +57,10 @@ async function getUserFoProfileData () {
   try {
     let userListPrimise =  api.getMyProfile()
     let usrLstResp = await userListPrimise
+
     if(!usrLstResp.success) {
-      return
+      console.log("response failed")
+      navigate('Home')
     }
     let flgList = usrLstResp.data.followings
     let flwrList = usrLstResp.data.followers
@@ -72,6 +74,7 @@ async function getUserFoProfileData () {
   }
   catch (err) {
     console.log("here error is "+err)
+    navigate('Home')
   }
 }
 

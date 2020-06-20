@@ -34,13 +34,13 @@ export async function getMyProfile(){
          blocked : snapshot.get('blocked'),
          isPrivate : snapshot.get('isPrivate')
        }
-       console.log("updating profile data")
+       //console.log("updating profile data",JSON.stringify(data))
        realm.updateProfileData(data)
        resolve(Ext.responseBuilderFirestore(true,data))
       return
      })
     .catch(err => {
-        console.log("getUserList is "+err)
+        console.log("getMyProfile is "+err)
         reject(Ext.responseBuilderFirestore(false))
      });
    });
