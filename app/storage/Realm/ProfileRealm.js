@@ -59,7 +59,7 @@ return new Promise((resolve,reject) => {
             blocked.push({uid: user, username: data.blocked[user]});
           }
       });
-      //realm.close();
+      realm.close();
       resolve(true)
   })
   .catch(error => {

@@ -33,6 +33,7 @@ function AuthProvider(props) {
             User.username = username
             User.sex = sex
             User.isPrivate = isPrivate
+            console.log("uid is "+User.uid)
             return AuthStatus.ACTIVATED
 
         } catch (error) {

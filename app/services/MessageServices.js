@@ -125,6 +125,9 @@ export async function postImage(imageUrl){
       const reference = firebase.storage().ref('thoughts/'+imagePath);
       console.log("putting file "+imagePath)
       await reference.putFile(imageUrl);
+      const ref = await storage.ref('thoughts/'+imagePath)
+      return await ref.getDownloadURL();
+
     }catch(err) {
         console.log("error is "+err)
     }

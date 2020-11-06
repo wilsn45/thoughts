@@ -13,7 +13,7 @@ import {View,
   import ImagePicker from 'react-native-image-picker';
   import ImageView from "thoughts/app/components/ImageViewComponent";
   import * as imageHelper from "thoughts/app/helper/ImageHelper";
-  import * as messageapi from "thoughts/app/services/MessageServices";
+  import * as thoughtsAPI from "thoughts/app/services/MessageServices";
 
   const options = {
     title: 'Select Image',
@@ -134,10 +134,33 @@ import {View,
         let imageArray = []
         if(imageOne) {
           console.log("before compression "+imageOne.uri);
-          // let newImage = await imageHelper.getResizedImage(imageOne.uri)
-          // console.log("new compressed image is "+newImage)
-          await messageapi.postImage(imageOne.uri)
-          console.log("image uploaded")
+          let url1  = await thoughtsAPI.postImage(imageOne.uri)
+          imageArray.put(url1)
+        }
+        if(imageTwo) {
+          console.log("before compression "+imageTwo.uri);
+          let url2  = await thoughtsAPI.postImage(imageTwo.uri)
+          imageArray.put(url2)
+        }
+        if(imageThree) {
+          console.log("before compression "+imageThree.uri);
+          let url3  = await thoughtsAPI.postImage(imageThree.uri)
+          imageArray.put(url3)
+        }
+        if(imageFour) {
+          console.log("before compression "+imageFour.uri);
+          let url4  = await thoughtsAPI.postImage(imageFour.uri)
+          imageArray.put(url4)
+        }
+        if(imageFive) {
+          console.log("before compression "+imageFive.uri);
+          let url5  = await thoughtsAPI.postImage(imageFive.uri)
+          imageArray.put(url5)
+        }
+        if(imageSix) {
+          console.log("before compression "+imageSix.uri);
+          let url6  = await thoughtsAPI.postImage(imageSix.uri)
+          imageArray.put(url6)
         }
       }catch(err) {
         console.log(err);
@@ -278,10 +301,13 @@ import {View,
       <Icon name={"list"} color={"gray"} size={32}  />
       </TouchableOpacity>
 
-      <TouchableOpacity style = {styles.postBottomView}
-      onPress={() => onPostClick()}>
-      <Text style = {styles.postText}> post </Text>
-      </TouchableOpacity>
+      <View style = {styles.sendSuperView}>
+        <TouchableOpacity style = {styles.postBottomView}
+        onPress={() => onPostClick()}>
+        <Icon name={"arrow-right"} color={"#149cea"} size={40}  />
+        </TouchableOpacity>
+      </View>
+
 
       </View>
       </View>
@@ -339,28 +365,24 @@ import {View,
       paddingLeft : 10
     },
     toolView : {
-      flex : 0.1,
-      marginTop : 10,
+      flex : 0.08,
       width : '100%',
       borderColor: "blue",
       // borderWidth : 1,
-      flexDirection : "row"
+      flexDirection : "row",
+
     },
     toolOption : {
-      marginTop : 10,
-      marginLeft : 30,
-      marginRight : 10,
+     height : '100%',
+     width : '25%',
+     // borderWidth : 1,
     },
+    sendSuperView : {
+      height : '100%',
+      width : '45%',
+      // borderWidth : 1,
+      flexDirection : 'row-reverse',
 
-    postBottomView : {
-      marginLeft : 100,
     },
-    postText : {
-      fontSize: 26,
-      fontFamily: "Thonburi",
-      color : "#63b1bf",
-      alignSelf : "center"
-    }
-
 
   });

@@ -88,15 +88,6 @@ async function navigateToProfile() {
        {picData && <Image style={styles.profileView} source={{uri: picData}}/>}
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style = {styles.superViewHeader}
-        onPress={() => navigateToAMessages()}
-        underlayColor='#fff'
-       >
-       <Icon name={'message-square'}  style = {styles.messageView} size={40} />
-      </TouchableOpacity>
-
-
       </View>
 
       <View style = {styles.centerView}>
@@ -184,7 +175,7 @@ async function navigateToProfile() {
         onPress={() => navigateToAMessages()}
         underlayColor='#fff'
        >
-       <Icon name={'zap'}  style = {styles.zapView} size={50} />
+       <Icon name={'message-square'}  style = {styles.zapView} size={50} />
       </TouchableOpacity>
 
       </View>
